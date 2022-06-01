@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+
+<body>
+  <script>
+    let obj1 = {
+      val: [1],
+      name: '电流',
+      unit: 'A',
+    };
+    let obj2 = {
+      val: 2,
+      name: '温度',
+      unit: 'C',
+    };
+    let obj3 = {
+      val: {
+        xxx1: {
+          val: 3,
+          name: '音量2',
+          unit: 'db',
+        },
+        xxx2: {
+          val: 4,
+          name: '音量3',
+          unit: 'dh',
+        },
+      },
+      name: '音量',
+    };
+    let obj4 = {
+      val: [
+        {
+          xxx3: {
+            val: 5,
+            name: '福特',
+            unit: 'V',
+          },
+          xxx4: {
+            val: 6,
+            name: 'lgbt',
+            unit: 'bt',
+          },
+        },
+      ],
+      name: '电压',
+    };
+    // 找到最底层数据后使用标识符停止上一层
+    // let flag = false;
+    function get_val3 (data, oldobj) {
+      if (typeof data === 'object') {
+        for (let [key, val] of Object.entries(data)) {
+          // if (!flag) {
+          get_val3(val, data);
+          // }
+        }
+      } else {
+        console.log(oldobj.val, oldobj.name, oldobj.unit);
+        // flag = true;
+      }
+    }
+    function get_val4 (data, old) {
+      // if (typeof data === 'object') {
+      console.log(data)
+      for (let [key, value] of Object.entries(data)) {
+        if (typeof value === 'object') {
+          get_val4(value, data);
+        } else {
+          console.log(old.val, old.name, old.unit);
+        }
+      }
+      // } else {
+
+      // }
+    }
+    get_val3(obj2.val, obj2)
+    // get_val4(obj2.val, obj2);
+  </script>
+</body>
+
+</html>
