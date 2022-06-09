@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+
+<body>
+  <button id="test1id">1111111</button>
+  <script>
+    function test1 () {
+      console.log('触发1')
+      return () => {
+        console.log('触发return')
+      }
+    }
+    // document.getElementById('test1id').onclick = () => {
+    //   console.log('出发外层')
+    //   return () => {
+    //     console.log('触发return')
+    //   }
+    // }
+    // document.getElementById('test1id').onclick = test1()
+    // document.getElementById('test1id').addEventListener('click', () => {
+    //   console.log('出发外层')
+    //   return () => {
+    //     console.log('触发return')
+    //   }
+    // })
+    document.getElementById('test1id').addEventListener('click', test1)
+    // 加了括号就会执行return里的方法  不加只会执行外层语句
+  </script>
+</body>
+
+</html>

@@ -53,35 +53,54 @@
       name: '电压',
     };
     // 找到最底层数据后使用标识符停止上一层
-    // let flag = false;
+    let flag = false
     function get_val3 (data, oldobj) {
       if (typeof data === 'object') {
         for (let [key, val] of Object.entries(data)) {
-          // if (!flag) {
-          get_val3(val, data);
-          // }
+          if (!flag) {
+            get_val3(val, data)
+          }
         }
       } else {
-        console.log(oldobj.val, oldobj.name, oldobj.unit);
-        // flag = true;
+        console.log('参数1', oldobj.val)
+        console.log('参数2', oldobj.name)
+        console.log('参数3', oldobj.unit)
+        flag = true
       }
     }
-    function get_val4 (data, old) {
-      // if (typeof data === 'object') {
-      console.log(data)
-      for (let [key, value] of Object.entries(data)) {
-        if (typeof value === 'object') {
-          get_val4(value, data);
-        } else {
-          console.log(old.val, old.name, old.unit);
+    function get_val4 (data) {
+      let keys = Object.keys(data)
+      if (keys.indexOf('unit') != -1) {
+        console.log(data.val, data.name, data.unit)
+      } else if (typeof data === 'object') {
+        for (let [key, value] of Object.entries(data)) {
+          get_val4(value)
         }
       }
-      // } else {
-
-      // }
     }
-    get_val3(obj2.val, obj2)
+    // get_val3(obj2.val, obj2)
     // get_val4(obj2.val, obj2);
+    function xxx (obj) {
+      switch (obj.datatype.type) {
+        case 'array':
+          if (Object.keys(obj.datatype.specs).indexOf('unitname') != -1) {
+            //取出obj.datatype.specs属性值
+          } else {
+            obj.datatype.specs.item.properties.forEach(e => {
+              xxx(e)
+            })
+          }
+          break
+        case 'struct':
+          obj.datatype.properties.forEach(e => {
+            xxx(e)
+          })
+          break;
+        default:
+          //取出obj.datatype.specs属性值
+          break;
+      }
+    }
   </script>
 </body>
 
