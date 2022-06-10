@@ -162,7 +162,7 @@ Tips：①使用“**flex-grow**/flex-shrink”可以控制元素自动填充，
 
 line-height是行高，在一行中字体是默认居中的，当行高与块级元素高度相同，字体就垂直居中了。
 
-**页面居中**：绝对或相对定位、top等属性设为0、margin：auto；左右居中就left，right为0，margin：auto（**但是会拉伸未设宽高的地方**）
+**页面居中**：绝对或相对定位、top等属性设为0、margin：auto；左右居中就left，right为0，margin：auto（==但是会拉伸未设宽高的地方==）
 
 ​         left：50%（移动边缘），margin-left：半径负数（再往回拉半径的距离就居中了）
 
