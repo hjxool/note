@@ -2,17 +2,31 @@
 
 [echarts饼图样式](https://www.jianshu.com/p/3c7523cc7a6b)
 
-------
 
-**tooltip**额外的小功能，包括配置鼠标滑过或者点击后的显示框；
+## 提示框：tooltip
 
-trigger：触发方式；
+- 额外的小功能，包括配置鼠标滑过或者点击后的显示框；
 
-formatter：以何种方式显示内容
+- trigger：触发方式；
 
-legend：图例显示方式；包括位置、大小、内容等；只要series中写了data[ ]，legend中的data就可以省略
+- formatter：以何种方式显示内容
 
-axispointer：坐标轴指示器，默认为line直线，cross十字准星，shadow阴影
+  - 简单模板：
+
+  ![简单模板](C:\Users\admin\AppData\Roaming\Typora\typora-user-images\image-20220614175753017.png)
+
+  - 自定义模板：
+
+    ```js
+    formatter:(params)=>{
+        params里有表格所有内容，取出重新排布以后
+        return 字符串内容
+    }
+    ```
+
+- legend：图例显示方式；包括位置、大小、内容等；只要series中写了data[ ]，legend中的data就可以省略
+
+- axispointer：坐标轴指示器，默认为line直线，cross十字准星，shadow阴影
 
 ------
 
@@ -107,12 +121,6 @@ Tips：
   ·**grid**·和轴线中的·**网格(splitLine)**·注意区分，前者是轴线以内的所有内容(**grid默认不显示**)，后者是分割线  在grid里设置网格样式、大小，但是默认是不会铺满整个canvas，距离上部的距离可以通过Y轴最大值调整，左右距离可以通过left、right负值
 
   ·**grid：{show：true}**·时才能设置样式
-
-------
-
-**提示框：**
-
-  ·**tooltip：{trigger}**·如何触发显示
 
 ------
 
