@@ -5,29 +5,12 @@
 - 二次封装就是“vue.component{}”中写入element ui等其他组件，并用**“prop”**属性从component外传入element ui元素内，“原生事件”还是写在组件内
 - 目前element ui不支持Vue3
 - element搭配自适应效果并不好，因为**内部**都有最小的**绝对尺寸**，比如padding之类的，扩大还行，但如果小到一定程度，就无法达到很小的效果了，像”input输入框“之类的**自动填充组件**可以被”**父容器**“压缩，但是“button按钮”之类**本身就不大的组件**，靠“父容器”**无法**进行**压缩**
-- element组件的方法传入参数时，必须用`**:或者v-bind**`
-
-------
-
-给elementUI绑定自定义事件是不行的，必须要事件后加“**.native**”属性
-
-------
-
-使用自定义icon：必须用before > content占位，并将文字隐藏才能显示出来自定义图标
-
-------
-
-element中的label属性是标签对应的值，如果标签后无文字labels属性就充当文字
-
-------
-
-**table**的**列标签**可以加**“class-name”**属性添加样式
-
-table标签下**添加样式**有**xxx-class-name:"className"**和**:xxx-class-name:"function({row,index}){if(index==n){return 'className}}"**两种形式
-
-对于需要转换的标识符使用**“:formatter”**函数，其中默认传递的第一个参数**“row”**包含对象数据，第二个参数**“column”**包含element自己定义的一些属性方法(一般用不到)
-
-插入单个元素用slot即可，但如果一个单元格内有多个元素标签呢？使用**“<template slot-scope='scope(固定名称)'”**，表示一个范围域；他可以获取到表格每一行数据，scope包含“row（每一行的数据）”、“column”、“$index（每一行索引值）”、“store（table 内部的状态管理）”
+- element组件的方法传入参数时，必须用`或者v-bind`
+- 给elementUI绑定自定义事件是不行的，必须要事件后加“**.native**”属性
+- 使用自定义icon：必须用`before下的content`占位，并将文字隐藏才能显示出来自定义图标
+- element中的label属性是标签对应的值，如果标签后无文字labels属性就充当文字
+- 对于需要转换的标识符使用**“:formatter”**函数，其中默认传递的第一个参数**“row”**包含对象数据，第二个参数**“column”**包含element自己定义的一些属性方法(一般用不到)
+- 插入单个元素用slot即可，但如果一个单元格内有多个元素标签呢？使用**“<template slot-scope='scope(固定名称)'”**，表示一个范围域；他可以获取到表格每一行数据，scope包含“row（每一行的数据）”、“column”、“$index（每一行索引值）”、“store（table 内部的状态管理）”
 
 
 ## 树形控件：
@@ -112,3 +95,17 @@ el-radio-button
 
 - [el-time-select]()：是精确到**分钟**的时间选择器，`picker-options`格式只能是`start：xxx，step：xxx，end：xxx`
 - [el-time-picker]()：精确到**秒**。`picker-options`格式只能是`selectableRange: '18:30:00 - 20:30:00'`
+
+## 选择器
+
+- 当==value==是==对象==时，就不再需要用`:key="xxx.id"`来绑定key了，必须要使用`value-key`(注意此处是[自动取所选对象的==第一层键值==]())
+
+  - ```js
+    数据：[{id:1,value:'asdas'},{id:2,value:'123'}]
+    HTML：<el-select v-model="xxx" value-key="id"/>
+    ```
+
+## 表格
+
+- **table**的**列标签**可以加**“class-name”**属性添加样式
+  - table标签下**添加样式**有**xxx-class-name:"className"**和**:xxx-class-name:"function({row,index}){if(index==n){return 'className}}"**两种形式
