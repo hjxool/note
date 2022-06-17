@@ -1,4 +1,4 @@
-### 变化：
+## 变化：
 
 1. vue3中·**<template>**·下不再需要·**根元素**·
 
@@ -45,11 +45,10 @@
 8. ·**toRef/toRefs**·：当想用·**简写**·形式，而不是·对象.xxx.xxx·时，会进行这么个操作·**name:person.name**·，而这个操作取出的数据赋值给新变量，其实只进行了基础数据类型的赋值，就·**失去**·了·**响应性**·。·**toRef**·的作用正在于此，它将对象中的·基础数据类型·与·源对象·进行了一次·桥接，使其进行了关联，操作·**name:toRef(person.name)**·中的·**name**·不是一个·**新的变量**·，而是·响应式·的从·**源对象**·身上得到的
    - ·**toRefs**·使用方法：在setup()返回值中·return { **...**toRefs(**对象**) }·，在HTML结构中用·{{对象中**第一层**的**基础类型数据**}}·，直接取用，而不需要·object.xxx·这样来使用。但是·**仅限第一层**·，其下的对象依然是·proxy·
 
-------
 
-### 创建组件
+## 创建组件
 
-![img](https://upload-images.jianshu.io/upload_images/6322775-5708bc097d7f0416.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+![](https://upload-images.jianshu.io/upload_images/6322775-5708bc097d7f0416.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
 
 ​	要用对象的形式，对象名就是组件标签名称
 
@@ -79,9 +78,7 @@ vue3方法创建的实例对象，不能直接使用，只有在 `mount()` 挂�
 
 使用防抖函数包裹function会改变原有 `xxx(){}` 的写法
 
-------
-
-### 组件新写法：
+## 组件新写法：
 
 ![img](https://upload-images.jianshu.io/upload_images/6322775-98fc500bb756ae16.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
 
@@ -95,9 +92,7 @@ vue3方法创建的实例对象，不能直接使用，只有在 `mount()` 挂�
 
 vue时间修饰符
 
-------
-
-### 响应性
+## 响应性
 
 vue2.x中的“provide/inject”在vue3中进化了，更增加了**响应性**
 
@@ -115,9 +110,21 @@ vue2.x中的“provide/inject”在vue3中进化了，更增加了**响应性**
 
 ​    现在的vue3还不是正式版本，“inject”传入的值需要“.value”，不然会有双引号
 
-------
+- 组件式写法
 
-### vue3新增watchEffect：
+  - ```js
+    上级组件：
+    	import {reactive,provide} from 'vue'
+    	let xxx = reactive({aaa:'asdas',bbb:'2222'})
+        provide('键名'，xxx)
+    子级组件：
+    	import {inject} from 'vue'
+    	let xxx2 = inject('键名')
+        直接调用：xxx2.aaa/xxx2.bbb
+    ```
+
+
+## vue3新增watchEffect：
 
   不指定监听对象，只指定回调，当使用和依赖数据变化时会触发回调
 
@@ -125,9 +132,7 @@ vue2.x中的“provide/inject”在vue3中进化了，更增加了**响应性**
 
   与**watch**的**不同**：watch是每个监听对象，都可以有不同的回调；而·watchEffect·是共用回调
 
-------
-
-### vue3新增hook函数：
+## vue3新增hook函数：
 
   简单来讲就是将主干部分写的复用功能放到外部js文件中，再通过import导入使用，乍看似乎就是封装方法复用，平平无奇，但是在vue3之前或者JS原生方法中，封装的方法无法做到响应性
 
@@ -135,13 +140,11 @@ vue2.x中的“provide/inject”在vue3中进化了，更增加了**响应性**
 
 ​    1、因为export导出的是一个函数，因此必须要有返回值以供其他组件使用
 
-------
-
-### Vue脚手架创建：
+## Vue脚手架创建：
 
 ![img](https://upload-images.jianshu.io/upload_images/6322775-a3fc6b3b9e436def.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
 
-### 尚硅谷课程方向
+## 尚硅谷课程方向
 
 ![img](https://upload-images.jianshu.io/upload_images/6322775-45d8605da3191c36.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
 
