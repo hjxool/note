@@ -109,3 +109,8 @@ el-radio-button
 
 - **table**的**列标签**可以加**“class-name”**属性添加样式
   - table标签下**添加样式**有**xxx-class-name:"className"**和**:xxx-class-name:"function({row,index}){if(index==n){return 'className}}"**两种形式
+- 表格也有树形展示功能
+
+## Tabs标签页
+
+- 点击选项==name必须==是==字符串==，因此如果是遍历用索引当分页切换，必须要`:name="index+''"`，将数字转换类型
