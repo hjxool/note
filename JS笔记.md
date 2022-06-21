@@ -186,15 +186,17 @@ function init(){ }
 
 ## JS原生方法：
 
-  sort(function(a，b){a-b或b-a})数组按照function规则排序，默认返回两个值，根据计算方式返回-∞~+∞的值，根据这个值对数组元素排序，**改变原数组**；
+- sort(function(a，b){a-b或b-a})数组按照function规则排序，默认返回两个值，根据计算方式返回-∞~+∞的值，根据这个值对数组元素排序，**改变原数组**；
 
-![img](https://upload-images.jianshu.io/upload_images/6322775-012863efdd40e26c.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+![21312323](https://upload-images.jianshu.io/upload_images/6322775-012863efdd40e26c.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
 
-a，b是任意两个数，但始终遵循以上规则，“大于0，a后。小于0，a前”
+<center>a，b是任意两个数，但始终遵循以上规则，“大于0，a后。小于0，a前”</center>
 
 ![img](https://upload-images.jianshu.io/upload_images/6322775-fafbed922eb002cb.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
 
-因此，当出现如下情况时，可以看到**只要是**“a-b”，始终是**升序**，而“b-a”则反之
+<center>因此，当出现如下情况时，可以看到**只要是**“a-b”，始终是**升序**，而“b-a”则反之</center>
+
+- 区分==对象==和==数组==：`xxx.constructor === Array/Object`或者`xxx instanceof Array/Object`或者`Array.isArray(xxx) //true或false`
 
 ### Array方法：
 
