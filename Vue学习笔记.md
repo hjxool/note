@@ -1,4 +1,4 @@
-## vue2.xx-1
+# vue2.xx-1
 
 1. [取对象数组下的属性值](https://blog.csdn.net/qq_31293575/article/details/81132506)
 2. 不同数组的数据不能拼接成一个列表
@@ -122,7 +122,7 @@ new Vue({
 ![](https://upload-images.jianshu.io/upload_images/6322775-bc13d5b9e904797a.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
 37. script引入vue，需要在div之后加载
 
-## vue2.xx-2
+# vue2.xx-2
 
 ### Tips：
 
@@ -558,33 +558,24 @@ provide是个函数，内部用return形式返回一个“prop属性”
 
 局部注册
 
-------
-
-### underscore.js组件:
+## underscore.js组件:
 
 ​    防抖**_.debounce(函数名**(只能写函数名调用，不能直接写函数)**，延迟)**
 
-------
+## $refs对象
 
-### $refs对象
+- 可以获取到用ref=“name”注册的**dom元素**或者**component实例对象**；
 
-​	可以获取到用ref=“name”注册的**dom元素**或者**component实例对象**；
+- 但是ref不是响应式，不能用v-bind；
 
-​    但是ref不是响应式，不能用v-bind；
+- ref是在渲染结束后才存在，created的时候还不存在；
+- 避免在component和计算属性中应用；
+- 用在**v-for**中会返回子组件**数组**；
+- 通过“vue.**$ref.name**”(标签中使用过ref属性的都会被$ref对象记录在册)获取到整个标签对象
+- **※**·**ref节点**·**===**·event.**currentTarget**·
+- 有==多个同名==`ref对象`时，会`this.$refs.ref对象`会得到一个数组
 
-​    ref是在渲染结束后才存在，created的时候还不存在；
-
-​    避免在component和计算属性中应用；
-
-​    用在**v-for**中会返回子组件**数组**；
-
-​    通过“vue.**$ref.name**”(标签中使用过ref属性的都会被$ref对象记录在册)获取到整个标签对象
-
-​    **※**·**ref节点**·**===**·event.**currentTarget**·
-
-------
-
-### VueAPI：
+## VueAPI：
 
 #### 		set/$set(target，key，value)：
 
