@@ -11,6 +11,7 @@
 - element中的label属性是标签对应的值，如果标签后无文字labels属性就充当文字
 - 对于需要转换的标识符使用**“:formatter”**函数，其中默认传递的第一个参数**“row”**包含对象数据，第二个参数**“column”**包含element自己定义的一些属性方法(一般用不到)
 - 插入单个元素用slot即可，但如果一个单元格内有多个元素标签呢？使用**“<template slot-scope='scope(固定名称)'”**，表示一个范围域；他可以获取到表格每一行数据，scope包含“row（每一行的数据）”、“column”、“$index（每一行索引值）”、“store（table 内部的状态管理）”
+- 需要用`this.$refs.xxx.$refs.input`才能修改到elementUI的控件节点
 
 
 ## 树形控件：
