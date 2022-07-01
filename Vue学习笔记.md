@@ -609,9 +609,11 @@ provide是个函数，内部用return形式返回一个“prop属性”
 
 ### Vue动画：
 
-  使用`**<transition/>**`标签包裹要显示的内容，并用`**v-enter等-active**`事先定义好动画，在<transition/>中的元素显示或隐藏等生命周期时会自动应用v-开头的css
+  使用`<transition/>`标签包裹要显示的内容，并用`v-enter等-active`事先定义好动画，在`<transition/>`中的元素显示或隐藏等生命周期时会自动应用v-开头的css
 
-  多个元素标签要放在一块同时控制，必须用`**<transition-group/>**`包裹，并且要绑定`**key**`
+  多个元素标签要放在一块同时控制，必须用`<transition-group/>`包裹，并且要在应用动画的标签上绑定`key`
+
+![image-20220701172405852](C:/Users/admin/AppData/Roaming/Typora/typora-user-images/image-20220701172405852.png)
 
   生命周期总是分为三个阶段：开始状态enter、进行中enter-active、结束状态enter-to
 
@@ -621,7 +623,7 @@ provide是个函数，内部用return形式返回一个“prop属性”
 
 ![img](https://upload-images.jianshu.io/upload_images/6322775-476428b1535beb52.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
 
-给**active**加上持续时间
+<center/>给active加上持续时间
 
   **name：**可以更改`**v-**`开头的默认设置，用于标记不同的动画
 

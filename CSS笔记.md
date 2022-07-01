@@ -192,43 +192,25 @@ padding可以限制内部宽高；
 
 边框角：用border-left等属性制作小正方形，通过absolute覆盖到边框角落
 
-------
+## 选择器：
 
-**选择器：**
-
-  “aaa bbb”：[后代选择器](https://developer.mozilla.org/zh-CN/docs/Web/CSS/Descendant_combinator)
-
-  “aaa > bbb”：[子代选择器](https://developer.mozilla.org/zh-CN/docs/Web/CSS/Child_combinator)
-
-  “h1 + p”：[相邻兄弟选择器](https://developer.mozilla.org/zh-CN/docs/Web/CSS/Adjacent_sibling_combinator)
-
-  “h1 ~ p”：[通用兄弟选择器](https://developer.mozilla.org/zh-CN/docs/Web/CSS/General_sibling_combinator)
-
-  before伪元素插入图片：content设为空，display必须为block或者inline-block，宽高必须设置才能显示出来；background-repeat以及vertical-align、background-position可以辅助设置图标位置
-
-  伪类**选择器后**还可以**跟子元素**，以及子元素的选择器——跟在选择器后的子元素可以用于限制在`**选择器特定条件**`下元素的样式改变，比如一些元素初始样式是隐藏，在`**:hover**`悬停时再显示这个元素
-
-  **选择器后**还可以**跟选择器**，但是要注意**顺序**。
-
-  伪元素**默认**属性是“**内联元素**”，要想设置宽高，必须设置display：block；在设置**背景图片**时，必须设置**content：‘ ’**。
-
-  **属性选择器**：
-
-​      “[标签属性]”搜寻所有标签中特定的**属性名**；
-
-  css函数：attr(属性名)——返回选择器前元素的属性值
-
-  nth-child(x)序号**从1开始**，匹配**同类元素集合**下的第x个元素
-
-  css选择器**“>”**是仅作用于**儿子**标签，不会作用于下一级标签（如果孙子节点才是要找的标签，使用>是找不到的）
-
-  TIps：
-
-​    1、css选择器，使用`**逗号，**`间隔应用多个样式
-
-​     2、css本质上是通过“各类选择器”**定位**标签位置，来设置样式，所以不论是通过 属性选择器、class、id，都是为了一个目的——找到这个标签元素
-
-​    3、·**指定类名等**：**nth-child(n)**·是当前元素的·**父级元素**·下的第n个元素，·**只会**·根据指定类名等来·**确定父级**·
+- “aaa bbb”：[后代选择器](https://developer.mozilla.org/zh-CN/docs/Web/CSS/Descendant_combinator)
+- “aaa > bbb”：[子代选择器](https://developer.mozilla.org/zh-CN/docs/Web/CSS/Child_combinator)
+- “h1 + p”：[相邻兄弟选择器](https://developer.mozilla.org/zh-CN/docs/Web/CSS/Adjacent_sibling_combinator)
+- “h1 ~ p”：[通用兄弟选择器](https://developer.mozilla.org/zh-CN/docs/Web/CSS/General_sibling_combinator)
+- before伪元素插入图片：content设为空，display必须为block或者inline-block，宽高必须设置才能显示出来；background-repeat以及vertical-align、background-position可以辅助设置图标位置
+- 伪类**选择器后**还可以**跟子元素**，以及子元素的选择器——跟在选择器后的子元素可以用于限制在`**选择器特定条件**`下元素的样式改变，比如一些元素初始样式是隐藏，在`**:hover**`悬停时再显示这个元素
+- **选择器后**还可以**跟选择器**，但是要注意**顺序**。
+- 伪元素**默认**属性是“**内联元素**”，要想设置宽高，必须设置display：block；在设置**背景图片**时，必须设置**content：‘ ’**。
+- 属性选择器：
+  - “[标签属性]”搜寻所有标签中特定的**属性名**；
+- css函数：attr(属性名)——返回选择器前元素的属性值
+- nth-child(x)序号**从1开始**，匹配父级元素下==1开始==的**同类元素集合**下的第x个元素
+- css选择器**“>”**是仅作用于**儿子**标签，不会作用于下一级标签（如果孙子节点才是要找的标签，使用>是找不到的）
+- TIps：
+  - css选择器，使用`**逗号，**`间隔应用多个样式
+  - css本质上是通过“各类选择器”**定位**标签位置，来设置样式，所以不论是通过 属性选择器、class、id，都是为了一个目的——找到这个标签元素
+  - **指定类名等**：**nth-child(n)**是当前元素的·**父级元素**·下的第n个元素，·**只会**·根据指定类名等来·**确定父级**·
 
 ------
 
