@@ -51,6 +51,23 @@
     Tips：let a = 20 
     	  a = a++   因为相当于a先做了一次++运算，a = 21，然后又进行了一次 a = a++(值20)
     	  console.log(a)//20
+    ```
+- [let c = a||b或a&&b]()：这种用法是因为对于==非布尔值==进行与或非运算时，会[先转换为布尔值，然后再运算，最后返回原值]()，
+
+  - ```js
+    let result = 5 && 6 //result=6 如果两个值都为true则返回后面的值
+    let result = 2 && 0 //result=0 如果有一个值为false，则返回**第一个**遇到的false值
+    let result = 0 && 2 //result=0
+    let result = NaN && 0 //result=NaN
+    let result = 2 || NaN //result=2
+    Tips:js中与或都是短路运算，与是查找false，遇到false就不再进行后面的运算，或运算是查找true，遇到第一个true就不再进行后面的运算
+    ```
+
+- [Unicode编码]()：用处很多！用`\u2620`等编码形式可以表示==中文==、==图标(element UI的小图标就是编码)==
+
+  - Tips：
+    - 在js中`\u2620`是==十六进制==表示，到了HTML标签中就得是`<span/>&#9760;(十进制)`(注意&#和；结尾)。通过计算器计算
+
 
 ---
 
