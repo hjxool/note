@@ -143,8 +143,6 @@ function init(){ }
 
 在绑定事件方法时：循环**变量**是**传递不进**函数的，**而是**会把参数当作**事件触发的对象**
 
-------
-
 ## 防抖：
 
 使用“underscore”插件，使用时在“**created**”函数中用变量承接“**_.debounce(执行函数，防抖时间)**”函数，再在watch等需要使用的地方调用这个**变量**
@@ -197,11 +195,16 @@ function init(){ }
   }
   ```
 
-- this一定指向的是一个对象
+- this出现的地方**一定**是在==函数中==，指向的也一定是一个==对象==，由它的==调用者==决定
 
-- 对象内的方法是箭头函数，则箭头函数内的this指向对象父级的调用者。使用var _this = this绑定可以解决
+  - TIps：
+    - this找最近的函数`{}`，这个函数**被谁调用就指向谁**，
 
-- **this**是往**外层**寻找最近的`{}`，就是它的父级，它的**父级被谁调用就指向谁**（所以说this是动态的，在**被调用**的**时**候才确定指向）
+    - **但是**函数在哪创建==作用域==就在哪，**不会**随着调用者而改变(即对象内调用一个方法，也是去声明函数的地方找它的作用域，找不到的变量就去作用域上级查找，很有可能就是去找全局作用域)
+
+    - 对象内的方法是箭头函数，则箭头函数内的this指向对象父级的调用者。使用var _this = this绑定可以解决
+
+    - 使用`let obj = new 构造函数()`创建的对象`obj`就是this指向的对象
 
 - 不同函数的this区别如下：
 
@@ -242,6 +245,34 @@ function init(){ }
   
 - ```js
   (function (){}) 是一个 函数对象 通过在后面的括号进行传参 (function (){})(params1,...)
+  ```
+  
+## 构造函数和工厂函数
+
+- ```js
+  #工厂函数     用于批量生产**同类型**对象 都是由Object生成
+  function person(name,age){
+      let obj ={}
+      obj.name = name
+      obj.age = age
+      return obj
+  }
+  let newObj = person('xxx',18)
+  console.log(newObj.constructor) 等于Object
+  console.log(newObj instanceof Object) true
+  console.log(newObj instanceof person) false
+  ```
+
+- ```js
+  #构造函数     声明方式和普通函数相同 但是使用时用**new关键词**创建**实例对象** 由构造函数生成
+  function Person(name,age){
+      this.name = name   此处this指向new**创建的对象**
+      this.age = age
+  }
+  let newObj = new Person('xxx',18)
+  console.log(newObj.constructor) 等于Person
+  console.log(newObj instanceof Object) true
+  console.log(newObj instanceof Person) true
 
 
 ------
@@ -545,15 +576,11 @@ getBoundingClientRect()求元素距视窗边距
 
 “创建a标签”，会直接下载体验较好
 
-------
-
 ##  JSON方法：
 
   `JSON.stringfy`：将JS值(数组、对象等)转换为JSON字符串
 
   `JSON.parse`：将JSON字符串转换为JS
-
-------
 
 ## 浅拷贝和深拷贝：
 
