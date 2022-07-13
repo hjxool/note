@@ -16,9 +16,22 @@
 
 ## 树形控件：
 
-​    每个节点都是.el-tree-node，如果其下还有子节点则用.el-tree-node__children包裹.el-tree-node
+- 每个节点都是.el-tree-node，如果其下还有子节点则用.el-tree-node__children包裹.el-tree-node
 
-​    节点前加样式的关键点在于.el-tree-node的after和before的**大小**以及**top**属性，构造一个横向线和竖向线（注意节点本身是并排的，所以要给节点和子节点都加padding-left使其错落开）
+- 节点前加样式的关键点在于.el-tree-node的after和before的**大小**以及**top**属性，构造一个横向线和竖向线（注意节点本身是并排的，所以要给节点和子节点都加padding-left使其错落开）
+
+- 当使用==自定义键名==，需要用[:props]()配置项
+
+  ```js
+  :props="setting"
+  ...
+  setting:{
+      label:'name',
+      children:'child'
+  }
+  ```
+
+- [slot-scope=“{node，data}”]()：==node==是element节点的一些属性、==data==则是自己定义的数据
 
 ## form表单
 
