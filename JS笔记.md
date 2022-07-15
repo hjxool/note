@@ -274,12 +274,10 @@ function init(){ }
   console.log(newObj instanceof Object) true
   console.log(newObj instanceof Person) true
 
+## 原型对象
 
-------
-
-![img](https://upload-images.jianshu.io/upload_images/6322775-cd0ccfe3b0216d4d.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
-
-创建对象数组
+- 访问一个对象时，会==先==在==自身==寻找，如果没有，则会去==原型对象==寻找
+- 当创建[构造函数]()时，可以将==实例身上共有==的属性和方法添加到==构造函数==的原型对象中，这样既可以每个对象都取到，也不会==影响全局作用域==
 
 ## JS原生方法：
 
