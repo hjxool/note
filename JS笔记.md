@@ -334,6 +334,7 @@ function init(){ }
 
 - “**for(let i in object)**”：遍历对象
 - **操作符**(等同与或符)**：delete**——“delete obj.property”删除对象上的指定属性，有返回值，返回删除成功与否
+- [hasOwnProperty]()：
 
 ###   window方法：
 
