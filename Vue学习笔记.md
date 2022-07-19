@@ -633,4 +633,5 @@ provide是个函数，内部用return形式返回一个“prop属性”
 
   TIps：
 
-​    1、<transition/>只能应用在**单个标签**
+1. <transition/>只能应用在**单个标签**
+2. 删除==数组==元素时，周围的元素会瞬移，解决这个问题需要在`v-leave-active`过程中设置`position: absolute`，并设置`v-enter`和`v-leave-to`的动画，其他生命周期动画可以删除
