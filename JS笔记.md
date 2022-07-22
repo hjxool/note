@@ -179,7 +179,7 @@ function init(){ }
 
 <center>每次重新开始计算时间，延后停止
 
-## 作用域
+## 作用域、this
 
 - [var关键字]()声明的变量会在所有代码执行之前==声明(但**不会赋值！**)==
 
@@ -205,6 +205,8 @@ function init(){ }
     - 对象内的方法是箭头函数，则箭头函数内的this指向对象父级的调用者。使用var _this = this绑定可以解决
 
     - 使用`let obj = new 构造函数()`创建的对象`obj`就是this指向的对象
+    
+    - ==事件绑定==给谁，this就是谁，比如`element.onclick = function(){ this }`，此处this指向`element`
 
 - 不同函数的this区别如下：
 
@@ -376,11 +378,12 @@ function init(){ }
 ###   window方法：
 
 - window方法可以省略`window`关键字，直接写后面的方法
-- 弹窗：警告窗alert('xxx')；确认框confirm('显示内容')，返回布尔值；提示框prompt('提示内容'，'预设内容')，返回的是一个字符串
+- 弹窗：警告窗[alert('xxx')]()；确认框[confirm('显示内容')]()，==返回布尔值==
+  - [prompt(string)]()：类似==alert()==，传入一个==字符串==作为提示文字，会弹出一个输入框，输入的内容作为`prompt函数`的返回值
+
 - **history**.pushState/**replaceState**(state,title,url)可以在**不跳转页面**的情况下**改写**当前页面的url
 - **跳转页面**：window.location.**href** = "地址?键值对"，跳转页面后使用`**location.search**`获取到`？`之后的内容，对获取的内容进行字符串分割，创建对象obj = { }，使用**obj['key'] = '值'**，将分割好的键值对装入对象
 - sessionStroage本地存储：使用sessionStroage.自定义变量名 = 值，就可以将**值**存入**自定义变量**名，取用的时候直接用**sessionStroage.自定义变量名**就可以获取值；删除的时候使用sessionStroage.removeItem("自定义变量名")
-- [prompt(string)]()：类似==alert()==，传入一个==字符串==作为提示文字，会弹出一个输入框，输入的内容作为`prompt函数`的返回值
 
 ### document方法：
 
@@ -680,3 +683,49 @@ getBoundingClientRect()求元素距视窗边距
   - `add('class1',...)`，往对象身上添加一个或多个class，同名的不会添加
   - `remove('class',...)`，移出一个或多个class，移出不存在的class不会报错
   - `toggle('class'，true/false)`，true添加类名，false移除类名
+
+- [getElements...]()：带有`Elements`字眼的获取到的节点，哪怕只有一个也会封装到==数组==里返回
+
+- 获取到节点后，控制台输出的第一层字段==都是可配置属性==，比如要获取`<input value="xxx"/>`输入框中的内容，就用==元素.属性名==
+
+  - 所有==属性==均适合这个规则，==除了Class！==，因为==class==是==保留字段==，想取用得用==元素.className==
+
+- ==元素==是==标签==，==节点==是==包括标签、文本、空格==的所有dom
+
+- 获取==父/子==元素
+
+  - [children]()：属性。获取==子元素==标签`dom.children`(与[childNodes]()相反，childNodes是获取所有==节点==)
+
+  - [parentNode]()：属性。获取==父元素==标签
+
+  - [父节点.getElementBy...]()：函数方法。除了用`document`去调用getElement，节点也可以用该方法来获取底下的所有子节点、孙节点
+
+  - [innerHTML]()：属性。不止用于设置和获取==标签内==文本内容，最主要的作用是显示和设置==标签内所有节点==
+
+    - ```js
+      例如：ul.innerHTML = "<li>1</li>
+      					<li>2</li>
+      					<li>3</li>"
+      这样就可以直接 增/删/改 元素   删改 不建议 用这种方式 因为动作幅度太大
+      但是往一个 空 的标签里添加 多个元素 用这种方式更便捷
+      ```
+
+- 获取==兄弟==元素
+
+  - [previousElementSibling]()：属性。获取==前一个兄弟元素==标签，好处是不用索引即可获取相邻元素
+  - [nextElementSibling]()：属性。
+
+- ※[querySelector]()：函数方法。非常强大，因为可以根据[CSS选择器]()来查询一个元素节点。比如`document.querySelector('.aaa div')`，就可以找到class aaa下的div标签元素
+
+  - 仅能找到符合条件的==第一个==元素
+  - 同样可以用于某一元素下去搜索子、孙元素
+  - [querySelectorAll]()：查找==所有==符合条件的元素。返回的==始终==是一个==数组==
+
+- [createElement]()：创建完元素以后==并不能==查找到节点，因为还在内存中，并没有放入页面，得[appendChild]()放入页面后才能查到
+
+- ==父节点==使用方法：
+
+  - [appendChild]()：向父节点==末尾==添加元素
+  - [insertBefore(新节点，旧节点)]()：向旧节点前==插入==一个新元素
+  - [replaceChild(新节点，旧节点)]()：==替换==节点
+  - [removeChild(子节点)]()：==删除==节点
