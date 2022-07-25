@@ -5,7 +5,6 @@
 - 对象.自定义属性 = xxx相当于将xxx赋值给对象下新创建的属性
 - 为了避免残留值，应当在**“即将”**调用和请求的地方清空再赋值。
 - 滑块必须用clientX/Y计算鼠标到浏览器边框的距离，因为只有键鼠**事件对象**是**动态**值（随鼠标动态改变），而offsetLeft等都是**元素对象**的属性，是**静态**值；还有mousedown事件包裹mouseover最好不用点击的对象作为调用者，最好用window，因为鼠标滑动过快，超出点击的对象就会出现问题
-- “e.target”不会随着冒泡移动，点的是哪个元素，指向的就是哪个，即使父元素冒泡执行方法，target指向的也是点的元素，所以要用**“currentTarget”**可以获取**绑定事件**的对象，而不是点到的对象
 - **三元运算**的选择结果不止是字符串，还可以是表达式，比如另一个三元运算
 - “mouseenter”和“mouseleave”可以替代css“hover选择器”，“e.target”有scr属性可以更改图片地址，准确的说“e.target”包含目标的所有属性
 - **表达式**和**语句**的区别：“表达式”由运算符构成，并“运算”产生一个“结果”；而“语句”包括“声明、赋值、条件判断等”，只是一句命令或者句子。像**JS**和**vue**中需要填入“表达式”的地方，就不能用“语句”，需要注意区分，而表达式一旦加上**“；”**，就不再是“表达式”，而是**表达式“语句”**，从而不被识别报错，但是加“逗号，”是可以的
@@ -18,8 +17,6 @@
 - 想要取小数点“后几位”，就“先取整再整除”——取**几位**就乘以10的指数，**取整**后再除以10的指数；另外js原生方法提供的都是**向下取整**，想要**向上取整**，加个**0.5**就可以了
 - 对象才可以赋值修改原值，变量赋值修改原值不变；**但是！**对象复制后，**置空**再修改原值，**不会**影响复制的对象
 - Number没有“length”属性！
-- `**阻止冒泡**`只能阻止`**同名的事件！**`，比如@click.stop，只有父级同样是@click事件才能阻止
-- `**冒泡事件的妙用！**`——外层包裹mousedown(不要用click，因为鼠标抬起也会触发一次，其次`**onmousedown**`和`**onmouseup**`是**一对**，onmousedown事件本身并不好用，会在自动获取焦点等情况触发奇怪的问题)显示和隐藏功能，内层则是点击发送指令事件(用同样的关键字`**mousedown**`)，就可以触发指令后隐藏选项框，而不需要遮罩
 - 对象取用属性不只用点，还可以用·**[ '属性名' ]**·，当取用的·属性名只有后缀不同时·，可以使用·**[ `前缀${动态后缀}` ]**·
 - **折叠注释**·//#region ...代码块... //#endregion·
 - **移除事件监听**时，传入两个参数，第一个是想解绑的事件名，第二个是**指向同一处地址**的方法**回调函数**
@@ -30,6 +27,7 @@
 - ==null==并不是什么都没有，而是一个==空对象==，==undefined==才是什么都没有的未定义数据
 - ==同时声明==：`let a=1,b=2,...`等同于`let a=1,let b=2`
 - ==基础==数据类型没有==引用地址==，作为实参传入，即使修改了原值也不会改变
+- js中==—等符号==表示运算符，所以==不能出现==短横线分隔命名，而HTML没有运算符之说，可以用短横线命名
 
 ------
 
@@ -380,7 +378,6 @@ function init(){ }
 - window方法可以省略`window`关键字，直接写后面的方法
 - 弹窗：警告窗[alert('xxx')]()；确认框[confirm('显示内容')]()，==返回布尔值==
   - [prompt(string)]()：类似==alert()==，传入一个==字符串==作为提示文字，会弹出一个输入框，输入的内容作为`prompt函数`的返回值
-
 - **history**.pushState/**replaceState**(state,title,url)可以在**不跳转页面**的情况下**改写**当前页面的url
 - **跳转页面**：window.location.**href** = "地址?键值对"，跳转页面后使用`**location.search**`获取到`？`之后的内容，对获取的内容进行字符串分割，创建对象obj = { }，使用**obj['key'] = '值'**，将分割好的键值对装入对象
 - sessionStroage本地存储：使用sessionStroage.自定义变量名 = 值，就可以将**值**存入**自定义变量**名，取用的时候直接用**sessionStroage.自定义变量名**就可以获取值；删除的时候使用sessionStroage.removeItem("自定义变量名")
@@ -576,17 +573,28 @@ setTimeout会将里面的函数先放入**任务队列**，4秒后执行，此�
 
 任务队列会保存下来作用域链中的原始值，但不进行计算
 
-------
-
-for循环是在下一次循环执行前再自增
-
-------
-
 ## 元素在页面中的位置
 
-![img](https://upload-images.jianshu.io/upload_images/6322775-d2bce26f79b3c151.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+- ![img](https://upload-images.jianshu.io/upload_images/6322775-d2bce26f79b3c151.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
 
-![img](https://upload-images.jianshu.io/upload_images/6322775-0cf168f634ec329d.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+  Tips：
+
+  - [offsetWidth/Height]()：元素整个大小。包括宽高、边框
+
+  - [clientWidth/Height]()：可视大小，有滚动条的话，会==减去滚动条大小==。包括padding、content
+
+    Tips:
+
+    - ==鼠标==的[clientX/Y]()也是==相对于**可见窗口**==的位置，可视窗口的左上角始终是(0,0)点。想要获取相对于==页面(超出窗口大小)==的坐标用[pageX/Y]()
+
+  - [scrollHeight/Width]()：滚动大小。包括可视区域、滚动条大小、隐藏部分
+
+    Tips：
+
+    - ==判断滚动条到底==：`scrollHeight - scrollTop == clientHeight`
+    - 滚动大小实际上就等于==滚动条可滚动宽/高==加上==可视窗口大小==
+
+- ![img](https://upload-images.jianshu.io/upload_images/6322775-0cf168f634ec329d.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
 
 offsetTop/Left是相对父级（注：滚动显示容器里，里面的每一个元素它的offset父级都是显示容器），并且会显示(※)**累计滚动隐藏部分**；
 
@@ -594,15 +602,15 @@ offsetTop/Left是相对父级（注：滚动显示容器里，里面的每一个
 
 ![img](https://upload-images.jianshu.io/upload_images/6322775-6dd4b0d7e07d70c9.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
 
-scrollHeight代表包括不可见部分的元素高度（只包含padding和content，即使是在IE盒模型下也不会计算border的值）
+<center/>scrollHeight代表包括不可见部分的元素高度（只包含padding和content，即使是在IE盒模型下也不会计算border的值）
 
 ![img](https://upload-images.jianshu.io/upload_images/6322775-3a3c4a65808c7cb1.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
 
-scrollTop（滚动条向下滚动的距离）
+<center/>scrollTop（滚动条向下滚动的距离）
 
 ![img](https://upload-images.jianshu.io/upload_images/6322775-3e30a11ad6d49ba4.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
 
-getBoundingClientRect()求元素距视窗边距
+<center/>getBoundingClientRect()求元素距视窗边距
 
 ### Tips：
 
@@ -612,21 +620,19 @@ getBoundingClientRect()求元素距视窗边距
 
   3、※**offset偏移量**是依据**上一级定位元素(position:relative等)**确定的
 
-  4、※·**offsetParent**·和·**parentNode**·的区别：
+  4、※**offsetParent**和**parentNode**的区别：
 
-​    ·**offsetParent**·
+​    [offsetParent]()
 
 ​      查找路径：有带有·**position**·属性的上一级→带有position属性的上一级。(body虽然没设置position，但是因为所有元素都脱离不了body文档流，所以总能找到body是最外层)
 
 ​      最外层：body→null
 
-​    ·**parentNode**·
+​    [parentNode]()
 
 ​      查找路径：·**不考虑position**·，单纯的父级元素往上查找。
 
 ​      最外层：body→html→document→null
-
-------
 
 ## object.defineProperty(对象名，'键'，{value:值})：
 
@@ -640,8 +646,6 @@ getBoundingClientRect()求元素距视窗边距
   1. js默认没有数据绑定，js不会帮你做这个事情，定义过的变量用变量名赋值给另一个属性后，不会随着原先的变量改变而改变。但是defineProperty中的**get函数**可以将其**绑定**
   2. get函数作用是**双向**绑定(**改原始值**会跟着变动)，**get函数**本身不会传入参数，它“return”返回的是外面定义好的变量，所以当**set函数**修改了外部定义的变量，get中**返回值**也就变了；set函数是**改对象属性**时触发，修改后**原始值**也会发生改变(原始值会发生改变是因为修改值对原始值进行了**赋值**操作，**再触发**的**get函数**)；使用set函数时必须也要有get函数，不然set修改完值后，没有对应的属性接收
   3. 数据代理：通过另一个对象来操作原先的对象属性，通过get、set函数实现
-
-------
 
 ## 下载：
 
@@ -679,7 +683,10 @@ getBoundingClientRect()求元素距视窗边距
 
 ## DOM对象操作
 
+- js操作DOM本质其实是修改==标签可配置属性==，所以像==css文件==中的样式是无法通过js读取的
+
 - [classList]()：虽然是个只读对象，但是拥有特殊方法修改
+
   - `add('class1',...)`，往对象身上添加一个或多个class，同名的不会添加
   - `remove('class',...)`，移出一个或多个class，移出不存在的class不会报错
   - `toggle('class'，true/false)`，true添加类名，false移除类名
@@ -729,3 +736,34 @@ getBoundingClientRect()求元素距视窗边距
   - [insertBefore(新节点，旧节点)]()：向旧节点前==插入==一个新元素
   - [replaceChild(新节点，旧节点)]()：==替换==节点
   - [removeChild(子节点)]()：==删除==节点
+
+- [getComputedStyle()]()：==window==方法，**只读**。读取元素==当前生效的样式==。没有设置则会返回==真实值==
+
+  ```js
+  let dom = document.querySelector('.aaa')
+  let css = getComputedStyle(dom,null) 获取到css对象
+  console.log(css.width)//100px
+  ```
+
+## 事件冒泡、委派等
+
+- [事件冒泡]()：1、只会==从底层元素往上==传递；2、只能触发==同名==事件，所以阻止冒泡也只能阻止同名事件触发
+
+  - `**冒泡事件的妙用！**`——外层包裹mousedown(不要用click，因为鼠标抬起也会触发一次，其次`**onmousedown**`和`**onmouseup**`是**一对**，onmousedown事件本身并不好用，会在自动获取焦点等情况触发奇怪的问题)显示和隐藏功能，内层则是点击发送指令事件(用同样的关键字`**mousedown**`)，就可以触发指令后隐藏选项框，而不需要遮罩
+
+  - [e.target]()不会随着冒泡移动，点的是哪个元素，指向的就是哪个(只会获取到==元素==，不会获取到元素里的文本节点等)，即使父元素冒泡执行方法，target指向的也是点的元素，所以要用**“currentTarget”**可以获取**绑定事件**的对象，而不是点到的对象
+
+  - ==取消事件冒泡==：[event.cancelBubble = true]()
+
+    Tips：[document]()中包含许许多多的==元素==，当有元素==取消冒泡==，==绑定到document==上的方法==**就不会触发**！==。因为==点击==的是document里的元素，是通过里层的元素冒泡到外层的document，才能执行document身上绑定的方法
+
+  - 当==不同名事件==是父子关系时，先触发的是==父级==的事件
+
+- [事件委派]()：给元素==共同的祖先==绑定事件，点击子元素时就会==冒泡==触发==父元素==事件。
+
+  Tips：
+
+  - 减少给同样元素绑定事件次数，提高性能
+  - 因为是共同的事件，所以要区分点击的是否是期望触发的元素。通过==e.target==来获取==className==等属性，进行辨识
+
+- 
