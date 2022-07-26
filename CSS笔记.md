@@ -84,7 +84,7 @@ float：使目标元素靠左右放置，父元素设置后不会应用于子元
 
 上标 下标
 
-------
+## flex和grid
 
 **flex:**主轴默认**横向**排列，**flex-direction**决定项目排列方向(**想要让大大小小每一个元素自动占一行就用这个属性**)。
 
@@ -104,7 +104,10 @@ flex布局下子元素**不能设置成absolute**,absolute会**脱离**布局控
 
 用flex排布字体会将div元素里的字当作最小的元素块移动位置
 
-Tips：①使用“**flex-grow**/flex-shrink”可以控制元素自动填充，是flex的自动填充方法，“flex-grow”默认不填充扩大，所以要单独设置
+Tips：
+
+1. 使用“**flex-grow**/flex-shrink”可以控制元素自动填充，是flex的自动填充方法，“flex-grow”默认不填充扩大，所以要单独设置
+2. [flex-grow]()会使[width]()失效
 
 **grid布局**：
 
