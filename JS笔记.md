@@ -745,6 +745,12 @@ offsetTop/Left是相对父级（注：滚动显示容器里，里面的每一个
   console.log(css.width)//100px
   ```
 
+## BOM对象
+
+- [BOM对象]()：window、Navigator、location、History、screen
+- [location]()：直接输出得到的是==完整路径地址==。因为浏览器很长，所以有不同方法是为了截取不同==段落==
+  - [href]()：完整的URL
+
 ## 事件冒泡、委派等
 
 - [事件冒泡]()：1、只会==从底层元素往上==传递；2、只能触发==同名==事件，所以阻止冒泡也只能阻止同名事件触发
