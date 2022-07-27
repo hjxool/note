@@ -177,19 +177,19 @@ front-size：%是相对于正常字体大小，不是相对于父元素
 - （new）==Sticky==(粘性的)：relative和fixed的结合体，通过top等属性，可以设置元素在**距离窗口**多少距离时**滚动时位置不变**
   - tips：可以做到类似element ui的固定表头和列的效果
 
-padding可以限制内部宽高；
+- padding可以限制内部宽高；
 
 ![img](https://upload-images.jianshu.io/upload_images/6322775-4d3009044c7807f7.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
 
-箭头代表正值移动方向，黑色表示可移动
+<center/>箭头代表正值移动方向，黑色表示可移动，即是说margin-left负值是元素往左移动，而margin-right正值是父元素往右移动
 
-即是说margin-left负值是元素往左移动，而margin-right正值是父元素往右移动
+- [padding]()和[margin]()用==百分比==，都是==相对于父元素==
 
-小技巧：当把自身体积压缩到0时，就不会浮动了；用**margin-right**是**右侧元素压缩自己**，到0的时候就变成了没有体积的东西，会跟到左侧元素的后面；用**margin-left**是**自己压缩左侧元素**，会取代左侧元素被压缩掉的宽度。
+- 小技巧：当把自身体积压缩到0时，就不会浮动了；用**margin-right**是**右侧元素压缩自己**，到0的时候就变成了没有体积的东西，会跟到左侧元素的后面；用**margin-left**是**自己压缩左侧元素**，会取代左侧元素被压缩掉的宽度。
 
-总结：margin-left压缩别人，margin-right压缩自己。
+- 总结：margin-left压缩别人，margin-right压缩自己。
 
-**仅**当父元素**宽高不固定**时，**margin**会**撑大**父容器。
+- **仅**当父元素**宽高不固定**时，**margin**会**撑大**父容器。
 
 ------
 
