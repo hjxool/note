@@ -26,7 +26,9 @@
 - 当使用==！=排除某些条件时==要用[&&]()并列，当使用====匹配某些条件时==，要用[||]()
 - ==null==并不是什么都没有，而是一个==空对象==，==undefined==才是什么都没有的未定义数据
 - ==同时声明==：`let a=1,b=2,...`等同于`let a=1,let b=2`
-- ==基础==数据类型没有==引用地址==，作为实参传入，即使修改了原值也不会改变
+- ==变量==类型指==栈中值==的类型，比如：==引用地址==、数字等
+  - ==数据==类型指==堆中数据==的类型，比如：==对象==等
+
 - js中==—等符号==表示运算符，所以==不能出现==短横线分隔命名，而HTML没有运算符之说，可以用短横线命名
 
 ------
@@ -186,7 +188,7 @@
   }
   ```
 
-- this出现的地方**一定**是在==函数中==，指向的也一定是一个==对象==，由它的==调用者==决定
+- this出现的地方**一定**是在==函数中==，指向的也==一定是一个对象==，由它的==调用者==决定
 
   - TIps：
     - this找最近的函数`{}`，这个函数**被谁调用就指向谁**，
@@ -205,7 +207,31 @@
     - 谁调用我，我的this就指向谁
     - js中this是根据函数的**执行环境**动态绑定的：全局函数中this指向的是window；当函数作为某个对象的方法被调用时，this就等于那个对象
   - 箭头函数：**定义时**被决定(因为没名字，所以不能像普通函数那样由对象调用，只能在定义处调用)
-    - 箭头函数的this是父级(作用域链的上一层)的this，**没有则指向window**
+    - 箭头函数的this是==父级==(**作用域链的上一层**)==**函数**的this==，**没有则指向window**，==**对象是没有this的！只有函数才有this！**==
+    
+      ```js
+      例如	
+      let a = {
+          b:{
+              c:{
+                  d:()=>{
+                      console.dir(this) 此处this指向window 因为父级c是对象没有this
+                  }
+              },
+              e:function (){
+                  let fun = ()=>{
+                      console.dir(this) 此处this指向b 因为父级e是函数，e的this指向b
+                  }
+                  fun()
+              }
+          }
+      }
+      function P(){
+          this.f = ()=>{
+              console.dir(this) 箭头函数的父级是 构造函数P 而不是 调用者this
+          }
+      }
+      let a = new P()
   - 匿名函数：谁调用指向谁
     -  而**多数情况**下，是由`windows方法中调用`，因此this指向window；此处解释一下为什么是window，因为不同函数方法或者全局定义的匿名函数，是由**JS引擎**各个模块分别**管理**，从**一开始**就已经定义好了this指向
 
@@ -266,6 +292,9 @@
   console.log(newObj.constructor) 等于Person
   console.log(newObj instanceof Object) true
   console.log(newObj instanceof Person) true
+  ```
+
+- 本质上，==构造函数==也是普通函数，只有当用==new关键字==调用时才是构造函数，虽然可以用普通函数的方式去调用，但没有意义
 
 ## 原型对象
 
@@ -483,11 +512,30 @@ js**原生**事件处理函数事件名必须叫“event”
 
 日期格式化或者数字替换：padStart(保持的长度，'用什么来填充')和padEnd(保持的长度，'用什么来填充')
 
-------
-
 ## js对象(数组)
 
+- 只要是==函数==，加==（）==就可以执行，哪怕是==变量==形式
+
 - 区分==对象==和==数组==：`xxx.constructor === Array/Object`或者`xxx instanceof Array/Object`或者`Array.isArray(xxx) //true或false`
+
+  Tips：
+
+  - [typeof]()是区分==基本==类型和==引用(对象)==类型的，返回的是==字符串==，注意全是==小写==；
+
+    - 可以判断==undefined==、==字符串/数字/布尔==、==函数==，==不能==判断==null==和==对象/数组==。简记：==只能判断基础类型和undefined==
+
+  - [instanceof]()是区分==对象的具体==类型(不靠谱，因为所有都可以判断为Object)，==不能==判断==null==
+
+    - ```js
+      console.log(对象 instanceof Object) true
+      console.log(对象 instanceof Array) false
+      console.log(数组 instanceof Object) true 因为数组是Array构造函数的实例，而Array又是Object原型对象的构造函数
+      console.log(数组 instanceof Array) true
+      console.log(函数 instanceof Object) true
+      console.log(函数 instanceof Function) true
+      ```
+
+  - [===]()相对万能，可以用`null === null`判断null
 
 - [对象的两种取值/定义方式]()：`obj.key `和 `obj["key"]`，但是如果key是一个变量（传进来的参数），就只能用obj[key]（注意少了引号）
 
@@ -641,11 +689,12 @@ offsetTop/Left是相对父级（注：滚动显示容器里，里面的每一个
 
 “创建a标签”，会直接下载体验较好
 
-##  JSON方法：
+##  JSON
 
-  `JSON.stringfy`：将JS值(数组、对象等)转换为JSON字符串
+- [JSON.stringfy]()：将JS值(数组、对象等)转换为JSON字符串
 
-  `JSON.parse`：将JSON字符串转换为JS
+- [JSON.parse]()：将JSON字符串转换为JS
+- JSON允许传递值包括：字符串、数字、布尔值、null、普通对象、数组。不允许传递方法及函数对象，这是js独有的
 
 ## 浅拷贝和深拷贝：
 
