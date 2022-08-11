@@ -149,17 +149,21 @@ Tips：
 
 line-height是行高，在一行中字体是默认居中的，当行高与块级元素高度相同，字体就垂直居中了。
 
-**页面居中**：绝对或相对定位、top等属性设为0、margin：auto；左右居中就left，right为0，margin：auto（==但是会拉伸未设宽高的地方==）
+## 页面布局
 
-​         left：50%（移动边缘），margin-left：半径负数（再往回拉半径的距离就居中了）
-
-​         在`**flex、grid**`布局下`**margin：auto**`会自动占用可用的`空间`，且`**绝对定位**`下，`**auto**`不会起作用
-
-front-size：%是相对于正常字体大小，不是相对于父元素
+- **页面居中**：
+  - ==绝对定位==：==top==等属性设为0，`margin:auto`。==会拉伸未设宽高的地方==
+  - ==相对定位==：==left、right==属性设为0，`margin:auto`。==会拉伸未设宽高的地方==
+  - left：50%（移动边缘），margin-left：半径负数（再往回拉半径的距离就居中了）
+  - `left:50%;top:50%`再`transform:translate(-50%,-50%)`
+  - 在[flex]()、[grid]()布局下`margin：auto`会自动占用可用的`空间`
+    - ==绝对定位==下，`margin：auto`不会起作用
 
 ------
 
 标准流就是元素排版布局中默认从左至右，从上到下的排列方式
+
+front-size：%是相对于正常字体大小，不是相对于父元素
 
 ------
 
@@ -202,22 +206,41 @@ front-size：%是相对于正常字体大小，不是相对于父元素
 ## 选择器：
 
 - “aaa bbb”：[后代选择器](https://developer.mozilla.org/zh-CN/docs/Web/CSS/Descendant_combinator)
+
 - “aaa > bbb”：[子代选择器](https://developer.mozilla.org/zh-CN/docs/Web/CSS/Child_combinator)
+
 - “h1 + p”：[相邻兄弟选择器](https://developer.mozilla.org/zh-CN/docs/Web/CSS/Adjacent_sibling_combinator)
+
 - “h1 ~ p”：[通用兄弟选择器](https://developer.mozilla.org/zh-CN/docs/Web/CSS/General_sibling_combinator)
+
 - before伪元素插入图片：content设为空，display必须为block或者inline-block，宽高必须设置才能显示出来；background-repeat以及vertical-align、background-position可以辅助设置图标位置
+
 - 伪类**选择器后**还可以**跟子元素**，以及子元素的选择器——跟在选择器后的子元素可以用于限制在`**选择器特定条件**`下元素的样式改变，比如一些元素初始样式是隐藏，在`**:hover**`悬停时再显示这个元素
+
 - **选择器后**还可以**跟选择器**，但是要注意**顺序**。
-- 伪元素**默认**属性是“**内联元素**”，要想设置宽高，必须设置display：block；在设置**背景图片**时，必须设置**content：‘ ’**。
+
 - 属性选择器：
   - “[标签属性]”搜寻所有标签中特定的**属性名**；
+
 - css函数：attr(属性名)——返回选择器前元素的属性值
+
 - nth-child(x)序号**从1开始**，匹配父级元素下==1开始==的**同类元素集合**下的第x个元素
+
 - css选择器**“>”**是仅作用于**儿子**标签，不会作用于下一级标签（如果孙子节点才是要找的标签，使用>是找不到的）
+
 - TIps：
   - css选择器，使用`**逗号，**`间隔应用多个样式
   - css本质上是通过“各类选择器”**定位**标签位置，来设置样式，所以不论是通过 属性选择器、class、id，都是为了一个目的——找到这个标签元素
   - **指定类名等**：**nth-child(n)**是当前元素的·**父级元素**·下的第n个元素，·**只会**·根据指定类名等来·**确定父级**·
+
+- [伪元素]()：并不真正存在于dom节点中，无法通过JS获取和操作。
+
+  Tips：
+
+  - 默认是`display:inline`，即使设置宽高也无法显示。所以必须设置成==块级元素==，`inline-block`或者`block`
+  - 必须设置`content`属性才能显示
+
+- [伪类]()：
 
 ------
 
