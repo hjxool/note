@@ -109,9 +109,10 @@ el-radio-button
 
 - [el-time-select]()：是精确到**分钟**的时间选择器，`picker-options`格式只能是`start：xxx，step：xxx，end：xxx`
 - [el-time-picker]()：精确到**秒**。`picker-options`格式只能是`selectableRange: '18:30:00 - 20:30:00'`
-- 时间和日期选择器==接收参数==可以是==字符串==和==Date==对象，字符串只要不是连在一起的日期，都能识别
+- [日期]()选择器==接收参数==可以是==字符串==和==Date==对象，字符串只要不是连在一起的日期，都能识别
   - 但是==onchange事件==获得的参数都是==Date对象==，不是==字符串！==
 
+- [时间]()选择器==接收==参数和==onchange事件==获得的参数都是==字符串！==
 
 ## select选择器
 
