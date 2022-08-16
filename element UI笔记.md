@@ -105,12 +105,15 @@ el-radio-button
 
   ·**<i class="图片地址" />**·大小和颜色由·**font-size**·和·**color**·决定，可以把它视作异形字体
 
-## 时间选择器
+## 时间/日期选择器
 
 - [el-time-select]()：是精确到**分钟**的时间选择器，`picker-options`格式只能是`start：xxx，step：xxx，end：xxx`
 - [el-time-picker]()：精确到**秒**。`picker-options`格式只能是`selectableRange: '18:30:00 - 20:30:00'`
+- 时间和日期选择器==接收参数==可以是==字符串==和==Date==对象，字符串只要不是连在一起的日期，都能识别
+  - 但是==onchange事件==获得的参数都是==Date对象==，不是==字符串！==
 
-## 选择器
+
+## select选择器
 
 - 当==value==是==对象==时，就不再需要用`:key="xxx.id"`来绑定key了，必须要使用`value-key`(注意此处是[自动取所选对象的==第一层键值==]())
 
