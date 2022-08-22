@@ -301,6 +301,8 @@
 
 - 本质上，==构造函数==也是普通函数，只有当用==new关键字==调用时才是构造函数，虽然可以用普通函数的方式去调用，但没有意义
 
+- 函数也是==对象==，`function xxx(){}`在栈中是以`xxx：0x123`形式存储，指向==堆==中的==Function对象==
+
 ## 原型对象、原型链
 
 - 访问一个对象时，会==先==在==自身==寻找，如果没有，则会去==原型对象==寻找
@@ -310,6 +312,8 @@
 - ==构造函数==之上还有==Object==原型对象，原型链就到头了
 
 - ==函数==才用`func.prototype`，==对象==用的是`obj.__proto__`
+
+  - 在`let vm = new p()`时，其实内部执行了一次`this.__proto__ = P.prototype`，所以对象身上的隐式原型指跟构造函数原型指向同处
 
 - [原型对象]()是==一个类别==对象/函数的==公共区域==，用于存放==公用==的东西
 
@@ -326,6 +330,10 @@
   console.log(xx.prototype.constructor == xx) //true
   console.log(a.__proto__.constructor == xx) //true
   console.log(a.__proto__ == xx.prototype) //true
+  ```
+
+- ==实例对象==和==函数==的原型都指向==**空的Object实例**对象==，==Object空对象==的原型指向==Object原型对象==，注意，到原型对象之间都隔了一次==空对象==
+- `function xxx()`等于`let xxx = new Function()`，而又有`Function = new Function()`。所以，所有==函数==都是==Function==的实例对象，因此，函数同时具有`__proto__`和`prototype`，且他们的隐式原型都指向都相同
 
 ## JS原生方法：
 
