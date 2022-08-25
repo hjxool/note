@@ -736,6 +736,25 @@ offsetTop/Left是相对父级（注：滚动显示容器里，里面的每一个
 
 ​      最外层：body→html→document→null
 
+5. [iframe]()：是一个==单独的视窗==
+
+   Tips：
+
+   - 内部执行的任何方法都==获取不到==iframe==父级==的元素
+
+   - iframe内的元素获取==相对视窗==的位置都是以==iframe为边界==
+
+   - 会在执行完父级的js后再执行iframe中内容
+
+   - 通过[window.parent.父级方法]()调用、传参到父级
+
+     Tips：
+
+     - ==必须在服务器环境下！==
+     - 可以通过函数传参，来获取父页面元素，但这种方法前提是，父页面也是自己编写
+
+   - [window.parent.document.querySelector]()：通过==window.parent==获取到父==页面==document从而获取元素
+
 ## object.defineProperty(对象名，'键'，{value:值})：
 
 - 为指定对象添加属性；并且该属性不可被遍历
@@ -806,7 +825,13 @@ offsetTop/Left是相对父级（注：滚动显示容器里，里面的每一个
 
   - [children]()：属性，返回==数组==。获取==子元素==标签`dom.children`(与[childNodes]()相反，childNodes是获取所有==节点==)
 
-  - [parentNode]()：属性，返回==单个元素==。获取==父元素==标签
+  - [parentNode]()：属性，返回==单个元素==。获取==父元素==标签。最多到document层
+
+    Tips：
+
+    - 不要用此方法配合`offsetLeft`等方法获取边距，因为会获取到`document`，offset就应该用offset开头的方法
+
+  - [offsetParent]()：属性。获取上一级带有`position`属性的父级。最多到body层
 
   - [父节点.getElementBy...]()：函数方法。除了用`document`去调用getElement，节点也可以用该方法来获取底下的所有子节点、孙节点
 
