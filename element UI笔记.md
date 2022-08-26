@@ -114,6 +114,11 @@ el-radio-button
 
 - [时间]()选择器==接收==参数和==onchange事件==获得的参数都是==字符串！==
 
+- [picker-options]()属性中配置选项
+  - 接收的是一个对象
+  - 对象中[disabledDate]()方法形参是==当前时间==，必须有==return true/false==，==返回true则禁用！==
+
+
 ## select选择器
 
 - 当==value==是==对象==时，就不再需要用`:key="xxx.id"`来绑定key了，必须要使用`value-key`(注意此处是[自动取所选对象的==第一层键值==]())
