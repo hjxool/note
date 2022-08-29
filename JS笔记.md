@@ -44,7 +44,7 @@
 
   - null是空对象，返回的也是object
 
-- 隐式类型转换：`num = num+“”等同于String(num)`，同理`string = +string等同于Number(string)`
+- ==隐式==类型转换：`num = num+“”等同于String(num)`，同理`string = +string等同于Number(string)`
 
 - `Number()`等方法不会转变原值，都是依靠返回值赋值给自身
 
@@ -744,17 +744,21 @@ offsetTop/Left是相对父级（注：滚动显示容器里，里面的每一个
 
    - iframe内的元素获取==相对视窗==的位置都是以==iframe为边界==
 
+     Tips:
+
+     - 鼠标事件也取不到iframe外的边距
+
    - 会在执行完父级的js后再执行iframe中内容
 
    - [vw]()和[vh]()是相对于视窗的，即是说是==相对于iframe==，而不是浏览器窗口
 
    - 通过[window.parent.父级方法]()调用、传参到父级
-
+   
      Tips：
-
+   
      - ==必须在服务器环境下！==
      - 可以通过函数传参，来获取父页面元素，但这种方法前提是，父页面也是自己编写
-
+   
    - [window.parent.document.querySelector]()：通过==window.parent==获取到父==页面==document从而获取元素
 
 ## object.defineProperty(对象名，'键'，{value:值})：

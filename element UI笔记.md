@@ -107,13 +107,20 @@ el-radio-button
 
 ## 时间/日期选择器
 
-- [el-time-select]()：是精确到**分钟**的时间选择器，`picker-options`格式只能是`start：xxx，step：xxx，end：xxx`
-- [el-time-picker]()：精确到**秒**。`picker-options`格式只能是`selectableRange: '18:30:00 - 20:30:00'`
+- [el-time-select]()：是精确到**分钟**的时间选择器
+  - `picker-options`格式只能是`start：xxx，step：xxx，end：xxx`
+  - 得到的输入结果是==字符串==
+  - ==可以传入==Date对象，但是==没有意义==，只有显示的时候会自动==toString==，但是得到的输入依然是Date对象
+
+- [el-time-picker]()：精确到**秒**。
+  - `picker-options`格式只能是`selectableRange: '18:30:00 - 20:30:00'`
+  - 得到的输入结果是==Date对象==
+  - ==可以传入==Date对象，显示的是==时分秒==
+
 - [日期]()选择器==接收参数==可以是==字符串==和==Date==对象，字符串只要不是连在一起的日期，都能识别
   - 但是==onchange事件==获得的参数都是==Date对象==，不是==字符串！==
-
-- [时间]()选择器==接收==参数和==onchange事件==获得的参数都是==字符串！==
-
+  - 得到的输入是==Date对象==
+- [日期时间选择器]()：得到的也是==Date对象==
 - [picker-options]()属性中配置选项
   - 接收的是一个对象
   - 对象中[disabledDate]()方法形参是==当前时间==，必须有==return true/false==，==返回true则禁用！==
