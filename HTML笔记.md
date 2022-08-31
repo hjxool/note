@@ -1,4 +1,4 @@
-### HTML-1
+# HTML-1
 ![](https://upload-images.jianshu.io/upload_images/6322775-739b3c6f4c4d7c8a.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
 
 1. `<h1></h1>`是标题标签
@@ -79,7 +79,7 @@
 32. **Label**标签
 - **for**与表单的**Id**对应，作用是点击label相当于点击表单
 
-### HTML-2
+# HTML-2
 
 Tips：
 
@@ -276,6 +276,7 @@ html的加载顺序：
   - 列表默认垂直排列，可以在`<ul>`样式设置==flex布局==来横向排列
 - [<li>]()：前带有小圆点，用`list-style`CSS属性设置清除
 
-## 一些标签的注意事项
+## 标签细节
 
 - [input]()：==value==即使在HTML写死，在==页面修改==时获取到的也是==当前输入值==
+  - [text-align]()：可以调整输入内容位置，但是布局样式flex、grid无法修改input里文字位置
