@@ -184,7 +184,7 @@ new Vue({
 
 ​	有v-on:click、v-on:monseenter。
 
-​	vue提供了一种简略写法@click。绑定的方法在methods中定义；若想访问**原始DOM**事件可以在传实参的时候加入**$event特殊变量**，就可以取到**原生**事件的**对象**；使用**修饰符**要注意**顺序**；使用keyup修饰符可以拼接组合键位；**.exact**修饰符可以限制仅限对应键位时才触发
+​	vue提供了一种简略写法@click。绑定的方法在methods中定义；若想访问**原始DOM**事件可以在传实参的时候加入**$event特殊变量(函数自带的默认值)**，就可以取到**原生**事件的**对象**；使用**修饰符**要注意**顺序**；使用keyup修饰符可以拼接组合键位；**.exact**修饰符可以限制仅限对应键位时才触发
 
 #### v-bind 动态绑定
 
@@ -404,12 +404,6 @@ methods中方法互相调用：通过this.$options.methods.方法名查找method
 
 ------
 
-function($event)：event可以获取到DOM元素节点，使用
-
-function(e) {e.srcElement.style.background = 'red'}对节点元素进行操作
-
-------
-
 ### keydown/up便捷事件：
 
 @keyup.13 回车 
@@ -592,6 +586,10 @@ template内如果想写入多个标签，需要用标签包裹，其原因是组
 
   - 用第三方插件，dom发生变化，想重新应用插件
   - Vue操作dom完，此时**虚拟**dom**尚未**放入页面，放在nextTick中的数据将在**真实**dom**放入页面**后调用；
+
+Tips：
+
+- 在多层for循环中 使用$nextTick会在所有层级的for循环执行完在调用，因此无法一次循环执行完渲染一些节点
 
 ------
 

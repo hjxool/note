@@ -83,15 +83,24 @@
 ### el-form-item：
 
 - 会继承el-form的label-width；但**嵌套**在 el-form-item 中的 el-form-item 标签宽度默认为零，**不会继承** el-form 的 label-width；
+- ==label==中想==自定义图形==时，使用==十进制==Unicode编码。
+  - 可以理解为label中的字符串会原样搬入HTML，所以要用HTML的Unicode编码
+  - 如果删除label属性或者空字符串，element会将label位置屏蔽
 
 
-## el-radio-group：
 
-  包裹单选，就可以用label切换，在同时显示的情况下知道你点的是哪一个，radio靠label传值，如果没有设置标签内显示的文字，则默认显示label内容
+## 单选/多选
 
-![img](https://upload-images.jianshu.io/upload_images/6322775-77fd45a188be6b26.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+- 单选
+  - `v-model`表示值，`<el-checkbox/>显示内容`
+  - [el-radio-group]()：包裹单选，就可以用label切换，在同时显示的情况下知道你点的是哪一个，radio靠label传值，如果没有设置标签内显示的文字，则默认显示label内容
+  - ![el-radio-button](https://upload-images.jianshu.io/upload_images/6322775-77fd45a188be6b26.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)el-radio-button
+  
+- 多选：
+  - `:label=""`表示勾选的值，不是`:value`！
+  - 多选用==checkbox-group==包裹时，==v-model==值必须初始化为==数组==
+  - 多选==垂直排布==：`<el-checkbox style="display:flex;align-items:center;">`，并用`<el-checkbox><div>包裹内容</div></el-checkbox>`
 
-el-radio-button
 
 ## el-option：
 
@@ -120,6 +129,7 @@ el-radio-button
 - [日期]()选择器==接收参数==可以是==字符串==和==Date==对象，字符串只要不是连在一起的日期，都能识别
   - 但是==onchange事件==获得的参数都是==Date对象==，不是==字符串！==
   - 得到的输入是==Date对象==
+  - 选择的是一个时间范围的话，`v-model`得到的是一个==数组==！数组第一位是开始，第二位是结束
 - [日期时间选择器]()：得到的也是==Date对象==
 - [picker-options]()属性中配置选项
   - 接收的是一个对象
@@ -139,7 +149,11 @@ el-radio-button
 
 - **table**的**列标签**可以加**“class-name”**属性添加样式
   - table标签下**添加样式**有**xxx-class-name:"className"**和**:xxx-class-name:"function({row,index}){if(index==n){return 'className}}"**两种形式
-- 表格也有树形展示功能
+- 使用`:formatter="函数(row,col)"`属性方法格式化传入值和表格显示内容，方法中用`return`返回显示在页面的内容
+- 取表格中行数据
+  - 对`<el-table-column>`，必须要用特有的属性方法才能获取到行数据
+  - 或者是`<el-table-column>`中插入`<template slot-scope="scope">`，`<template>`包裹中的标签都可以通过`scope.row.属性名`传入或调用值进行判断
+
 
 ## Tabs标签页
 
