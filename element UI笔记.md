@@ -141,7 +141,7 @@
 - [日期时间选择器]()：得到的也是==Date对象==
 - [picker-options]()属性中配置选项
   - 接收的是一个对象
-  - 对象中[disabledDate]()方法形参是==当前时间==，必须有==return true/false==，==返回true则禁用！==
+  - 对象中[disabledDate]()方法形参是==每一天时间==，必须有==return true/false==，==返回true则禁用！==
 
 
 ## select选择器
