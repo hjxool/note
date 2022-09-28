@@ -173,3 +173,7 @@
   - 默认传入==el-menu-item==里的==index值==(字符串)、路径(数组)
   - select绑定的方法也可以普通调用，传入字符串索引，只要都是用v-show等控制显示
   - 无法用`func($event，$event，自定义变量)`，因为`$event`只能表示事件传入的==第一个==默认值
+
+## 描述列表
+
+- `<el-descriptions-item>`无法用`v-show`控制显示，必须用`v-if`
