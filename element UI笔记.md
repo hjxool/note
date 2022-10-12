@@ -170,7 +170,15 @@
 - 勾选
   - 最重要的是[toggleRowSelection(行对象,true/false)]()，此方法会触发==selection-change事件==，用以控制勾选项是否符合条件要被勾选
 
-
+- 修改表格样式
+  - 背景色
+    - 必须同时修改`<el-table>`标签，以及`.el-table tr`样式的==background==颜色
+  - 文字颜色
+    - 修改`<el-table>`标签的==color==，以及`.el-table thead`的color
+  - 鼠标悬浮
+    - 背景色：修改`.el-table--enable-row-hover .el-table__body tr:hover>td`
+  - 边框
+    - 
 
 ## Tabs标签页
 
