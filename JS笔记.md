@@ -347,14 +347,25 @@
   console.log(a.__proto__ == xx.prototype) //true
   ```
 
+  - **只有**==读取属性==时才会在**原型链**中查找，当给实例==设置属性==时，是给当前实例对象上设置属性
+
 - ==实例对象==和==函数==的原型都指向==**空的Object实例**对象==，==Object空对象==的原型指向==Object原型对象==，注意，到原型对象之间都隔了一次==空对象==
 
   Tips：
 
-  - 在`function XX(){}`内部隐式加入了`xx(this).prototype = {}`，在`let aa = new xx()`时则是隐式`aa(this).__proto__ = xx.prototype`
+  - 在`function XX(){}`内部隐式加入了`xx(this).prototype = {}`，在`let aa = new xx()`时则是隐式`aa(this).__proto__ = xx.prototype`(这步是在==创建==实例对象时做的，后面不会再将新的显示原型地址值赋给实例的隐式原型)
   - 虽然`xx.prototype`是一个空对象，**但是**`xx.prototype`和`xx.prototype.函数.prototype`并不是同一个空对象
 
 - `function xxx()`等于`let xxx = new Function()`，而又有`Function = new Function()`。所以，所有==函数==都是==Function==的实例对象，因此，函数同时具有`__proto__`和`prototype`，且他们的隐式原型都指向都相同
+
+- ```js
+  函数的原型指向对象默认是空Object实例 但Object不满足 因为Object原型对象是原型链尽头
+  函数.prototype instanceof Object //true
+  Object.prototype instanceof Object //false
+  Function.prototype instanceof Object //true
+  ```
+
+- [instanceof]()原理：`A instanceof B`，B的显示原型对象在A的原型链上(原型链有交叉)，则返回true，否则返回false
 
 ## JS原生方法：
 
