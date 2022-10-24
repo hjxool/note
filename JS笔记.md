@@ -970,6 +970,8 @@ offsetTop/Left是相对父级（注：滚动显示容器里，里面的每一个
 
   - [title]()：`document.title`可直接修改页面名称
 
+- [setAttribute(属性，值)]()：用以给标签元素设置自定义属性
+
 
 ## BOM对象
 
