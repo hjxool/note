@@ -117,6 +117,10 @@ float：使目标元素靠左右放置，父元素设置后不会应用于子元
 
   - 设置==align-items==、==justify-content==会使==flex-grow==失效
 
+    Tips：
+
+    - 只设置align-items==或==justify-content其中一个时，flex-grow会向==未设对齐属性==的地方扩充
+
 - **grid布局**：
 
   Tips：
@@ -171,6 +175,9 @@ line-height是行高，在一行中字体是默认居中的，当行高与块级
 ![img](https://upload-images.jianshu.io/upload_images/6322775-501bf926c3989a1d.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
 
 ![img](https://upload-images.jianshu.io/upload_images/6322775-35173e384eaa7c90.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+
+- 页面布局小技巧
+  - 当子元素大小是==px==，就没必要设置父元素宽高，用==padding==和==margin==撑开并加以边框，尤其==父容器==使用==flex、grid对齐属性==时，更不需要设置宽高，用==padding==将元素边框与内容撑开一个舒服的距离即可
 
 ## 定位
 
