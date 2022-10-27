@@ -153,6 +153,10 @@ new Vue({
 
 - **只有data或者set()中的属性变量才有响应式！**
 
+  - ==小技巧==：请求回来的数据先进行构造、添加属性，==再==赋值给==data中提前定义好的变量==，即可为自己添加的属性绑定响应式
+  - js中变量没有固定类型，因此赋值给==data中变量==的是**基础数据类型**还是**对象**都具有响应式
+
+
 ## vue指令：
 
 - ![img](https://upload-images.jianshu.io/upload_images/6322775-07bad3e6685ee9da.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
