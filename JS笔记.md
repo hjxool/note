@@ -343,6 +343,8 @@
   - `函数.prototype(object空对象).__proto__(object原型对象).__proto__(null)`
   - `实例对象.__proto__(object空对象).__proto__(object原型对象).__proto__(null)`
   - `Object创建的对象.__proto__(原型对象).__proto__(null)`
+  - `函数.__proto__(Function对象).__proto__(object原型对象).__proto__(null)`
+  - `Function.__proto__(Function对象).__proto__(object原型对象)`
   - 实例对象是实例对象，函数对象是函数对象，实例对象的`_proto__`并不是函数对象，而是object空对象，里面有个属性==constructor==，指向实例对象的构造函数
 
 - 访问一个对象时，会==先==在==自身==寻找，如果没有，则会去==原型对象==寻找
