@@ -366,7 +366,9 @@ created:function(){
 
 - beforeCreate：vue**对象创建后**，规则制定完毕
 
-- created：方法和回调都已经配置，但是跟html页面对应的属性和方法还没有挂载上去，$el不可见；
+  - 声明的函数都还没有
+
+- created：方法和回调都==已经配置==，但是跟html页面对应的属性和方法还没有挂载上去，$el不可见；
 
   Tips：
 
@@ -377,6 +379,9 @@ created:function(){
 
 - beforeMount：所有对节点的操作都不会奏效
 - mounted：挂载成功，html节点都已被vue节点**替换**
+  - **注意！**==mounted==只是==挂载节点==，还没==渲染==，渲染前元素大小获取到都是0
+  - ==组件==在此时才被放到真实dom节点
+
 - beforeUpdate：数据变化但是没传递到虚拟DOM
 - updated：虚拟DOM和html上的都已经更新
 - beforeDestory：监听、子组件和事件未被销毁前
@@ -418,18 +423,19 @@ methods中方法互相调用：通过this.$options.methods.方法名查找method
 - @keyup.down 下键
 - @keyup.delete 删除键
 
-## Vue.component：
+## 组件
 
-- （'组件名称'（必须全部小写或者用短横线分隔），对象）
+- [Vue.component('组件名',{ 配置项 })]()
+  - **组件必须声明在new vue实例之前！**
+  - component**读取不到**vue实例和**其他**组件中的**data数据**，有效避免了变量污染
+  - ==vue根实例==也获取不到组件定义的属性
+  - ==组件名称==是在HTML页面上使用的==标签名==
 
-- **组件必须声明在new vue实例之前！**
-- component**读取不到**vue实例和**其他**component中的**data数据**，有效避免了变量污染；`**vue根实例**`也获取不到组件定义的属性
-- 组件名称是在HTML页面上使用的标签名、对象里包含所使用的数据和vue属性；
 
 ![img](https://upload-images.jianshu.io/upload_images/6322775-43c0d72fa179b58c.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
 
-- template内如果想写入多个标签，需要用标签包裹，其原因是组件中只能有一个根元素
-- 每个同名的**组件**会**独立**维护自己的数据，每创建一个同名组件都有新**实例**被创建；
+- [template]()内如果想写入多个标签，需要用标签包裹，其原因是组件中==只能有一个根元素==
+- 每个同名的**组件**会**独立**维护自己的数据，每创建一个同名组件都有新**实例**被创建
 
 - data
   - 必须是一个**函数**，这样**同名**的**组件**才能**各自**维护一份return回来的**拷贝**；
@@ -443,8 +449,9 @@ methods中方法互相调用：通过this.$options.methods.方法名查找method
   - component是“**全局注册！**”，而extend是`let **对象名** = Vue.extend({})`的形式注册的`**局部组件**`
   - component('组件名'，extend对象名)
   - extend使用时：`new Vue({ components:{ **组件名：extend赋值对象** } })`
-- 在根实例对象使用组件是`**平级的**`，但是组件中可以用`**components：{}**`包裹其他组件，并在`**template**`中调用
+- 在根实例对象使用组件是==平级的==，但是组件中可以用`components：{}`包裹其他组件，并在`template`中调用
 - 组件之所以能`**同名且维护不同的对象**`，就是因为`**extend**`中返回的是`**新创建的function Vuecomponent()**`，就是每次调用都创建一个新的函数
+- ※组件是在==挂载==时就已经==执行完==身上立即执行的方法了！
 
 ## slot插槽：
 
@@ -560,31 +567,29 @@ Tips：
 
 ### Vue动画：
 
-  使用`<transition/>`标签包裹要显示的内容，并用`v-enter等-active`事先定义好动画，在`<transition/>`中的元素显示或隐藏等生命周期时会自动应用v-开头的css
+- 使用`<transition/>`标签包裹要显示的内容，并用`v-enter等-active`事先定义好动画，在`<transition/>`中的元素显示或隐藏等生命周期时会自动应用v-开头的css
 
-  多个元素标签要放在一块同时控制，必须用`<transition-group/>`包裹，并且要在应用动画的标签上绑定`key`
+- 多个元素标签要放在一块同时控制，必须用`<transition-group/>`包裹，并且要在应用动画的标签上绑定`key`
 
 ![image-20220701172405852](C:/Users/admin/AppData/Roaming/Typora/typora-user-images/image-20220701172405852.png)
 
-  生命周期总是分为三个阶段：开始状态enter、进行中enter-active、结束状态enter-to
+- 生命周期总是分为三个阶段：开始状态enter、进行中enter-active、结束状态enter-to
 
 ![img](https://upload-images.jianshu.io/upload_images/6322775-a25eb3b0bfa2d3c4.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
 
-使用@keyframes叫动画，使用enter、enter-to叫过渡
+- 使用@keyframes叫动画，使用enter、enter-to叫过渡
 
 ![img](https://upload-images.jianshu.io/upload_images/6322775-476428b1535beb52.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
 
 <center/>给active加上持续时间
 
-  **name：**可以更改`**v-**`开头的默认设置，用于标记不同的动画
+- **name：**可以更改`**v-**`开头的默认设置，用于标记不同的动画
+-  **appear：**是否在初始渲染时使用过度
 
-  **appear：**是否在初始渲染时使用过度
+- **enter-class等：**适合搭配第三方样式库
 
-  **enter-class等：**适合搭配第三方样式库
-
-  TIps：
-
-1. `<transition/>`只能应用在**单个标签**
-2. 删除==数组==元素时，周围的元素会瞬移，解决这个问题需要在`v-leave-active`过程中设置`position: absolute`，并设置`v-enter`和`v-leave-to`的动画，其他生命周期动画可以删除
-3. `<transition/>`和`<transition-group/>`可以加class，会应用到`span`标签上
-4. `<transition/>`在HTML上不会渲染，但是`<transition-group/>`在HTML上是以`<span>`标签存在
+- TIps：
+  1. `<transition/>`只能应用在**单个标签**
+  1. 删除==数组==元素时，周围的元素会瞬移，解决这个问题需要在`v-leave-active`过程中设置`position: absolute`，并设置`v-enter`和`v-leave-to`的动画，其他生命周期动画可以删除
+  1. `<transition/>`和`<transition-group/>`可以加class，会应用到`span`标签上
+  1. `<transition/>`在HTML上不会渲染，但是`<transition-group/>`在HTML上是以`<span>`标签存在
