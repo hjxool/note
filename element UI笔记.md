@@ -41,6 +41,10 @@
 
 - 使用==rules==时必须要搭配==model==，不然会出错
 
+  Tips：
+
+  - prop后的字符必须是==model对象下**第一层**属性==，使用==多层嵌套==或者==单独声明==的变量不能正确验证
+
 - ==无法验证v-for遍历的同名字段==
 
 - 表单要用`v-if`渲染，不然重置后的表单项会一直进行验证，一点开就报错
@@ -92,7 +96,7 @@
     requured:true表示字段必填
     pattern:正则表达式
     min、max:最大最小字符串长度
-    trigger:触发方式
+    trigger:触发方式，可以是数组形式：trigger:['blur','change']
     ```
 
 ### el-form-item：
@@ -108,6 +112,8 @@
   Tips：
 
   - 即使里面包裹不是单个el组件，也只会验证prop后跟的那个属性，**但是**prop验证==视觉效果==生效于==el-form-item==标签==包裹的所有部分==
+
+- ==el-form-item==不一定是==el-form==的下一层，可以被==div标签==包裹==el-form-item==里也可以包裹==el-form-item==
 
 ## 单选/多选
 
