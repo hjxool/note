@@ -395,6 +395,14 @@
 
 - 函数也是==对象==，`function xxx(){}`在栈中是以`xxx：0x123`形式存储，指向==堆==中的==Function对象==
 
+- ```js
+  function fn1(){                                          function fn2(){
+      let t = new Date()									let t = 2
+      return t										    return t
+  }													}
+  let t = new fn1() 此处t为返回的Date实例对象				let t = new fn2() 此处t为空对象！
+  结论：new一个有返回值的普通函数 在返回值是基础数据类型时 new出来的实例是空对象！
+
 ## 原型对象、原型链
 
 - [原型链]()：
@@ -966,11 +974,11 @@ offsetTop/Left是相对父级（注：滚动显示容器里，里面的每一个
 
 1. “window.location.href = down_url”下载会打开一个空白页，体验不好
 
-2. download属性可有可无；添加·**a.target = '_blank****'**·在新建空白页打开更好
+   1.  download属性可有可无
 
-![img](https://upload-images.jianshu.io/upload_images/6322775-8601768fc123b84c.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+2. `a.target = '_blank'`在空白页打开
 
-“创建a标签”，会直接下载体验较好
+   ![image-20221110165616446](C:/Users/admin/AppData/Roaming/Typora/typora-user-images/image-20221110165616446.png)
 
 ##  JSON
 
@@ -1124,3 +1132,14 @@ offsetTop/Left是相对父级（注：滚动显示容器里，里面的每一个
   - 变量提升后是undefined，而函数可以正常使用
   - 因为变量提升只是在内存中创建但是值以及类型==未定==，而函数声明会在代码进程开始之前，并不是js中所在位置
 - ==注意！==用变量声明形式创建的函数并==不会提升==
+
+## 读取文件并传输
+
+- [new FileReader()]()：
+  - 用[readAsArrayBuffer(file)]()将文件转换为二进制数据，才能触发[onload]()事件
+  - 再用`fr.onload = (e) => { e.target.result }`可以获取到转换的二进制数据
+
+- ==input==标签获取到的文件可以直接用[slice(start,end)]()切割
+  - 也可以readAsArrayBuffer转换二进制后切割
+- ==二进制==数据没有==length==属性，需要用[.byteLength]()获取字节长度
+  - ==文件==用[.size]()属性获取字节长度
