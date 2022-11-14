@@ -417,12 +417,26 @@
 
   - `Function.__proto__(Function对象).__proto__(object原型对象)`
 
-  - 实例对象是实例对象，函数对象是函数对象，实例对象的`_proto__`并不是函数对象，而是object空对象，里面有个属性==constructor==，指向实例对象的构造函数
+  - 从上可以看出：
 
-    Tips：
+    - 实例对象是实例对象，函数对象是函数对象，实例对象的`_proto__`并不是函数对象，而是object空对象，里面有个属性==constructor==，指向实例对象的构造函数
 
-    - `构造函数.prototype`和`实例对象.__proto__`是一个东西，指向同一个object空对象
-    - `let aaa = 'text' aaa.__proto__`和`Vue.prototype`并不是一个东西
+      Tips：
+
+      - `构造函数.prototype`和`实例对象.__proto__`是一个东西，指向同一个object空对象
+      - `let aaa = 'text' aaa.__proto__`和`Vue.prototype`并不是一个东西
+
+- [原型链继承]()
+
+  - 即将一个构造函数的==原型重新指向==另一个构造函数的==实例==，`子函数.prototype = new 父()`
+
+  - ==构造函数==及其==实例==也用到了原型链==继承==，他们的原型链比==Object==及实例对象的原型链==多一层==
+
+  - **注意**，因为==子的原型==重新指向了父的==实例==，而实例和构造函数里是没有==constructor==属性的，又因为子的原型是实例，再去==原型==实例==的原型==去找，所以==子的constructor指向父的构造函数==
+
+    TIps：
+
+    - 因为==constructor==指向了改变了，所以就需要重新指向。`子函数.prototype.constructor = 子函数`，因为子函数的实例找`constructor`是从原型链上，因此需要给==父函数实例==身上加个同名属性
 
 - 访问一个对象时，会==先==在==自身==寻找，如果没有，则会去==原型对象==寻找
 
@@ -651,6 +665,7 @@
   Tips：
 
   - [func.call(obj)]()和[func.apply(obj)]()等同于`obj.func()`，只不过是临时的，让`func()`成为`obj`的方法调用
+  - **注意！**等同于只是说相当于这样用，但不能真的写成`obj.func()`！因为obj里没有`func`方法，`.call`只是临时的！
 
 ------
 
@@ -974,11 +989,16 @@ offsetTop/Left是相对父级（注：滚动显示容器里，里面的每一个
 
 1. “window.location.href = down_url”下载会打开一个空白页，体验不好
 
-   1.  download属性可有可无
+2. [download]()属性，以==下载文件的方式==下载href属性上的链接。必须要加，不然无法下载文件流
+3. `a.target = '_blank'`在空白页打开
+4. 请求==返回类型==必须设置`responseType: "blob"`
+5. `URL.createObjectURL(File对象/Blob对象)`将文件流转换成==a标签==可识别的==链接==形式
 
-2. `a.target = '_blank'`在空白页打开
+![image-20221114112003852](C:/Users/admin/AppData/Roaming/Typora/typora-user-images/image-20221114112003852.png)
 
-   ![image-20221110165616446](C:/Users/admin/AppData/Roaming/Typora/typora-user-images/image-20221110165616446.png)
+![image-20221114104516632](C:/Users/admin/AppData/Roaming/Typora/typora-user-images/image-20221114104516632.png)
+
+- **注意**：必须要用[new Blob( [ blob ]，{type:'xxx'} )]()来处理文件流，因为文件流一般自带`type="xxx/json"`，直接放到超链接下载会下载json文件，但是我们要的是txt或者exe文件，这就需要==new Blob==将文件流处理成==type为空==的文件流，这样下载的时候json一类的文件就当作txt格式下载了
 
 ##  JSON
 
