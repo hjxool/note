@@ -1,6 +1,4 @@
 # HTML-1
-![](https://upload-images.jianshu.io/upload_images/6322775-739b3c6f4c4d7c8a.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
-
 1. `<h1></h1>`是标题标签
 2. `<p></p>`段落
 3. 图片由`<img src="1.jpg">`
@@ -226,43 +224,34 @@ HTML**属性名**对大小写不敏感，会统一转换成小写，在js中是�
 
 ![img](https://upload-images.jianshu.io/upload_images/6322775-f07c8f6f5807509c.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
 
-------
+## html的加载顺序
 
-html的加载顺序：
+- 解析html结构 -> 加载外部脚本和样式表文件 -> 解析并执行脚本代码 -> 构造html dom模型 -> 加载图片等外部文件 -> 页面加载完毕。
 
-​    解析html结构 -> 加载外部脚本和样式表文件 -> 解析并执行脚本代码 -> 构造html dom模型 -> 加载图片等外部文件 -> 页面加载完毕。
+-  html文件从上至下读取，如果“head”中外部引入文件读取慢，则会发生“js阻塞”，只有等前一个文件/服务器读取完才能执行后面的操作
 
-​    html文件从上至下读取，如果“head”中外部引入文件读取慢，则会发生“js阻塞”，只有等前一个文件/服务器读取完才能执行后面的操作
+  解决办法：
 
-解决办法：
+  - 使用 v-cloak指令<div **v-cloak**>{{msg}}</div>；这个指令保持在元素上知道关联实例结束编译
+  - 使用 v-html指令 <div v-html='msg'></div>
+  - 使用 v-text指令 <div v-text='msg'></div>
+  - 使用template标签将需要渲染的 html 包起来；template标签 是一种用于保存客户端内容的机制，该内容在页面加载时不被渲染，但可以在运行时使用JavaScript进行实例化。
 
-​    1、使用 v-cloak指令<div **v-cloak**>{{msg}}</div>；这个指令保持在元素上知道关联实例结束编译
+## HTML全局属性(可以与所有元素一起使用)
 
-​    2、使用 v-html指令 <div v-html='msg'></div>
+- title：为元素标签添加鼠标**悬停信息**
 
-​    3、使用 v-text指令 <div v-text='msg'></div>
+- data-*：搭配 `getAttribute(' ')`方法 来获得标签上的自定义 `data-*` 属性；
 
-​    4、使用template标签将需要渲染的 html 包起来；template标签 是一种用于保存客户端内容的机制，该内容在页面加载时不被渲染，但可以在运行时使用JavaScript进行实例化。
+  - 通过JS中 `dataset.后缀名` 设置/setAttribute('data-*'，值)
 
-------
+  - 或者通过JQ中 `data('后缀名')`方法 设置
 
-**HTML全局属性**(可以与所有元素一起使用)：
+- draggable：链接和图像默认是可拖动的
 
-​    title：为元素标签添加鼠标**悬停信息**
+- 其他的还有style和class等
 
-​    data-*：搭配 `getAttribute(' ')`方法 来获得标签上的自定义 `data-*` 属性；
-
-​        通过JS中 `dataset.后缀名` 设置/setAttribute('data-*'，值)
-
-​        或者通过JQ中 `data('后缀名')`方法 设置
-
-​    draggable：链接和图像默认是可拖动的
-
-​    其他的还有style和class等
-
-------
-
-**取值类型：**
+## 取值类型
 
   1、·**<input type="checkbox/radio">**·值存在dom节点的·**checked**·属性中
 
@@ -281,3 +270,11 @@ html的加载顺序：
 - [input]()：==value==即使在HTML写死，在==页面修改==时获取到的也是==当前输入值==
   - [text-align]()：CSS样式。可以调整输入内容位置
   - [readonly]()：标签属性。输入框变成只读，可选中但不能输入
+  
+- `<!Doctype HTML>`就是==文档声明==，用来告诉浏览器当前网页版本
+
+- `<meta>`表示声明==字符集==，只有用正确的字符集去==解码==，才不会出现乱码
+
+  - ==content==属性：设备被搜索时的关键词(百度搜索、爬虫可用)。`<meta content="购物,前端">`
+
+    
