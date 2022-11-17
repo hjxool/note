@@ -1107,6 +1107,22 @@ offsetTop/Left是相对父级（注：滚动显示容器里，里面的每一个
 
   - [title]()：`document.title`可直接修改页面名称
 
+  - [documentElement]()：用于操作==文档根元素==。
+
+    - 有==style==等属性
+
+    - ※==rem==就是相对于这个根元素的字体大小(rem不设置默认16px)
+
+      ```js
+      window.onresize = ()=>{
+          let dom = document.documentElement
+          let width  = dom.clientWidth
+          let t = width / 375	相对最小尺寸的倍数
+          let fontsize = t * 10	最小375px时字体大小10px
+          if(fontsize > 20) fontsize = 20
+          dom.style.fontSize = `${fontsize}px`
+      }
+
 - [setAttribute(属性，值)]()：用以给标签元素设置自定义属性
 
 
