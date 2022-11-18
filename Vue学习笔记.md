@@ -386,6 +386,10 @@ created:function(){
 - updated：虚拟DOM和html上的都已经更新
 - beforeDestory：监听、子组件和事件未被销毁前
 - destoryed：销毁完成
+- 通过`let vm = new Vue()`接收创建的实例对象，**不能**在==beforeUpdate之前的生命周期中获取到！==
+  - 因为beforeUpdate之前的生命周期都是在==初始化==，初始化没完成之前，==new Vue还没有返回值！==
+  - **但是**==不论在哪个生命周期==，==this==都能取到vue实例，因为钩子函数也是函数，this指向它的调用者，也就是内部正在运作的vue实例，但是new Vue还没有返回这个实例
+
 
 ![img](https://upload-images.jianshu.io/upload_images/6322775-7de7c499c66ac7e6.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
 
