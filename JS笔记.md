@@ -935,30 +935,28 @@ offsetTop/Left是相对父级（注：滚动显示容器里，里面的每一个
 
 ​      最外层：body→html→document→null
 
-5. [iframe]()：是一个==单独的视窗==
+## iframe标签
 
-   Tips：
+- 是一个==单独的视窗==
 
-   - 内部执行的任何方法都==获取不到==iframe==父级==的元素
+- 内部执行的任何方法都==获取不到==iframe==父级==的元素
 
-   - iframe内的元素获取==相对视窗==的位置都是以==iframe为边界==
+- iframe内的元素获取==相对视窗==的位置都是以==iframe为边界==
 
-     Tips:
+  - 鼠标事件也取不到iframe外的边距
 
-     - 鼠标事件也取不到iframe外的边距
+- 会在执行完父级的js后再执行iframe中内容
 
-   - 会在执行完父级的js后再执行iframe中内容
+- [vw]()和[vh]()是相对于视窗的，即是说是==相对于iframe==，而不是浏览器窗口
 
-   - [vw]()和[vh]()是相对于视窗的，即是说是==相对于iframe==，而不是浏览器窗口
+- 通过[window.parent.父级方法]()调用、传参到父级
 
-   - 通过[window.parent.父级方法]()调用、传参到父级
-   
-     Tips：
-   
-     - ==必须在服务器环境下！==
-     - 可以通过函数传参，来获取父页面元素，但这种方法前提是，父页面也是自己编写
-   
-   - [window.parent.document.querySelector]()：通过==window.parent==获取到父==页面==document从而获取元素
+  Tips：
+
+  - ==必须在服务器环境下！==
+  - 可以通过函数传参，来获取父页面元素，但这种方法前提是，父页面也是自己编写
+
+- [window.parent.document.querySelector]()：通过==window.parent==获取到父==页面==document从而获取元素
 
 ## 数据劫持/代理
 

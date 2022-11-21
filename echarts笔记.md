@@ -111,6 +111,10 @@
 
 - **grid：{show：true}**时才能设置样式
 
+- 用于==拉伸展示区域==
+
+- 只作用于四周的外边框
+
 ## 颜色样式
 
 - ![img](https://upload-images.jianshu.io/upload_images/6322775-732f6a51c1a3cf45.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
@@ -134,3 +138,14 @@
 - ==labelLine==：==视觉引导线==的设置
   - ==lineStyle==：线的样式。
     - ==color==：颜色
+
+## 漏斗图
+
+- ==sort==：数据排序。可以传==ascending上升==、==descending降序==、==none按照data顺序==、==function(a,b)函数==
+- ==itemStyle==：图形样式
+  - ==borderWidth==：描边。默认为1，0是无描边
+
+## 共同配置
+
+- ==label==和==emphasis==里的label都会影响图形标签显示、样式，且==emphasis==优先级更高
+  - 想要让label消失，必须同时设置label和emphasis > label的show均为false，不然默认会显示
