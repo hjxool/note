@@ -183,13 +183,16 @@ line-height是行高，在一行中字体是默认居中的，当行高与块级
 
 - 页面布局小技巧
   - 当子元素大小是==px==，就没必要设置父元素宽高，用==padding==和==margin==撑开并加以边框，尤其==父容器==使用==flex、grid对齐属性==时，更不需要设置宽高，用==padding==将元素边框与内容撑开一个舒服的距离即可
+  - ==自动撑大==的元素需要==设置overflow==，不然撑大到边界时不会出现滚动条，而是会继续顶出元素边界
 
 ## 定位
 
 - 父元素下的子元素是absolute时margin是相对于父元素而言的；一般情况下margin是相对于相邻元素的外边距，left等属性只有在absolute下才能使用
 - 在同一个父元素下使用relative，原始位置会自动错开；使用absolute且想保持**贴合**，需要统一**使用一个**定位**基准**，比如都用left和top
 - ==Fixed==：绝对定位，是相对于浏览器窗口，**会脱离文档流，滚动时位置不变**；
-- ==Absolute==：**绝对**定位，是**相对于最近的父元素**(不是static定位)，**会脱离文档流**，**无视padding**；
+- ==Absolute==：**绝对**定位，是**相对于最近的父元素**(不是static定位)，**会脱离文档流**，**无视padding**
+  - 绝对定位会==脱离文档流==，即==不会撑开父容器==
+
 - ==Relative==：**相对**定位(偏移)，**不会脱离**文档流，**原来的位置依然被保留**(原来的位置指所有元素的默认叠加位置，比如第二个块元素的原始位置在第一个块元素的下面，那么relative就是从第一个块元素下作为起始位置)。
 - （new）==Sticky==(粘性的)：relative和fixed的结合体，通过top等属性，可以设置元素在**距离窗口**多少距离时**滚动时位置不变**
   - tips：可以做到类似element ui的固定表头和列的效果
@@ -339,35 +342,26 @@ text-overflow：必须搭配overflow：hidden（溢出内容隐藏）和white-sp
 
 没设置宽高的元素，通过同时设置上下边距，可以间接设置宽高
 
-------
+## @keyframes关键字
 
-**@keyframes关键字**：
+- 0%和100%可以用from to代替(但其实不太好用，不能来回)；
 
-  0%和100%可以用from to代替(但其实不太好用，不能来回)；
+- 搭配animation-name调用定义好的动画名
 
-  搭配animation-name调用定义好的动画名
+- animation是自动触发的动画，并且有帧的概念，而transition（过渡动画）和transform（变形）只有开始和结束状态，并且需要依靠条件（hover等）触发;
 
-  animation是自动触发的动画，并且有帧的概念，而transition（过渡动画）和transform（变形）只有开始和结束状态，并且需要依靠条件（hover等）触发;
+- transform-origin是相对于自身
 
-  transform-origin是相对于自身
-
-**animation动画：**
-
-  animation：以下所有属性的集合，书写位置不限制，例如`animation: test 1s alternate linear 3;`，表示`使用动画test，动画持续时间1秒，交替播放，线性播放，动画播放3次`
-
-  animation-duration：动画持续时间
-
-  animation-timing-function：动画展示速度(先快后慢或是中间快两边慢等)
-
-  animation-delay：动画启动前延迟
-
-  animation-iteration-count：动画循环次数
-
-  animation-direction：动画**正向**播放或者**反**着播放，且当动画播放**不止一次**时，选择动画**轮流**方式(交替反向动画等)
-
-  ※animation-fill-mode：动画播放完是默认清除动画过程中的样式的，这个属性可以设置动画结束时样式是否保留
-
-  animation-play-state：动画暂停或播放，常用于JS中
+- *animation动画：**
+  - animation：以下所有属性的集合，书写位置不限制，例如`animation: test 1s alternate linear 3;`，表示`使用动画test，动画持续时间1秒，交替播放，线性播放，动画播放3次`
+  - animation-duration：动画持续时间
+  - animation-timing-function：动画展示速度(先快后慢或是中间快两边慢等)
+  - animation-delay：动画启动前延迟
+  - animation-iteration-count：动画循环次数
+  - animation-direction：动画**正向**播放或者**反**着播放，且当动画播放**不止一次**时，选择动画**轮流**方式(交替反向动画等)
+  - ※animation-fill-mode：动画播放完是默认清除动画过程中的样式的，这个属性可以设置动画结束时样式是否保留
+  - animation-play-state：动画暂停或播放，常用于JS中
+- 无法用==duration==控制==从top：0变化到bottom：0==这样的属性值切换
 
 ------
 
