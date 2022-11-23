@@ -145,7 +145,30 @@
 - ==itemStyle==：图形样式
   - ==borderWidth==：描边。默认为1，0是无描边
 
+## 折线图
+
+- ==areaStyle==：区域面积样式。空对象即可显示默认区域样式
+
 ## 共同配置
 
 - ==label==和==emphasis==里的label都会影响图形标签显示、样式，且==emphasis==优先级更高
   - 想要让label消失，必须同时设置label和emphasis > label的show均为false，不然默认会显示
+
+- ==color==：
+
+  ```js
+  线性渐变
+  color:{
+  	type: 'linear',
+  	x: 0,	横向从右到左 0~1之间的值 表示百分比
+  	y: 0,	纵向从下到上
+  	x2: 0,	从左到右
+  	y2: 1,	从上到下
+  	colorStops: [{
+  		offset: 0, 	0~1之间的值 表示从百分之多少开始渐变
+          color: 'rgba(30,144,255,1)' // 0% 处的颜色
+  	}, {
+  		offset: 1, color: 'rgba(30,144,255,.4)' // 100% 处的颜色
+  	}],
+  	global: false // 缺省为 false
+  }
