@@ -219,15 +219,7 @@ line-height是行高，在一行中字体是默认居中的，当行高与块级
 
 边框角：用border-left等属性制作小正方形，通过absolute覆盖到边框角落
 
-## 选择器：
-
-- “aaa bbb”：[后代选择器](https://developer.mozilla.org/zh-CN/docs/Web/CSS/Descendant_combinator)
-
-- “aaa > bbb”：[子代选择器](https://developer.mozilla.org/zh-CN/docs/Web/CSS/Child_combinator)
-
-- “h1 + p”：[相邻兄弟选择器](https://developer.mozilla.org/zh-CN/docs/Web/CSS/Adjacent_sibling_combinator)
-
-- “h1 ~ p”：[通用兄弟选择器](https://developer.mozilla.org/zh-CN/docs/Web/CSS/General_sibling_combinator)
+## 选择器
 
 - before伪元素插入图片：content设为空，display必须为block或者inline-block，宽高必须设置才能显示出来；background-repeat以及vertical-align、background-position可以辅助设置图标位置
 
@@ -238,25 +230,48 @@ line-height是行高，在一行中字体是默认居中的，当行高与块级
 - 属性选择器：
   - “[标签属性]”搜寻所有标签中特定的**属性名**；
 
-- css函数：attr(属性名)——返回选择器前元素的属性值
+- ==css函数==
 
-- [nth-child(x)]()序号**从1开始**，匹配父级元素下==1开始==的**同类元素集合**下的第x个元素
-
-- css选择器**“>”**是仅作用于**儿子**标签，不会作用于下一级标签（如果孙子节点才是要找的标签，使用>是找不到的）
+  - [attr(属性名)]()——返回选择器前元素的属性值
 
 - TIps：
   - css选择器，使用`**逗号，**`间隔应用多个样式
   - css本质上是通过“各类选择器”**定位**标签位置，来设置样式，所以不论是通过 属性选择器、class、id，都是为了一个目的——找到这个标签元素
   - **指定类名等**：**nth-child(n)**是当前元素的·**父级元素**·下的第n个元素，·**只会**·根据指定类名等来·**确定父级**·
 
-- [伪元素]()：并不真正存在于dom节点中，无法通过JS获取和操作。
+- [伪元素]()：表示一个==特殊的位置==
 
-  Tips：
+  - 并不真正存在于dom节点中，无法通过JS获取和操作。
 
   - 默认是`display:inline`，即使设置宽高也无法显示。所以必须设置成==块级元素==，`inline-block`或者`block`
   - 必须设置`content`属性才能显示
 
-- [伪类]()：
+- [伪类]()：表示一个==特殊的状态==。形如`li:first-child`
+
+  - `ul > li:first-child`正确的解读方式应该是==当作交集==选择器。即，是li且是父元素下的第一个==子元素==的才会被渲染，比如li前有其他标签，那first-child就不会生效
+  - [nth-child(n)]()：匹配父级元素下==1开始==的下的第n个元素
+    - 序号**从1开始**
+    - ==n==的范围是==0==到正无穷
+  - [nth-of-type(n)]()：==同类型==里的第n个
+  - [:not(:nth-child(2n))]()：除了xxx条件的。
+
+- ==交集==选择器：同时满足多个条件。`选择器1选择器2...`
+
+- ==并集==选择器：同时选择多个对应元素。`选择器1，选择器2，...`
+
+- ==子元素==选择器：仅找最近一层的==所有==子元素。`.aaa > .bbb`
+
+- ==后代==选择器：只要是包含关系的元素都符合。`.aaa .bbb`
+
+- ==兄弟==选择器：==紧挨==着的下==一个==兄弟元素。`.aaa + .bbb`
+
+- ==所有兄弟==选择器：所选元素==之后==的所有兄弟元素。`.aaa ~ .bbb`
+
+- ==标签属性==选择器：带有所选择属性的==所有==元素。
+
+  - `[title]`
+  - `[title=xxx]`这种新式不用给xxx加引号，只选择属性值特定的元素
+    - 等号前可以加正则符号`[title$=abc]`
 
 ------
 
