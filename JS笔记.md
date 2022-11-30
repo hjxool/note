@@ -949,6 +949,10 @@ offsetTop/Left是相对父级（注：滚动显示容器里，里面的每一个
 
 - [vw]()和[vh]()是相对于视窗的，即是说是==相对于iframe==，而不是浏览器窗口
 
+- 父获取子iframe的window：[iframeElement.contentWindow]()
+
+  - 子获取父的window：[window.parent]()
+
 - 通过[window.parent.父级方法]()调用、传参到父级
 
   Tips：
@@ -957,6 +961,12 @@ offsetTop/Left是相对父级（注：滚动显示容器里，里面的每一个
   - 可以通过函数传参，来获取父页面元素，但这种方法前提是，父页面也是自己编写
 
 - [window.parent.document.querySelector]()：通过==window.parent==获取到父==页面==document从而获取元素
+
+- 不同页面间通信[postMessage]()、[onmessage]()
+
+  - 不是==多进程==独有的方法
+  - window自带==postMessage==以及==onmessage==，`window.postMessage(数据)`是给==自身==发送消息，使用`window.onmessage = function(e){e.data}`即可接收到数据
+
 
 ## 数据劫持/代理
 
