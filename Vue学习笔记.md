@@ -158,22 +158,23 @@ new Vue({
 
 - Vue代理思路
 
-  - ```js
-    首先封装一个函数 将data中的数据传入		function ob(obj){
-    遍历传入的对象 取出key 做数据代理				let keys = Object.keys(obj)
-    										 keys.forEach((k)=>{
-    注意这里有一个很聪明的做法 					Object.defineProperty(this,k,{
-    将ob函数的this传入进去							 get(){
-                                                       	return obj[k]
-                                                       }     
-                                                       set(val){
-                                                        obj[k] = val
-                                                        }	
-                                                   }) 
-                                                 })   
-                                              }
+  ```js
+  首先封装一个函数 将data中的数据传入		function ob(obj){
+  遍历传入的对象 取出key 做数据代理				let keys = Object.keys(obj)
+  										 keys.forEach((k)=>{
+  注意这里有一个很聪明的做法 						Object.defineProperty(this,k,{
+  将ob函数的this传入进去							 get(){
+                                                     	return obj[k]
+                                                     }     
+                                                     set(val){
+                                                      obj[k] = val
+                                                      }	
+                                                 }) 
+                                               })   
+                                            }
+  ```
 
-
+- Vue的响应式不仅会重新解析==HTML==模板，而且会==重新执行==**引用**了响应式变量的==方法==！
 
 ## vue指令：
 
@@ -199,13 +200,10 @@ new Vue({
 
 #### v-bind 动态绑定
 
-​	(但是**单向，只能从data流向页面**)，可以用v-bind:动态变化值 = "表达式"；要用vue动态改变值的HTML原生属性都需要用**v-bind:属性名**；除了用**字符串表达式**，**动态绑定**属性时**必须**用**对象**和**数组**表达式，使用方法：:class="{ 样式:vue属性(true/false) / 样式：true/false }"、"[ '样式1', '样式2' ]"，样式用引号；v-bind绑定可以针对某一属性使用三元运算**:**style="{ fontSize：isRed ? '30px' : '16px' }"，style的**属性必须**是**驼峰式**或者用括号括起来；**对象**必须是**键值对**的形式，:class时必须设一个可判断的值
-
-##### 	Tips:
-
-​		class也可以动态绑定，第一个参数是默认样
-
-​		可以建立一个空对象，在触发事件的时候建新属性赋初值
+- (但是**单向，只能从data流向页面**)，可以用v-bind:动态变化值 = "表达式"；要用vue动态改变值的HTML原生属性都需要用**v-bind:属性名**；除了用**字符串表达式**，**动态绑定**属性时**必须**用**对象**和**数组**表达式，使用方法：:class="{ 样式:vue属性(true/false) / 样式：true/false }"、"[ '样式1', '样式2' ]"，样式用引号；v-bind绑定可以针对某一属性使用三元运算**:**style="{ fontSize：isRed ? '30px' : '16px' }"，style的**属性必须**是**驼峰式**或者用括号括起来；**对象**必须是**键值对**的形式，:class时必须设一个可判断的值
+  - class也可以动态绑定，第一个参数是默认样
+  - 可以建立一个空对象，在触发事件的时候建新属性赋初值
+  - 在==挂载==时进行
 
 ![](https://upload-images.jianshu.io/upload_images/6322775-538dae39965c59ac.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
 
@@ -378,9 +376,15 @@ created:function(){
 ![img](https://upload-images.jianshu.io/upload_images/6322775-85b5be56f78a787b.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
 
 - beforeMount：所有对节点的操作都不会奏效
+  - beforeMount及之前的周期函数都==先于[v-bind]()==执行
+  - beforeMount及之前的周期函数都==先于组件任何生命周期执行==
+
 - mounted：挂载成功，html节点都已被vue节点**替换**
   - **注意！**==mounted==只是==挂载节点==，还没==渲染==，渲染前元素大小获取到都是0
   - ==组件==在此时才被放到真实dom节点
+  - 此时[v-bind]()触发的方法已经==先于mounted==执行了！
+  - 挂载节点，即，所有标签上的方法都已经处理完毕。在mounted生命周期再创建静态变量就晚了
+  - `mounted()`执行时，==组件==已经==挂载完毕==，该执行的方法都执行完了
 
 - beforeUpdate：数据变化但是没传递到虚拟DOM
 - updated：虚拟DOM和html上的都已经更新
@@ -429,10 +433,12 @@ methods中方法互相调用：通过this.$options.methods.方法名查找method
 
 ## 组件
 
+- 在==根实例==[beforeMount]()之==后==，正式开始处理挂载时才执行组件的初始化
 - [Vue.component('组件名',{ 配置项 })]()
   - **组件必须声明在new vue实例之前！**
   - component**读取不到**vue实例和**其他**组件中的**data数据**，有效避免了变量污染
   - ==vue根实例==也获取不到组件定义的属性
+  - ==不==在页面==使用==就==不会初始化==操作，也不会报错
   - ==组件名称==是在HTML页面上使用的==标签名==
 
 
@@ -456,6 +462,32 @@ methods中方法互相调用：通过this.$options.methods.方法名查找method
 - 在根实例对象使用组件是==平级的==，但是组件中可以用`components：{}`包裹其他组件，并在`template`中调用
 - 组件之所以能`**同名且维护不同的对象**`，就是因为`**extend**`中返回的是`**新创建的function Vuecomponent()**`，就是每次调用都创建一个新的函数
 - ※组件是在==挂载==时就已经==执行完==身上立即执行的方法了！
+- 给组件上添加的==class==、==style==会直接添加到组件==根节点==上
+- [局部注册组件]()
+
+  ```js
+  let component = {
+      template:xxxx,
+      data(){return { } }
+      ...
+  }
+  new Vue({
+      ...
+      components:{'自定义':component},  完整写法 页面<自定义/>
+      components:{component},	简写 页面<component/>
+  })
+  或者
+  Vue.component('xxx',{
+      ...
+      components:{component} 同上
+  })
+  ```
+- 不管是==全局==组件还是==局部==组件，[mixins]()==混入==对象**必须**==声明在组件**之前**！==
+- [mixins: [ 变量1,变量2, ... ] ]()：将外部文件/变量混入当前组件/根实例
+
+  - 组件是独立作用域，所以每个组件都要混入才能使用外部声明的变量和方法
+  - 混入==优先==于组件==子身的同名==方法和变量。例如，混入文件里有mounted/data配置项，它的执行优先于组件内写的mounted/data
+
 
 ## slot插槽：
 
@@ -502,21 +534,6 @@ methods中方法互相调用：通过this.$options.methods.方法名查找method
     Tips：
   
     - ·**$on**·第二个参数是监听的事件函数，默认参数是·**$emit**·传递过来的值
-
-## 动态组件：
-
-- 首先用v-for显示点击的标签，方便取出点击的标签名，想办法与组件名动态关联（计算属性或者监听）
-- is标签属性除了可以用来切换组件，还可以用来突破`<ul>` `<select>`标签限制
-
-- 组件是全局的，在不同vue实例中都可以
-
-![img](https://upload-images.jianshu.io/upload_images/6322775-45cdf99e3c36d02f.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
-
-<center>局部注册
-
-## underscore.js组件:
-
-​    防抖**_.debounce(函数名**(只能写函数名调用，不能直接写函数)**，延迟)**
 
 ## $refs对象
 
