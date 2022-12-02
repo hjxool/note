@@ -57,6 +57,8 @@
 
     - 使用“**flex-grow**/flex-shrink”可以控制元素自动填充，是flex的自动填充方法，“flex-grow”默认不填充扩大，所以要单独设置
     - [flex-grow]()会使[width]()失效
+      - flex主轴==横向==时，==width==失效
+      - flex主轴==纵向==时，==height==失效
 
   - 设置==align-items==、==justify-content==会使==flex-grow==失效
 
