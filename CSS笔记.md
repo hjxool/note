@@ -316,6 +316,7 @@ text-overflow：必须搭配overflow：hidden（溢出内容隐藏）和white-sp
   - 不能更改height，width值，大小只能由==内容决定==
   - 不会独占一行
   - 可以使用padding全部属性以及margin==左右==属性。
+  - ==垂直==方向的margin、padding、border属性都==不生效==
 - block（块元素）
   - 可以更改height，width值以及padding、margin全部属性；但是会独占一行；默认填满父元素宽度
 - inline-block（行内块元素）：不独占一行的块元素。
