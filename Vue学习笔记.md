@@ -315,13 +315,12 @@ computed计算属性和methods是不同的，computed是基于响应式的，dat
 
   - get函数中使用“this”，本身的指向应该是windows，但是这里vue帮你做了一件事，就是把“this”的指向改成“vue实例”，所以在这类vue给定的特殊函数中，可以用this
 
-- 侦听器watch：
-
-  - 带**$**符号的是vue实例对象**自带**的属性和方法
-
-  - $watch('监听的属性'，function(变化后的值，变化前的值) {代码})
-
-  - **watch**用在执行**异步**和开销较大的计算时更适合；最适合的场景是输入框联想，在输入内容时是中间状态，但是停止输入后开始执行方法（限制操作的频率）
+- ==侦听器watch==：
+- 带**$**符号的是vue实例对象**自带**的属性和方法
+  
+- $watch('监听的属性'，function(变化后的值，变化前的值) {代码})
+  
+- **watch**用在执行**异步**和开销较大的计算时更适合；最适合的场景是输入框联想，在输入内容时是中间状态，但是停止输入后开始执行方法（限制操作的频率）
 
 ![img](https://upload-images.jianshu.io/upload_images/6322775-ea5ac780ccd1e2fd.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
 
