@@ -318,6 +318,9 @@ text-overflow：必须搭配overflow：hidden（溢出内容隐藏）和white-sp
   - 不会独占一行
   - 可以使用padding全部属性以及margin==左右==属性。
   - ==垂直==方向的margin、padding、border属性都==不生效==
+  - **但是**！==脱离文档流==后就可以设置宽高即以前不生效的属性
+    - [float]()、==绝对定位==均可脱离文档流
+      - ==float==脱离文档流不会遮盖前一个兄弟元素，但是==绝对定位==会堆叠遮盖
 - block（块元素）
   - 可以更改height，width值以及padding、margin全部属性；但是会独占一行；默认填满父元素宽度
 - inline-block（行内块元素）：不独占一行的块元素。
