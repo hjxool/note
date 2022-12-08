@@ -578,6 +578,8 @@
 
   - [字符串]()中见到[\n]()就是换行
 
+  - 返回==修改后==的字符串
+
 - [substring(start，end)]()：截取从==开始索引(包含)==到==结束索引(不包含)==的字符串
 
 - [slice]()：同数组
@@ -996,7 +998,7 @@ offsetTop/Left是相对父级（注：滚动显示容器里，里面的每一个
   2. get函数作用是**双向**绑定(**改原始值**会跟着变动)，**get函数**本身不会传入参数，它“return”返回的是外面定义好的变量，所以当**set函数**修改了外部定义的变量，get中**返回值**也就变了；set函数是**改对象属性**时触发，修改后**原始值**也会发生改变(原始值会发生改变是因为修改值对原始值进行了**赋值**操作，**再触发**的**get函数**)；使用set函数时必须也要有get函数，不然set修改完值后，没有对应的属性接收
   3. 数据代理：通过另一个对象来操作原先的对象属性，通过get、set函数实现
 
-## 下载：
+## 下载
 
 1. “window.location.href = down_url”下载会打开一个空白页，体验不好
 
@@ -1004,12 +1006,17 @@ offsetTop/Left是相对父级（注：滚动显示容器里，里面的每一个
 3. `a.target = '_blank'`在空白页打开
 4. 请求==返回类型==必须设置`responseType: "blob"`
 5. `URL.createObjectURL(File对象/Blob对象)`将文件流转换成==a标签==可识别的==链接==形式
+   - 下载完后需[URL.revokeObjectURL(url)]()释放内存
 
 ![image-20221114112003852](C:/Users/admin/AppData/Roaming/Typora/typora-user-images/image-20221114112003852.png)
 
 ![image-20221114104516632](C:/Users/admin/AppData/Roaming/Typora/typora-user-images/image-20221114104516632.png)
 
 - **注意**：必须要用[new Blob( [ blob ]，{type:'xxx'} )]()来处理文件流，因为文件流一般自带`type="xxx/json"`，直接放到超链接下载会下载json文件，但是我们要的是txt或者exe文件，这就需要==new Blob==将文件流处理成==type为空==的文件流，这样下载的时候json一类的文件就当作txt格式下载了
+- Tips:
+  - 有时候需要从回包里获取==响应头==里的字段，但是默认暴露出来的字段有限，需要后端设置允许访问的字段。
+    - 使用`res.headers['content-disposition']`取出额外文件信息
+
 
 ##  JSON
 
