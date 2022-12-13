@@ -1021,6 +1021,7 @@ offsetTop/Left是相对父级（注：滚动显示容器里，里面的每一个
 ##  JSON
 
 - [JSON.stringfy]()：将JS值(数组、对象等)转换为JSON字符串
+  - `stringify(值,null,缩进)`可以格式化JSON字符串。**注！**格式化后的值必须放入==<pre/>==标签
 
 - [JSON.parse]()：将JSON字符串转换为JS，==不改变原始数据==
 - JSON允许传递值包括：字符串、数字、布尔值、null、普通对象、数组。不允许传递方法及函数对象，这是js独有的
