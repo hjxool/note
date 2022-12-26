@@ -514,14 +514,16 @@ methods中方法互相调用：通过this.$options.methods.方法名查找method
 
 ![img](https://upload-images.jianshu.io/upload_images/6322775-973e1f485034f113.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
 
-<center>provide是个函数，内部用return形式返回一个“prop属性”
+<center>provide是个函数，内部用return形式返回一个“prop属性”</center>
+
 
 ![img](https://upload-images.jianshu.io/upload_images/6322775-65e782fcfaf8ad48.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
 
-<center>在“不论层数”的子组件中用“inject”来接收，写法类似“prop”
-- ※`**$emit**`其本质是**`触发`**自己定义的事件，而`**$on**`或者`**v-on**`则是`**监听**`事件，当`**$emit**`触发时，`**$on、v-on**`则收到其传过来的参数
+在“不论层数”的子组件中用“inject”来接收，写法类似“prop”
+- ※`$emit`其本质是**`触发`**自己定义的事件，而`$on`或者`v-on`则是`监听`事件，当`$emit`触发时，`$on、v-on`则收到其传过来的参数
 - 通过[$parent]()获取父级方法/变量：`this.$parent.fatherFunction(参数)`或`this.$parent.变量`
 - 将父级函数直接传入进去：`<component :自定义名="fatherFun" />`、`组件内：props:['自定义名']`、`this.自定义名(参数)`
+
 
 ## 子组件间互相传值：
 
