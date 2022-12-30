@@ -611,6 +611,7 @@
 
   - 与[for(let value of array)]()不同的是，遍历的是key，而`for of`遍历的是值
   - ==注意！==此方法会遍历出==原型链==上的属性！
+  - 遍历数组时，==key均为字符串！==
 
 - [delete  obj.xxx]()：操作符，等同与或符。返回删除成功与否
 - [hasOwnProperty]()：使用`xxx in obj`会寻找obj==原型链==上的属性方法，而==hasOwnProperty==只会查找`obj`身上的属性方法
