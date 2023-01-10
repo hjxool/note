@@ -161,6 +161,8 @@ line-height是行高，在一行中字体是默认居中的，当行高与块级
 
 - before伪元素插入图片：content设为空，display必须为block或者inline-block，宽高必须设置才能显示出来；background-repeat以及vertical-align、background-position可以辅助设置图标位置
 - 伪类**选择器后**还可以**跟子元素**，以及子元素的选择器——跟在选择器后的子元素可以用于限制在`**选择器特定条件**`下元素的样式改变，比如一些元素初始样式是隐藏，在`**:hover**`悬停时再显示这个元素
+  - 伪类选择器仅可以用==兄弟/子元素==选择器实现特定条件下用CSS切换显示元素
+
 - **选择器后**还可以**跟选择器**，但是要注意**顺序**。
 - 属性选择器：
   - “[标签属性]”搜寻所有标签中特定的**属性名**；
@@ -328,6 +330,18 @@ text-overflow：必须搭配overflow：hidden（溢出内容隐藏）和white-sp
     - 只有==块元素==会坍缩，flex等弹性布局下不会
   - box-sizing：属性。border-box下相当于把padding和border算在content里，盒模型会自动根据padding和border的值来调整content的值
   - ==背景色==会给除了margin内的所有区域都上色，使用`background-clip:content-box`可以将边框底部的背景色去除
+
+## 文字
+
+- 文字始终处于行高最==中间==
+- 文字有字体框的概念，`font-size:50px`即==行高==/==文字框==高度是50px，文字是小于50px的
+- [line-height]()
+  - 可以设置1、2这样的数字，表示几倍的==font-size==
+  - 仅表示单行的行高
+- [text-align]()：文字的==水平对齐==。可选值：left、right、center、justify
+- [vertical-align]()：文字==垂直==方向对齐。可选值：baseline(基线)、top、bottom、middle、px
+- [white-space]()：网页如何处理空白。可选值：normal、wrap、==pre(保留空白，可作为预处理格式)==
+  - 文字省略：需要具备几个条件，宽度、空白不换行、超出部分裁剪、文字溢出如何处理
 
 ## RGB颜色
 
