@@ -261,7 +261,7 @@ text-overflow：必须搭配overflow：hidden（溢出内容隐藏）和white-sp
 
 没设置宽高的元素，通过同时设置上下边距，可以间接设置宽高
 
-## 动画和过渡
+## 动画、过渡、变形
 
 - keyframe
   - 0%和100%可以用from to代替(但其实不太好用，不能来回)；
@@ -283,9 +283,20 @@ text-overflow：必须搭配overflow：hidden（溢出内容隐藏）和white-sp
     - animation-play-state：动画暂停或播放，常用于JS中
 
   - 无法用==duration==控制==从top：0变化到bottom：0==这样的属性值切换
-
 - transition
   - 只能对有效数值进行过渡，比如：`0到100px`等，但是值由浏览器自动计算的auto无法过渡，例如：从top：0到bottom：0，浏览器不知道怎么将bottom：auto过渡到bottom：0
+  - [transition-timing-function]()：
+    - [steps(帧)]()：里面填入参数只能是正整数。表示过渡效果由几帧来完成
+- transform
+  - 只针对元素本身(即变形的大小百分比等都是相对自身)，变形不会脱离文档流，也不会挤压其他元素
+  - 可以同时写多个变形，中间用空格隔开`transform:translateX(-50%) translateY(-50%)`
+  - [perspective]()：视距。默认远近大小都相同，但设置了视距，移动Z轴会使元素==变大/小==。`transform:perspective(800px) translateZ(500px)`，视距必须写前面才会生效。
+    - 设置视距很有用！除了像scale放大缩小元素，最主要的是在==旋转==时产生==透视==效果！
+    - 也可以给==变形的元素父级==加上perspective属性
+
+  - [transform-style]()：默认值flat，2D平面效果。可选值，==preserve-3d==3D效果
+  - [transform-origin]()：变形原点。默认值在中心点。
+
 
 
 ------
@@ -366,3 +377,20 @@ text-overflow：必须搭配overflow：hidden（溢出内容隐藏）和white-sp
   - H：色相。0~360的值。用于计算调色
   - S：饱和度。0%~100%。可以理解为“灰度”，0%全是灰色，50%颜色不饱和，一般取100%
   - L：亮度。0%~100%。0%全是黑色，100%全是白色，一般取50%
+
+## Less
+
+- ```less
+  >符等同css
+  .box{
+      >.子{}			生成css		.box > 子{}
+      .后代{}
+  }
+  &符不只可以跟选择器 还可以直接用于拼接字符串
+  .box{
+      &box2{}			生成css		.boxbox2{}
+  }
+  ※混入：将其他类的样式复制进另一个类，达到样式的复用，而不用复制粘贴
+  .box{
+      .box2()			生成css		.box{ 里面是.box2的样式 }
+  }
