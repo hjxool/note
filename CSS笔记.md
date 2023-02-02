@@ -407,3 +407,14 @@ text-overflow：必须搭配overflow：hidden（溢出内容隐藏）和white-sp
     - **但是**大小不是用px这种绝对单位，而是设置为相对视口的单位vw，由`100vw = 390px(视口/CSS像素)`得`0.2564vw = 1px`，**但是**font-size最小值为12px，为了方便计算，设置为20px，即==5.128vw==，这样，根节点字体大小就是自适应
     - 设置元素大小为40px，即==10.256rem==
     - 这样在不同移动端屏幕下，会自适应缩放
+
+## 媒体查询media
+
+- 语法`@media 媒体类型、特性组成的规则{}`
+  - 媒体类型：`@media screen`
+    - all所有设备
+    - screen带屏幕的设备
+    - print打印设备
+    - speech屏幕阅读器
+  - 媒体特性：`@media (width:500px)`
+    -  可选项：width、height
