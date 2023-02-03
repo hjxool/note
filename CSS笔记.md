@@ -410,6 +410,7 @@ text-overflow：必须搭配overflow：hidden（溢出内容隐藏）和white-sp
 
 ## 媒体查询media
 
+- 一般来说，==视口以**宽度**为准，不考虑高度==，因为大多数情况下，都是横向满铺，纵向滚动显示
 - 语法`@media 媒体类型、特性组成的规则{}`
   - 媒体类型：`@media screen`
     - all所有设备
@@ -417,4 +418,7 @@ text-overflow：必须搭配overflow：hidden（溢出内容隐藏）和white-sp
     - print打印设备
     - speech屏幕阅读器
   - 媒体特性：`@media (width:500px)`
-    -  可选项：width、height
+    -  可选项：width、height、==min-width==(最**小**宽度)、==max-width==(最大宽度)等
+    -  用括号圈起来
+    -  不要用==逗号==，表示==或==的关系。用==and==，表示==与==
+       -  `@medai screen and (min-width:500px) and (max-width:1200px)`
