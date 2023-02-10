@@ -879,6 +879,7 @@ js**原生**事件处理函数事件名必须叫“event”
   - 方法：用[setInterval]()定时执行==动作==，通过==触发事件==设置==定时器触发条件==
 - 定时器的回调函数并==不是到时间就触发！==必须在主线程栈里面的==初始化代码==逻辑执行出结果后，才轮到==事件队列==(事件循环模型)里的代码执行
   - ==事件==包括：==onclick==等==监听事件==，定时器的==回调函数(事件)==
+- ==清除定时器==后，==不会立即==将整个回调函数干掉，而是等全部逻辑执行完后再清除
 
 
 ## 元素在页面中的位置
@@ -895,11 +896,12 @@ js**原生**事件处理函数事件名必须叫“event”
 
     - ==鼠标==的[clientX/Y]()也是==相对于**可见窗口(body)**==的位置，可视窗口的左上角始终是(0,0)点。想要获取相对于==页面(超出body大小)==的坐标用[pageX/Y]()
 
-  - [scrollHeight/Width]()：滚动大小(==不是元素自身大小！是被撑大后的大小==)。包括可视区域、滚动条大小、隐藏部分
+  - [scrollHeight/Width]()：滚动大小(==不是元素自身大小！是被撑大后的大小==)。包括==可视区域（clientHeight）==、滚动条大小、隐藏部分
 
     Tips：
 
     - ==判断滚动条到底==：`scrollHeight - scrollTop == clientHeight`
+      - **注意**：`offsetHeight + scrollTop > scrollHeight`
     - 滚动大小实际上就等于==滚动条可滚动宽/高==加上==可视窗口大小==
 
 - ![img](https://upload-images.jianshu.io/upload_images/6322775-0cf168f634ec329d.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
@@ -922,25 +924,25 @@ offsetTop/Left是相对父级（注：滚动显示容器里，里面的每一个
 
 ### Tips：
 
-  1、想横向滚动，可以用“@wheel”，此事件在**鼠标滚轮**滚动时触发，然后手动设置，事件触发一次横向滚动距离
+1. 想横向滚动，可以用“@wheel”，此事件在**鼠标滚轮**滚动时触发，然后手动设置，事件触发一次横向滚动距离
 
-  2、wheelDelta为正则是滚轮向上，为负则向下
+2. wheelDelta为正则是滚轮向上，为负则向下
 
-  3、※**offset偏移量**是依据**上一级定位元素(position:relative等)**确定的
+3. ※**offset偏移量**是依据**上一级定位元素(position:relative等)**确定的
 
-  4、※**offsetParent**和**parentNode**的区别：
+4. ※**offsetParent**和**parentNode**的区别：
+   - [offsetParent]()
+     - 查找路径：有带有·**position**·属性的上一级→带有position属性的上一级。(body虽然没设置position，但是因为所有元素都脱离不了body文档流，所以总能找到body是最外层)
+     - 最外层：body→null
+   - [parentNode]()
+     - 查找路径：·**不考虑position**·，单纯的父级元素往上查找。
+     - 最外层：body→html→document→null
 
-​    [offsetParent]()
-
-​      查找路径：有带有·**position**·属性的上一级→带有position属性的上一级。(body虽然没设置position，但是因为所有元素都脱离不了body文档流，所以总能找到body是最外层)
-
-​      最外层：body→null
-
-​    [parentNode]()
-
-​      查找路径：·**不考虑position**·，单纯的父级元素往上查找。
-
-​      最外层：body→html→document→null
+5. [判断滚动触底]()：
+   - [scrollTop]()取值范围：[0，==( scrollHeight  - clientHeight )==]
+     - ==滚动条到底==：scrollTop = scrollHeight  - clientHeight
+     - ==滚动条距离底部50px以内==：(scrollHeight  - clientHeight) - scrollTop <= 50
+     - ==滚动条距离底部5%以内==：scrollTop / (scrollHeight  - clientHeight) >= 0.95
 
 ## iframe标签
 
