@@ -67,12 +67,13 @@
     - flex主轴==横向==时，==width==失效
     - flex主轴==纵向==时，==height==失效
     - flex-grow最好搭配==overflow:hidden==，容器自动伸展，因此会被撑大，里面的子元素设置overflow失效
+    - 设置==align-items==、==justify-content==会使==flex-grow==失效
 
-- 设置==align-items==、==justify-content==会使==flex-grow==失效
 
   Tips：
 
   - 只设置align-items==或==justify-content其中一个时，flex-grow会向==未设对齐属性==的地方扩充
+
 
 ## grid布局
 
@@ -394,7 +395,9 @@ text-overflow：必须搭配overflow：hidden（溢出内容隐藏）和white-sp
   }
   ※混入：将其他类的样式复制进另一个类，达到样式的复用，而不用复制粘贴，仅能使用class样式
   .box{
-      .box2()			生成css		.box{ 里面是.box2的样式 }
+      .box2()			生成css		.box{ 里面是.box2的样式 } 不能是子元素！只能是**后代**元素样式
+      >.box3()		不行
+      .box3()			box3是>子元素也不行
   }
   ```
 
