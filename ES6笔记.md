@@ -11,19 +11,42 @@
 - ES6新增let和const。var是全局变量，即使是在区块内声明也是作用全局
 
 
+## let
+
+- 声明变量
+
+  ```js
+  let a
+  let b,c,d
+  let f = 100, g = []		之前我错误的写过 let f,g=[] 形式，这只能给一个变量赋值！
+  ```
+
+- 块级作用域：在`{ let }`内声明的变量无法被父级读取
+
+- 不存在变量提升：
+
+  - ==var==声明的变量，==可以==在==声明前==使用，只不过是==undefined==
+  - let声明的变量，不能在声明前使用，会报错
+
+- Tips：
+
+  - **注意**：==for(let index = 0;index<length; index++)==中，let声明的index是在==每一次==循环创建的==块级作用域==中新声明的index
+
+
 ## string扩展
 
 - padStart和padEnd，有两个参数，第一个是要保持的长度，第二个是长度不够的补白字符
 
-## 模块数据语法：
+## 模块化
 
 - 在一个**js文件**中想`**暴露**`和`**引入**`一些方法和属性，有几种对应形式：
   1. 通用形式：`import * as 别名 from "文件路径"``
   2. ``export 对象；export function`或者`export{ 对象，函数名 }`——`import {暴露的对象和方法名} from 路径`
   3. 引入默认暴露时不能直接用default表示引入的对象，必须用`as 别名``
-  4. ``export default { 写入属性和方法 }`——`import {default as xxx} from 路径`或者`import xxx from 路径`
+  4. `export default { 写入属性和方法 }`——`import {default as xxx} from 路径`或者`import xxx from 路径`
+     - `import {xxx as aaa,obj1,fnc} from '../xxx.js'`
   5. 动态引入：在需要用到的地方调用`**import('地址').then(传入的模块 =>{模块.里面暴露的方法})**`，import函数，其返回值是promise对象
-
+  
 - 要引入**css文件**，直接使用`**import 路径**`
 
 ## 扩展运算符和rest参数：

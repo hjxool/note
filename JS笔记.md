@@ -1240,3 +1240,38 @@ offsetTop/Left是相对父级（注：滚动显示容器里，里面的每一个
         //计算
         postMessage(计算结果)	向主线程发送数据
     }
+    ```
+
+## MD5、FileReader
+
+- [SparkMD5]()只能读取[FileReader]()对象生成的结果
+
+  - 哪怕是==Blob==或者==File==类型对象也会报错
+
+- [FileReader]()
+
+  - [readAsBinaryString]()：读取为二进制字符串
+
+    - 可以读取==Blob==或者==File==类型对象
+
+    - 适合==小文件==，大文件加载过慢
+
+    - 只有==SparkMD5.hashBinary==才可以读取生成MD5
+
+      ```js
+      file_reader.onload = (e) => {
+          let md5 = SparkMD5.hashBinary(e.target.result)
+      }
+
+  - [readAsArrayBuffer]()：读取为数组缓冲区
+
+    - 可以读取==Blob==或者==File==类型对象
+
+    - 只有SparkMD5的==数组缓冲==对象才可以读取生成MD5
+
+      ```js
+      let spark = new SparkMD5.ArrayBuffer()
+      file_reader.onload = (e) => {
+          spark.append(e.target.result)
+          let md5 = spark.end()
+      }
