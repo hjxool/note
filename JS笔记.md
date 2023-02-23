@@ -358,8 +358,6 @@
     执行文件中 直接调用模块对象里的方法
     	module.add()
 
-
-
 ## 自执行函数
 
 - `()`表示函数的执行，而函数必须是一个==整体==，所以需要用`(function (){})`的形式将整个函数包起来，再用`(function (){})()`去执行函数
@@ -1324,3 +1322,21 @@ offsetTop/Left是相对父级（注：滚动显示容器里，里面的每一个
           spark.append(e.target.result)
           let md5 = spark.end()
       }
+      ```
+
+## 错误异常处理
+
+- [try{ }catch( ){ }]()中可以配合[throw]()关键字自定义报错内容
+
+  ```js
+  function fn( params ) {
+      this.m = params
+      this.name = 'xxx'
+  }
+  try{
+      if(...){
+         throw new fn('error')
+      }
+  }catch(e){
+      console.log(e.m,e.name) 对应上面自定义函数中的属性
+  }
