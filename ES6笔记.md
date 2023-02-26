@@ -44,6 +44,35 @@
 - 不能作为==构造函数==
 - 不能使用[arguments]()变量
 
+## 生成器
+
+- `function * fn(){ }`function关键词后跟==*号==
+
+  - `let obj = fn()`
+
+- 可以使用[yield]()关键词，例：`{/*代码块*/yield 返回值; /*代码块*/yield 返回值;}`
+
+  - 作用：分隔代码，可以理解为小==return==，yield后是==for循环==每次循环得到的结果，有几个yield就将代码分隔为几块
+
+  - 遍历只会返回yield后的语句，但是[生成器对象.next( )]()会yield分隔开的前、后代码块，如
+
+    ```js
+    function * gen(){
+        console.log(1)
+        yield 123;
+        console.log(2)
+        yield 456;
+        console.log(3)
+    }
+    let t = gen()
+    t.next() // 1
+    t.next() // 2
+    t.next() // 3
+    t.next() // 空
+    ```
+
+  - [next]()会返回yield后的内容
+
 ## Symbol
 
 - ES6提出的一种原始数据类型，跟Number等一样，只能接受字符串作为参数
