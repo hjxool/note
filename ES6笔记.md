@@ -71,7 +71,57 @@
     t.next() // 空
     ```
 
-  - [next]()会返回yield后的内容
+  - [next( )]()会返回yield后的内容
+  
+    - 与==for循环==不同的是，for循环拿到的是yield后的结果，比如`yield 123`，那for循环得到的就是123
+  
+    - 而==next( )==执行返回的是一个对象，比如`yield 123;  obj.next()`返回`{done:false,value:123}`
+  
+    - ==next( )==也可以接收参数，会作为==上一个==**yield**语句==返回的结果==，下例是一个异步执行的定时任务，但是要在前一个异步任务执行完后再执行后一个
+  
+      ```js
+      function oneStep(){
+          setTimeout(()=>{
+              let data = '第1步'
+              g.next(data) 过1秒后执行第二个yield 在第一个yield中调用第二个yield
+          },1000)
+      }
+      function twoStep(){
+          setTimeout(()=>{
+              let data2 = '第2步'
+              g.next(data2)
+          },1000)
+      }
+      function threeStep(){
+          setTimeout(()=>{
+              let data3 = '第3步'
+              g.next(data3)
+          },1000)
+      }
+      function * gen(){
+          let t = yield oneStep()
+          console.log(t) next中传入的参数作为前一个**yield的返回值** 此处输出'第1步'
+          let t2 = yield twoStep()
+          console.log(t2) 输出'第2步'
+          let t3 = yield threeStep()
+          console.log(t3) 输出'第3步'
+      }
+      let g = gen()
+      g.next() 开始执行第一个yield
+      ```
+  
+  - [正确理解yield范围]()
+  
+    ```js
+    /* 代码块1 */
+    let t = yield /* 代码块2 */
+    /* 代码块3 */
+    let t2 = yield /* 代码块4 */
+    /* 代码块5 */
+    代码块1、2为*第一个yield*的范围
+    t、代码块3、4为*第二个yield*的范围
+    t2、代码块5为*第三个yield*的范围
+  
 
 ## Symbol
 
