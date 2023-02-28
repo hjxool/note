@@ -77,7 +77,7 @@
   
     - 而==next( )==执行返回的是一个对象，比如`yield 123;  obj.next()`返回`{done:false,value:123}`
   
-    - ==next( )==也可以接收参数，会作为==上一个==**yield**语句==返回的结果==，下例是一个异步执行的定时任务，但是要在前一个异步任务执行完后再执行后一个
+    - ==next( )==也可以==传入实参==，==后一个next('实参')==会作为==上一个==**yield**语句==整体的返回结果==，下例是一个异步执行的定时任务，但是要在前一个异步任务执行完后再执行后一个
   
       ```js
       function oneStep(){
@@ -100,7 +100,7 @@
       }
       function * gen(){
           let t = yield oneStep()
-          console.log(t) next中传入的参数作为前一个**yield的返回值** 此处输出'第1步'
+          console.log(t) 第二个next中传入的参数作为第一个**yield整体的返回值** 此处输出'第1步'
           let t2 = yield twoStep()
           console.log(t2) 输出'第2步'
           let t3 = yield threeStep()
@@ -122,6 +122,27 @@
     t、代码块3、4为*第二个yield*的范围
     t2、代码块5为*第三个yield*的范围
   
+
+## Promise
+
+- 本质是==构造函数==，用以处理==异步操作失败或成功的结果==
+
+- ```js
+  let p = new Promise(fn1)	Promise接收 函数 作为参数
+  function fn1(p1, p2) {		Promise执行时 会往函数中传入两个 函数 作为参数
+      setTimeout(() => {
+          let data = '数据'
+          // p1('成功')
+          p2('err1','err2')	这两个函数分别可以用来改变 Promise对象 的 状态
+      }, 1500)			   第一个参数 表示成功 可以接收 1个 参数
+  }					      第二个参数 表示失败 也只能接收 1个 参数
+  p.then(success, fail)	    Promise对象的 then函数 也只接收 函数 作为参数 有两个参数
+  function success(...p) {	Promise对象状态为成功时会执行第一个参数
+      console.log(p)	输出'成功'
+  }
+  function fail(...p) {		Promise对象状态为失败时会执行第二个参数
+      console.log(p)	输出'err1' 只有一个参数传入进来
+  }
 
 ## Symbol
 
