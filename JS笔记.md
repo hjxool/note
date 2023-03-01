@@ -356,6 +356,7 @@
                 console.log(--a)
             }    
             window.module = {add,sub}
+        	想往window上添加方法，直接用 window.module = add
     	})()
     执行文件中 直接调用模块对象里的方法
     	module.add()
