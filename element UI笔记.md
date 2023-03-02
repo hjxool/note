@@ -234,3 +234,20 @@
 
 - [current-change]()：回调参数是==当前页==。==所有改变当前页==码的行为都会触发此方法
 - [page-size]()：一页最大显示数量。必不可少的属性，少了的话会出现分页错乱
+
+## 弹框
+
+- element弹框本质上是封装的==Promise对象==，例如：
+
+  ```js
+  function xxx(a) {
+      return new Promise((fn1, fn2) => {
+          if (a) fn1('success')
+          fn2('fail')
+      })
+  }
+  xxx(0).then((ss)=>{
+      console.log(ss)
+  }).catch((ss)=>{
+      console.log(ss)
+  })

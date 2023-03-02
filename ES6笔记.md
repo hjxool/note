@@ -328,7 +328,7 @@
 - 与==解构赋值==结合
 
   ```js
-  function fn( { a = 1, b, c } ){
+  function fn( { a = 1, b, c } ){	注意！解构赋值对象 设置默认值 用的不是{a:1}而是 {a=1}
       console.log(a,b,c)
   }
   fn({a:'123',b:123,c:'root'}) // '123',123,'root'

@@ -657,7 +657,10 @@
   - [prompt(string)]()：类似==alert()==，传入一个==字符串==作为提示文字，会弹出一个输入框，输入的内容作为`prompt函数`的返回值
 - **history**.pushState/**replaceState**(state,title,url)可以在**不跳转页面**的情况下**改写**当前页面的url
 - **跳转页面**：window.location.**href** = "地址?键值对"，跳转页面后使用`**location.search**`获取到`？`之后的内容，对获取的内容进行字符串分割，创建对象obj = { }，使用**obj['key'] = '值'**，将分割好的键值对装入对象
-- sessionStroage本地存储：使用sessionStroage.自定义变量名 = 值，就可以将**值**存入**自定义变量**名，取用的时候直接用**sessionStroage.自定义变量名**就可以获取值；删除的时候使用sessionStroage.removeItem("自定义变量名")
+- [sessionStroage]()：本地存储
+  - 使用`sessionStroage.自定义变量名 = 值`，就可以将**值**存入**自定义变量**名，取用的时候直接用**sessionStroage.自定义变量名**就可以获取值
+  - ==删除==的时候使用`sessionStroage.removeItem("自定义变量名")`
+
 
 ### document方法：
 
