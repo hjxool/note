@@ -149,6 +149,38 @@
 
 - 除了then里传入两个函数，还可以用[promise对象.catch(函数)]()接收失败回调方法
 
+- 对比普通回调和Promise.then的区别
+
+  ```js
+  普通回调
+  function fn1(a) {
+      fn2(a, 'b')
+  }
+  function fn2(...p) {
+      fn3(...p, 'c')
+  }
+  function fn3(...p) {
+      console.log(p[0] + p[1] + p[2])	输出'abc'
+  }
+  fn1('a')
+  Promise回调——then方法返回的结果还是Promise对象，所以可以接着用.then执行后续回调
+  let p = new Promise((a, b) => {
+      a('a')
+  })
+  p.then((v) => {
+      return new Promise((a, b) => {
+          a([v, 'b'])	成功和失败函数只能传入一个参数
+      })
+  }).then((v) => {
+      return new Promise((a, b) => {
+          v.push('c')
+          a(v)
+      })
+  }).then((v) => {
+      console.log(v[0] + v[1] + v[2])	输出'abc'
+  })
+
+
 ## Symbol
 
 - ES6提出的一种原始数据类型，跟Number等一样，只能接受字符串作为参数

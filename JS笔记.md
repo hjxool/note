@@ -1343,7 +1343,7 @@ offsetTop/Left是相对父级（注：滚动显示容器里，里面的每一个
   }
   try{
       if(...){
-         throw new fn('error')
+         throw new fn('error')	throw相当于return 后面是对象就给catch一个对象 后面是数字 就给catch一个数字
       }
   }catch(e){
       console.log(e.m,e.name) 对应上面自定义函数中的属性
