@@ -1064,10 +1064,11 @@ offsetTop/Left是相对父级（注：滚动显示容器里，里面的每一个
 ## 下载
 
 1. “window.location.href = down_url”下载会打开一个空白页，体验不好
-
 2. [download]()属性，以==下载文件的方式==下载href属性上的链接。必须要加，不然无法下载文件流
+   - 决定下载文件的文件名，**但是**==跨域==文件下载==不会生效==！此时就需要用==get==从文件地址获取==流文件==，再下载！
 3. `a.target = '_blank'`在空白页打开
 4. 请求==返回类型==必须设置`responseType: "blob"`
+   - 加了`responseType: "blob"`就不需要再用`new Blob([res.data])`了，因为已经是二进制流文件，只要`a.download`写好文件名称，就不会出现无格式的txt下载
 5. `URL.createObjectURL(File对象/Blob对象)`将文件流转换成==a标签==可识别的==链接==形式
    - 下载完后需[URL.revokeObjectURL(url)]()释放内存
 
@@ -1075,10 +1076,11 @@ offsetTop/Left是相对父级（注：滚动显示容器里，里面的每一个
 
 ![image-20221114104516632](C:/Users/admin/AppData/Roaming/Typora/typora-user-images/image-20221114104516632.png)
 
-- **注意**：必须要用[new Blob( [ blob ]，{type:'xxx'} )]()来处理文件流，因为文件流一般自带`type="xxx/json"`，直接放到超链接下载会下载json文件，但是我们要的是txt或者exe文件，这就需要==new Blob==将文件流处理成==type为空==的文件流，这样下载的时候json一类的文件就当作txt格式下载了
 - Tips:
   - 有时候需要从回包里获取==响应头==里的字段，但是默认暴露出来的字段有限，需要后端设置允许访问的字段。
     - 使用`res.headers['content-disposition']`取出额外文件信息
+  - 链接可以直接访问文件的可以用`a.download = '文件名' a.href = url`下载文件
+    - 浏览器可以识别并自动下载的才行，图片应该是直接打开
 
 
 ##  JSON
