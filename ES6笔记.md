@@ -180,6 +180,94 @@
       console.log(v[0] + v[1] + v[2])	输出'abc'
   })
 
+## Set集合
+
+- 一种新的数据结构，类似于==数组==，**但是**集合中==每个值都唯一==(仅限于==对象地址值/基本数据类型==)
+
+- ==不能==用`for(let i=0;i<l;i++)`方法遍历，因为
+
+- 属性方法
+
+  - size：返回集合个数，类似于length
+  - add：添加一个新元素，并返回新的集合，类似于push
+  - delete(索引)：删除索引位置的元素，返回boolean值，类似于splice
+  - has(值)：检测集合中是否包含某个元素，返回boolean
+
+- 用例
+
+  - 数组去重：`let t = [...new Set([1,1,2,2,3,4])] // 输出t为[1,2,3,4]`
+
+  - 两个数组求交集：
+
+    ```js
+    let a = [1,2,3,4,5,4,3,2,1]
+    let a2 = [4,5,5,6,5]
+    let result = [...new Set(a)].filter(item => return new Set(a2).has(item)) 输出[4,5]
+    ```
+
+  - 并集：`let t = new Set([...a,...a2])`
+
+  - 差集(双方集合中独有的元素)：`let t = [...new Set(a)].filter(item= > return !(new Set(a2).has(item)) )`
+
+## Map
+
+- ==Set==和==Map==的共同点：
+  - 都无法用==数组下标==的方式获取数据，只能用==for...of==等遍历方式才能取得里面的内容
+  - 自然也只能用api添加元素
+- Map是一种新的数据结构。类似于==对象==，里面每个元素都是==键值对==的组合，但是==键==不仅限于字符串，甚至是==对象==都可以作为键。同样也只能用==for...of==等方法遍历取得里面的内容
+- 属性方法
+  - size：返回Map元素的个数，类似于length
+  - set(key，value)：添加一个新元素，并返回新的集合，类似于push
+  - ==get(key)==：返回键名对象的键值
+  - ==delete(key)==：删除键名对应的元素
+  - has(==key==)：检测Map是否包含某个元素，返回boolean值
+  - clear：清空集合，返回==undefined==
+- **特别需要注意**的是==for...of==遍历出来的每一项都是==数组==。数组长度都是2，第一个元素是key，第二个元素是value。
+
+## Class
+
+- class是function构造函数的==语法糖==，只是为了结构语法更清晰
+
+  ```js
+  function构造函数
+  function Person(name){
+      this.name = name
+  }
+  Person.prototype.age = function(){
+      console.log(18)
+  }
+  let hj = new Person('hj')	得到的对象身上有name属性 以及原型身上的age方法
+  class类
+  class Person2{	注意不能用函数形式
+      constructor(name){	构造方法 名字不能修改
+          this.name = name
+      }
+      age(){	注意!只能用这种形式 不能用ES5的对象形式
+          console.log(22)
+      }
+      static bbb = 'bbb'	Person2的实例对象身上是看不到 static关键字声明的静态属性和方法的
+                			等同于Person函数对象身上添加属性方法 其实例对象看不到
+  }
+  let zh = new Person2('zh')	同function构造函数得到的对象一样 但是简化了原型身上添加属性方法
+  ```
+
+- ==继承==
+
+  - ES5类继承
+
+    ```js
+    function Phone(price){
+        this.price = price
+    }
+    Phone.prototype.fn = ()=>{
+        console.log('打电话')
+    }
+    function SmartPhone(price,color){
+        Phone.call(this,price)	此处非常聪明的用call重新矫正this的指向 用当前构造函数的this 相当于在自己实例对象身上
+        this.color = color		添加其他构造函数的属性 达到复用的目的
+    }
+    SmartPhone.prototype = new Phone()	重新定向原型
+    SmartPhone.prototype.constructor
 
 ## Symbol
 

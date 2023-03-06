@@ -887,8 +887,6 @@ js**原生**事件处理函数事件名必须叫“event”
   function func(形参) “形参”则是“变量” 只不过是局部的
   ```
 
-- ![image-20220810101644812](C:/Users/admin/AppData/Roaming/Typora/typora-user-images/image-20220810101644812.png)
-
 ## Date对象
 
 - [new Date()]()：会返回代码执行时的时间，也可以传入固定格式参数`12/2/2011 11:10:30`，指定时间
