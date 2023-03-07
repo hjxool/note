@@ -285,11 +285,30 @@
             super(price) 或 super.fn()	super表示父类的constructor 直接传参表示继承使用父类的属性
             this.color = color			也可以直接.父类方法调用
         }
-        fn2(){
+        fn2(){	此处可以用super调父类方法 但是！不能用super(参数)
             console.log(222)
         }
     }
     let t = new SmartPhone('xiaomi','red')	子类身上就有父类的属性方法了 并且！不用重新定向原型和constructor
+    ```
+
+- 父类方法的重写：即在子类上声明跟父类同名的方法
+
+- class的==getter==和==setter==
+
+  ```js
+  class tt{
+      constructor(aa){	constructor不是必须有的 有get和set同样可以读取、设置属性
+          this.aa = aa
+      }
+      get aa(){
+          console.log('读取')
+          return 'aaa'	不能写return this.aa 因为会读取aa然后再触发get方法然后无限循环
+      }
+      set aa(newVal){
+          console.log('设置')	同样不能在此处写this.aa=newVal 会无限循环
+      }
+  }
 
 ## Symbol
 
