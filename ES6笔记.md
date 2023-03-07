@@ -267,7 +267,29 @@
         this.color = color		添加其他构造函数的属性 达到复用的目的
     }
     SmartPhone.prototype = new Phone()	重新定向原型
-    SmartPhone.prototype.constructor
+    SmartPhone.prototype.constructor = SmartPhone 因为原型是实例对象 所以没有constructor 这里要弄一个同名的来替代
+    ```
+
+  - Class继承
+
+    ```js
+    function Phone(price){
+        this.price = price
+    }
+    Phone.prototype.fn = function (){
+        console.log('打电话')
+    }
+    Phone.prototype.bbb2 = 123
+    class SmartPhone extends fn{	必须要用extends关键字
+        constructor(price,color){
+            super(price) 或 super.fn()	super表示父类的constructor 直接传参表示继承使用父类的属性
+            this.color = color			也可以直接.父类方法调用
+        }
+        fn2(){
+            console.log(222)
+        }
+    }
+    let t = new SmartPhone('xiaomi','red')	子类身上就有父类的属性方法了 并且！不用重新定向原型和constructor
 
 ## Symbol
 
