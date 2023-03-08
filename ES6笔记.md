@@ -392,14 +392,27 @@
 
 ## 模块化
 
+- ES6模块化：不同于ES5使用==闭包==做的模块化，ES6使用export、import关键字来导入导出
+
+  - 把想要暴露的变量和方法前加export，例：`export let params = 'xxx'`或者`export function fn(){}`
+
+  - js文件中想要==引入模块==，使用
+
+    ```html
+    <script type="module">
+        import * as m from 'xxx.js'
+        console.log(m)
+    </script>
+
 - 在一个**js文件**中想`**暴露**`和`**引入**`一些方法和属性，有几种对应形式：
-  1. 通用形式：`import * as 别名 from "文件路径"``
-  2. ``export 对象；export function`或者`export{ 对象，函数名 }`——`import {暴露的对象和方法名} from 路径`
+
+  1. 通用形式：`import * as 别名 from "文件路径"`，==*==表示暴露出来的所有内容，别名则代替了所有内容，使用`别名.变量/方法`来使用
+  2. ``export 对象`或者`export function`或者`export{ 对象，函数名 }`——`import {暴露的对象和方法名} from 路径`
   3. 引入默认暴露时不能直接用default表示引入的对象，必须用`as 别名`
-  4. `export default { 写入属性和方法 }`——`import {default as xxx} from 路径`或者`import xxx from 路径`
-     - `import {xxx as aaa,obj1,fnc} from '../xxx.js'`
-  5. 动态引入：在需要用到的地方调用`**import('地址').then(传入的模块 =>{模块.里面暴露的方法})**`，import函数，其返回值是promise对象
-  
+     1. `export default { 写入属性和方法 }`——`import {default as xxx} from 路径`或者`import xxx from 路径`
+     2. as可以只给一个变量做别名，如`import {xxx as aaa,obj1,fnc} from '../xxx.js'`
+  4. 动态引入：在需要用到的地方调用`**import('地址').then(传入的模块 =>{模块.里面暴露的方法})**`，import函数，其返回值是promise对象
+
 - 要引入**css文件**，直接使用`**import 路径**`
 
 ## 扩展运算符和rest参数
