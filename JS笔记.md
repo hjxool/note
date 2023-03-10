@@ -567,7 +567,7 @@
 
   - 例如：`数组.filter((数组元素) => { return 数组元素.indexOf(变量) != -1 })`
 
-- include：检测数组中是否包含指定内容
+- list.[includes(内容)]()(ES7)：检测数组中是否包含指定内容。返回==true/false==
 
 - **forEach( (当前值，索引)=>{ } )：**foreach中回调的函数是数组中每一个元素都调用一次
 

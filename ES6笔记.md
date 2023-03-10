@@ -398,19 +398,29 @@
 
   - js文件中想要==引入模块==，使用
 
+    - ==注意！==通过此方法引入的模块是==独立作用域==，不能在其他==script标签内使用==
+    
     ```html
     <script type="module">
         import * as m from 'xxx.js'
         console.log(m)
     </script>
     ```
+    
+    - **但是**把引入模块和JS文件写到一起就可以了
+    
+    ```html
+    <script src="./index.js" type="module"></script>
+    index.js文件内写入
+    import * as m from 'xxx.js'
+    console.log(m)
 
   - **只有**==export default==才能在import时省略==* as==
 
 - 在一个**js文件**中想==暴露==和==引入===一些方法和属性，有几种对应形式：
 
   ```js
-  1、通常形式
+  1、通常形式 分别暴露 和 集中暴露
   export let t = 111			 let t = 111
   export function fn(){}		 function fn(){}
   						   export {t,fn}
@@ -422,13 +432,64 @@
       t:111,
       fn(){}
   }
-  import 别名 from 'path'	不能用 default as 别名 或者 * as 别名
-  import {default as 别名} from 'path'
+  import 别名 from 'path'
+  import * as 别名 from 'path'	注意！这种方式导入的模块会多一层default，即 别名.default.t
+  import {default as 别名} from 'path'	default不能直接使用必须用别名
   ```
 
 - ==动态引入==：在需要用到的地方调用`import('地址').then(传入的模块 =>{模块.里面暴露的方法})`，import函数，其返回值是promise对象
 
 - 要引入**css文件**，直接使用`**import 路径**`
+
+- ==引入Npm包==：`import 别名 from '包的名称'`即可使用，例：`import $ from 'jquery'`—`$(body).css('color','red')`
+
+
+## async、await
+
+- 使==异步==代码像==同步==代码一样执行
+
+- async==函数==
+
+  - 返回值为==promise对象==
+
+  - promise对象的==状态==是==成功==或是==失败==，由==return==后的值决定
+
+    ```js
+    async function fn(){
+        return 基本数据类型、对象等	返回结果状态成功
+        return new Promise((success,reject)=>{
+            success(内容)			  返回结果状态成功
+        })
+        return new Promise((success,reject)=>{
+            reject(内容)			  返回结果状态失败
+        })
+        throw new Error('xxx')		返回结果状态失败
+    }
+    let result = fn()
+    result.then(value => {},reason => {})
+    ```
+
+- await==表达式==
+
+  - ==必须==写在async函数**里**
+
+  - await后跟==Promise对象==
+
+  - 返回值是promise对象状态==成功==的值
+
+  - 必须要搭配==try...catch==，因为promise对象状态==失败会抛出异常==，影响后续执行
+
+    ```js
+    let r = new Promise((success,reject)=>{
+        success('xxx')
+    })
+    async function fn(){
+        try{
+            let result = await r
+        }catch(err){
+            console.log(err)
+        }
+    }
 
 ## 扩展运算符和rest参数
 
