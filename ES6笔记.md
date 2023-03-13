@@ -222,7 +222,23 @@
   - ==delete(key)==：删除键名对应的元素
   - has(==key==)：检测Map是否包含某个元素，返回boolean值
   - clear：清空集合，返回==undefined==
+- ==new Map(参数)==里能接收的初始化参数只有==二维以上的数组==，只会取数组第二层的==前两项==
+
 - **特别需要注意**的是==for...of==遍历出来的每一项都是==数组==。数组长度都是2，第一个元素是key，第二个元素是value。
+
+  - [Object.entries]()就是为了配合Map使用的
+
+    ```js
+    let t = {
+        a:111,
+        b:222
+    }
+    let t2 = new Map(Object.entries(t)) => 0:{key:'a',value:111}
+    						    		1:{key:'b',value:222}
+    for(let val of t2){
+        val => ['a',111]
+    }
+
 
 ## Class
 
@@ -475,17 +491,19 @@
 
   - await后跟==Promise对象==
 
-  - 返回值是promise对象状态==成功==的值
+  - ==返回值==是==promise对象==状态==成功==的值，即then方法里传入的参数
 
-  - 必须要搭配==try...catch==，因为promise对象状态==失败会抛出异常==，影响后续执行
+  - ==await后==跟异步方法返回的==promise对象！==会等该异步方法==执行返回==成功或失败结果后==才会继续==执行后续的代码
 
+  - 要搭配==try...catch==，因为promise对象状态==失败会抛出异常==，影响后续执行
+  
     ```js
     let r = new Promise((success,reject)=>{
         success('xxx')
     })
     async function fn(){
         try{
-            let result = await r
+            let result = await r	注意，必须要跟promise对象 后跟 普通函数 没有作用
         }catch(err){
             console.log(err)
         }
@@ -500,6 +518,8 @@
   - rest参数必须要放到==形参==列表==末尾==
 
   - rest参数==只能有一个==
+
+  - 实参给形参的赋值，其实就是`let 形参 = 实参`，只不过看不到赋值过程
 
   - 用什么包裹rest参数，得到的就是什么样的数据
 
