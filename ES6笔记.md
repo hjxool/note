@@ -453,7 +453,13 @@
   import {default as 别名} from 'path'	default不能直接使用必须用别名
   ```
 
-- ==动态引入==：在需要用到的地方调用`import('地址').then(传入的模块 =>{模块.里面暴露的方法})`，import函数，其返回值是promise对象
+- ==动态引入==：
+
+  - 在需要用到的地方调用`import('地址').then(传入的模块 =>{模块.里面暴露的方法})`
+
+  - import函数，其返回值是promise对象
+
+  - 动态引入`.then`内执行的实际上是`import * as 形参名`，所以`export default`时，需要`形参.default`才能取到里面的属性方法
 
 - 要引入**css文件**，直接使用`**import 路径**`
 
@@ -634,3 +640,58 @@
 
 - 最大的作用是——不需要·**try{}catch(error){}**·，最典型的一个例子就是·defineProperty·出错时，整个单线程程序都会挂掉，所以封装的框架中通常都要用·try catch·来捕获错误，同时保证程序正常运行。**而**·**reflect**·则不用，它在使用·defineProperty·时，会返回·**执行成功或失败**·，而不会使整个代码都挂掉，**同时**·**reflect**·身上还有全套的object对象操作方法
 - [Reflect.deleteProperty(obj,  '属性名')]()：删除对象身上的属性
+
+## 私有属性
+
+- 类外不能访问，只有内部函数能够访问到
+
+- 需要在构造函数外部声明
+
+  ```js
+  class test{
+      #p
+      constructor(a,b){
+          this.a = a
+          this.#p = b
+      }
+      fn(){
+          console.log(this.#p)
+      }
+  }
+  let t = new test(1,2)
+  t.fn()	输出2
+  ```
+
+## 可选链操作符
+
+- 用于==对象==属性==是否存在==的判断
+
+- `对象?.属性`：对象不存在或者对象下属性不存在只会返回`undefined`而不会报错。
+
+  - `?.`可理解为查询下一层是否存在，如果存在就`.`获取
+
+- 使用场景：对象有多层结构，且不确定对象下属性是否存在
+
+  ```js
+  function fn(params){
+      通常做法1
+      this.ip = params && params.xxx1 && params.xxx1.ip
+      通常做法2
+      if(params){
+          if(params.xxx1){
+              this.ip = params.xxx1.ip
+          }
+      }
+      有了可选链操作符后
+      this.ip = params?.xxx1?.ip
+  }
+  fn({
+      xxx1:{
+          ip:'qweqweqw',
+          port:8080
+      },
+      xxx2:{
+          ip:'qqqqqq',
+          port:4050
+      }
+  })
