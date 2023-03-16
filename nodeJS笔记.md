@@ -44,8 +44,104 @@
 ## fs模块
 
 - **不能**使用`import`方式导入模块
-- [writeFile]()
+- ==相对路径==参照的是==命令行工作目录==，**不是**JS所在目录
+  - 要解决这个问题使用`__dirname`变量，它会保存JS文件位置的==绝对路径==（不包含文件），如`__dirname + 'index.js'`
+- [writeFile]()：文件写入
   - `fs.writeFile('写入路径','写入内容',回调函数)`
     - 写入路径下没有对应文件会新建
     - writeFile方法写入的内容会==覆盖==源文件内容
     - 回调函数内形参是==失败==后的==对象==，==成功==则返回==nul==l
+    - 还有第三个配置项`fs.writeFile('写入路径','写入内容',{flag:'a'},回调函数)`，配置flag值为`a`表示==追加==内容==而不是覆盖==
+  - [writeFileSync]()：文件同步写入
+    - ==没有回调函数==
+    - ==同步==执行，等文件写入完后才会执行后续的代码
+  - **只能**在==已有路径目录==下创建文件！
+- [appendFile]()：文件追加写入
+  - `fs.appendFile('路径','内容',回调函数)`
+  - ==不会覆盖==文件内容，而是==追加==内容
+  - [appendFileSync]()
+  - 在需要换行的字符串前使用`\r\n`==换行==
+
+- [createWriteStream]()：文件流式写入
+
+  - ```js
+    let ws = fs.createWriteStream('文件路径')
+    ws.write('内容')
+    ws.write('内容2')
+    ws.close() 关闭通道 可选 因为脚本执行完毕资源也会被回收 通道会自动关闭
+    ```
+
+  - 类似于websocket==推流==的方式，即当前执行脚本和文件之间==连接不断开==，有需要就写人，适合==高频次==写入或者==大文件==写入
+
+  - 同样会==覆盖==源文件内容
+
+- [readFile]()：文件读取
+
+  - `fs.readFile('文件路径',(err,data)=>{})`
+    - 有两个参数，第一个依然是错误参数，第二个是读取==成功==的内容
+    - 读取到的值是==Buffer==，转换成可读字符串需要`toString`
+  - [readFileSync]()：文件同步读取
+    - `let data = fs.readFileSync('路径')`
+    - 因为是同步，所以没有回调函数，而是直接==返回值==，`data`依然是==Buffer==
+
+- [createReadStream]()：文件流式读取
+
+  - ```js
+    let rs = fs.createReadStream('路径') 可读取视频等文件
+    rs.on('data',chunk => { 必须写 data 绑定的是 data事件 不是 自定义事件名
+        事件在 读取完一块 后执行回调
+        chunk是读取到的 Buffer数据 不是什么数据都能用toString转 比如读取视频 就无法转换
+    })
+    rs.on('end',()=>{ 没有参数 同 createWriteStream 可以不绑定end事件 脚本执行完会自动释放
+        console.log('读取完成')
+    })
+    ```
+
+  - 将文件一块一块读取，读取效率高
+
+- ==文件复制==
+
+  ```js
+  第一种方法——读写最快、占用内存最小，因为每次读取64KB就写入，不需要将整个文件缓存进内存
+  const rs = fs.createReadStream('xxx')
+  const ws = fs.createWriteStream('xxx2')
+  rs.on('data',chunk=>{
+      ws.write(chunk)
+  })
+  rs.on('end',()=>{
+      console.log('写入完成')
+  })
+  第二种方法——整体读取、写入
+  let data = fs.readFileSync('xxx')
+  fs.writeFileSync('xxx2',data)
+  第三种方法——最简单、用的少
+  rs.pipe(ws)
+  ```
+
+- [rename]()：文件重命名(也可根据路径移动文件)
+
+  - `fs.rename('源文件路径','重命名路径',回调函数)`
+  - [renameSync]()：文件同步重命名
+  - **只能**移动文件到==存在的目录下==，不能同时创建文件夹并移动
+
+- [rm]()：文件删除
+
+  - `fs.rm('路径',err=>{})`
+  - 同样有[rmSync]()
+  - 要删除多层级目录和文件，需要配置项`fs.rm('路径',{recursive:true},err=>{})`，==recursive==，即可递归删除==多级目录和文件==
+
+- [mkdir]()：创建文件夹
+
+  - `fs.mkdir('路径',err=>{})`
+  - 当创建路径中存在多个层级不存在时，即需要递归创建路径中有不存在的文件夹，需要第二个参数`fs.mkdir('./a/b/c',{recursive:true},err=>{})`，==recursive==，意为递归，设为==true==即可
+
+- [readdir]()：读取文件夹内文件目录
+
+  - `fs.readdir('路径',(err,data)=>{})`
+
+- [stat]()：获取文件状态信息(比如：创建时间、大小等)
+
+  - `fs.stat('路径'(err,data)=>{})`
+    - data是文件状态==对象==
+    - data方法`data.isFile()`，返回true/false，表示是否是文件，是文件夹的话会返回false
+    - data方法`data.isDirectory()`，返回true/false，表示是否是文件夹
