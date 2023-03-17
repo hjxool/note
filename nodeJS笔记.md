@@ -45,7 +45,8 @@
 
 - **不能**使用`import`方式导入模块
 - ==相对路径==参照的是==命令行工作目录==，**不是**JS所在目录
-  - 要解决这个问题使用`__dirname`变量，它会保存JS文件位置的==绝对路径==（不包含文件），如`__dirname + 'index.js'`
+  - 要解决这个问题使用`__dirname`变量，它会保存JS==文件夹==位置的==绝对路径==（不包含文件），如`__dirname + '/index.js'`
+    - `__filename`是==文件==的==绝对路径==
 - [writeFile]()：文件写入
   - `fs.writeFile('写入路径','写入内容',回调函数)`
     - 写入路径下没有对应文件会新建
@@ -138,6 +139,7 @@
 - [readdir]()：读取文件夹内文件目录
 
   - `fs.readdir('路径',(err,data)=>{})`
+  - 同样有同步方法[readdirSync]()
 
 - [stat]()：获取文件状态信息(比如：创建时间、大小等)
 
@@ -145,3 +147,13 @@
     - data是文件状态==对象==
     - data方法`data.isFile()`，返回true/false，表示是否是文件，是文件夹的话会返回false
     - data方法`data.isDirectory()`，返回true/false，表示是否是文件夹
+
+## path模块
+
+- 用于==拼接==、规范路径格式，`resolve(多个参数)`，从第一个参数往后拼接
+
+- ```js
+  const path = require('path')
+  path.resolve(__dirname,'index.js') => D:\node\index.js
+  path.resolve(__dirname,'./index.js') => D:\node\index.js
+  path.resolve(__dirname,'index.js','index2.js') => D:\node\index.js\index2.js
