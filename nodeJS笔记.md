@@ -157,3 +157,8 @@
   path.resolve(__dirname,'index.js') => D:\node\index.js
   path.resolve(__dirname,'./index.js') => D:\node\index.js
   path.resolve(__dirname,'index.js','index2.js') => D:\node\index.js\index2.js
+  ```
+
+## http模块
+
+- 每个服务对象
