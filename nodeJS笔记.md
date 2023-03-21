@@ -161,4 +161,34 @@
 
 ## http模块
 
-- 每个服务对象
+- ```js
+  const http = require('http')
+  
+  const server = http.createServer((request, response)=>{ 回调函数 在 
+      第一个参数 request => 浏览器发来的 请求报文 对象，包括 请求行、请求头、请求体
+      第二个参数 response => 服务器的 响应报文 对象，可以设置 返回结果
+  })
+  
+  listen方法 监听端口、创建服务
+  server.listen(端口号,()=>{ 回调函数在 服务启动成功 后被调用
+      console.log('服务已启动')
+  })
+  ```
+
+- ==重启==服务==修改==才能==生效==
+
+- [request]()：创建服务传入函数的第一个参数，用于==解析请求报文==
+
+  - `request.method`：属性。获取请求方法，如post、get
+  - `request.url`：属性。获取==端口号后==的内容，如`/api?name=xxx`
+
+- [response]()：创建服务传入函数的第二个参数，用于设置==返回结果==
+
+  - `response.end(内容)`：设置响应体，**但是**中文显示在页面上会是乱码，需要设置==字符集==
+
+  - `response.setHeader(键,值)`
+    - `setHeader('content-type','text/html;charset=utf-8')`，告诉浏览器==返回内容==是HTML，内容对应的==字符集==是UTF-8
+
+- [listen(端口号，回调函数)]()：监听端口、创建服务
+
+  - ==80==是==http协议==默认端口号，==https协议==默认端口号是==443==，默认端口号不会在地址栏显示

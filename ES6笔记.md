@@ -149,6 +149,14 @@
 
 - 除了then里传入两个函数，还可以用[promise对象.catch(函数)]()接收失败回调方法
 
+- `then()`**返回值**还是==Promise对象==
+
+  - **但是**then里的函数如果没有`return`，`then()`返回的是==值为undefined的Promise对象==
+
+  - 如果`then( res => { return res } )`有return，则返回==值为res的Promise对象==
+
+- Promise对象里的值，**只能**通过`p.then( res => {获取res} )`才能获取Promise对象里存的值
+
 - 对比普通回调和Promise.then的区别
 
   ```js
@@ -163,7 +171,7 @@
       console.log(p[0] + p[1] + p[2])	输出'abc'
   }
   fn1('a')
-  Promise回调——then方法返回的结果还是Promise对象，所以可以接着用.then执行后续回调
+  Promise回调——then方法*返回*的结果还是*Promise对象*，所以可以接着用.then执行后续回调
   let p = new Promise((a, b) => {
       a('a')
   })
