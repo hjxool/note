@@ -698,12 +698,12 @@
 ### document方法：
 
 - [cookie]()：
-  - 设置cookie：document.cookie = "user=hou jie"；
-  
-  - 默认情况下浏览器关闭就清除cookie，添加保存时间： document.cookie = "user=hou jie;  expires=Thu, 18 Dec 2043 12:00:00 GMT（此处时间是new Date()）"，通过new Date()中的setDate()可以**设置**当月中的**某一天**，用getDate()**获取当天**日期；
-  - 删除cookie的原理：将expires 参数设置为当前时间或者前几天即可；
-  - 同名的cookie会被覆盖，新加的cookie不会覆盖会加到string尾部;
-  - cookie.match时`=`后面的[^;]+必须用括号括起来才会返回等号后面的值
+  - ==设置cookie==：`document.cookie = "user = xx"`
+  - **默认**情况下浏览器关闭就清除cookie
+    - ==添加保存时间==： `document.cookie = "user=xx;expires=Thu, 18 Dec 2043 12:00:00 GMT(此处时间是Date对象的toString)"`，通过Date对象的[setDate]()方法可以**设置**当月中的**某一天**，用getDate()**获取当天**日期
+    - ==删除cookie==的原理：将expires 参数设置为当前时间或者前几天即可
+  - ==同名==的cookie会被覆盖，==新==的cookie不会覆盖，会加到string尾部
+  - ==读取cookie==：`cookie.match(reg)`
 
 
 - [session、cookie、token]()三者区别：

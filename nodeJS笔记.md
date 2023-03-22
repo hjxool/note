@@ -44,9 +44,11 @@
 ## fs模块
 
 - **不能**使用`import`方式导入模块
+
 - ==相对路径==参照的是==命令行工作目录==，**不是**JS所在目录
   - 要解决这个问题使用`__dirname`变量，它会保存JS==文件夹==位置的==绝对路径==（不包含文件），如`__dirname + '/index.js'`
     - `__filename`是==文件==的==绝对路径==
+  
 - [writeFile]()：文件写入
   - `fs.writeFile('写入路径','写入内容',回调函数)`
     - 写入路径下没有对应文件会新建
@@ -57,6 +59,7 @@
     - ==没有回调函数==
     - ==同步==执行，等文件写入完后才会执行后续的代码
   - **只能**在==已有路径目录==下创建文件！
+  
 - [appendFile]()：文件追加写入
   - `fs.appendFile('路径','内容',回调函数)`
   - ==不会覆盖==文件内容，而是==追加==内容
@@ -164,7 +167,7 @@
 - ```js
   const http = require('http')
   
-  const server = http.createServer((request, response)=>{ 回调函数 在 
+  const server = http.createServer((request, response)=>{ 回调函数 在 *每次*收到请求后都会调用
       第一个参数 request => 浏览器发来的 请求报文 对象，包括 请求行、请求头、请求体
       第二个参数 response => 服务器的 响应报文 对象，可以设置 返回结果
   })
@@ -181,14 +184,62 @@
 
   - `request.method`：属性。获取请求方法，如post、get
   - `request.url`：属性。获取==端口号后==的内容，如`/api?name=xxx`
+    - **但是**使用不便，一般不会用这种方法提取参数，而是使用[url模块]()，详情见后
+  - `request.on('data', chunk =>{解析})`：读取收到的==请求体==数据。request是==流数据==，所以要绑定==data事件==一片一片取数据
+    - **注意**此处只能提取到==post==方式发送的参数，**无法获取**拼接到地址栏的参数，如`?xxx1=123&xxx2=456`
+  - `request.on('end', () => {})`：读取完成事件。在回调里执行返回页面结果
 
 - [response]()：创建服务传入函数的第二个参数，用于设置==返回结果==
 
-  - `response.end(内容)`：设置响应体，**但是**中文显示在页面上会是乱码，需要设置==字符集==
+  - `response.write(内容)`：设置==响应体==，可以==多次==调用，内容会拼接在一起
+    - 如果`response.end`也有内容，则也会拼接在一起
 
-  - `response.setHeader(键,值)`
+  - `response.end(内容)`：设置==响应体==，**并**==断开通信==，**但是**中文显示在页面上会是乱码，需要设置==字符集==
+    - `response.end()`只能存在**一个**，不然会报错
+
+    - 不写end，会导致请求一直是==待处理==状态，从而占用资源，以致==其他请求==无法返回结果
+
+  - `end`和`write`均可以接收==Buffer==类型的数据！因此可以将[fs模块]()读取的==html文件==数据传入，从而根据==路径名==返回对应的页面
+    - 当页面解析返回的html文件，其内`<img>`、`<link>`等引入了外部文件，就又会发起请求，**并且**是==异步==请求获取外部文件
+    - 通过解析==URL对象.[pathname]()==，可以区分是带路由的请求还是加载==外部资源==文件，如，获取`./index.css`文件时发送的请求是`http.../index.css`，而路由的请求是`http.../login?name=xxx`
+  - `response.setHeader(键,值)`：设置==响应头==
     - `setHeader('content-type','text/html;charset=utf-8')`，告诉浏览器==返回内容==是HTML，内容对应的==字符集==是UTF-8
+    - `setHeader('test',[1, 2, 3])`，第二个参数传入==数组==可以创建==多个同名==请求头
+  - `response.statusCode = 404`：**设置**==响应状态码==，但是并不影响请求返回结果
+  - `response.statusMessage = 'xxx'`：设置==响应状态描述==，比如==Not Found==就是状态描述
 
 - [listen(端口号，回调函数)]()：监听端口、创建服务
 
   - ==80==是==http协议==默认端口号，==https协议==默认端口号是==443==，默认端口号不会在地址栏显示
+
+## url模块(旧版)
+
+- 用于解析地址栏url，一般用于提取、解析==query==参数
+
+- ```js
+  const url = require('url') 引入url内置模块
+  ...
+  const server = http.createServer((request,response)=>{
+      let res = url.parse(request.url,true) 解析请求行url
+      let keyword = res.query.xxx
+  })
+  ```
+
+- `url.parse(url字符串,true/false)`：解析url字符串，返回==对象==
+
+  - 第一个参数是请求行的url，可以是完整形式`http:...`，也可以是端口号后内容`request.url`
+  - 第二个参数是==是否将query属性解析为对象==，可选true/false
+    - 解析后的结果`{ name:'xxx',password:'123' }`
+
+## URL API
+
+- 与HTML页面的URL通用
+- 与旧版的区别
+  - ==无需引入模块==
+  - 默认将url携带参数整合成对象
+  - 必须传入完整url地址，包括域名、协议、端口，或者在第二个参数中补全域名协议端口号
+    - `let url = new URL(request.url,'http://127.0.0.1')`
+    - 或者`let url = new URL('http://127.0.0.1' + request.url)`
+    - 可以==省略端口号==
+  - ==query参数==不是**对象**，需要用==get方法==获取里面的内容
+    - `url.searchParams.get('name')`
