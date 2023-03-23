@@ -46,7 +46,7 @@
 - **不能**使用`import`方式导入模块
 
 - ==相对路径==参照的是==命令行工作目录==，**不是**JS所在目录
-  - 要解决这个问题使用`__dirname`变量，它会保存JS==文件夹==位置的==绝对路径==（不包含文件），如`__dirname + '/index.js'`
+  - 要解决这个问题使用`__dirname`变量，它会保存JS==文件夹==位置的==绝对路径==（不包含文件），如`__dirname + './index.js'`
     - `__filename`是==文件==的==绝对路径==
   
 - [writeFile]()：文件写入
@@ -155,12 +155,21 @@
 
 - 用于==拼接==、规范路径格式，`resolve(多个参数)`，从第一个参数往后拼接
 
+  - ==URL对象==里的==pathname==只有`/index.css`单斜线，会省略`../`和`./`，因此path方法处理时会==重新定位到根目录==
+
 - ```js
   const path = require('path')
   path.resolve(__dirname,'index.js') => D:\node\index.js
   path.resolve(__dirname,'./index.js') => D:\node\index.js
   path.resolve(__dirname,'index.js','index2.js') => D:\node\index.js\index2.js
+  path.resolve(__dirname,'/index.js') => D:\index.js 注意此处是从根目录开始
   ```
+
+- ==地址拼接==
+
+  - `__dirname + '/../xxx' + pathname`当前==执行js的文件夹为**根目录**==，`/../`表示返回**根目录**的**上一级**，下的`xxx`文件夹下的`pathname`路径
+    - 不能用path方法把这个路径整合，会变成`D:\xxx\pathname`
+
 
 ## http模块
 
@@ -243,3 +252,4 @@
     - 可以==省略端口号==
   - ==query参数==不是**对象**，需要用==get方法==获取里面的内容
     - `url.searchParams.get('name')`
+- URL对象里的`pathname`属性会省略相对路径前的`./`或`../`
