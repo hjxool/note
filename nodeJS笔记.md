@@ -253,3 +253,46 @@
   - ==query参数==不是**对象**，需要用==get方法==获取里面的内容
     - `url.searchParams.get('name')`
 - URL对象里的`pathname`属性会省略相对路径前的`./`或`../`
+
+## mime资源类型
+
+- 结构`[type]/[subType]`
+
+  - 如`text/html`、`text/css`、`image/jpeg`，`application/json`
+  - 在响应头`Content-Type`表明类型，浏览器会根据类型决定如何处理资源
+  - 对于未知类型，设置`application/octet-stream`类型，浏览器遇到该类型，会对响应体进行独立存储，即==下载==
+
+- ==获取对应类型==
+
+  ```js
+  let mimes = {
+      html:'text/html',
+      css:'text/css',
+      js:'text/javascript',
+      png:'image/png',
+      jpg:'image/jpeg',
+      gif:'image/gif',
+      mp4:'video/mp4',
+      mp3:'audio/mpeg',
+      json:'application/json'
+  }
+  http.createServer((request,respone)=>{
+      let {pathname} = new URL(request.url,'http://127.0.0.1')
+      let file_path = __dirname + pathname
+      fs.readFile(file_path,(err,data)=>{
+          if(err) {
+              response.end()
+              return
+          }
+          let t = pathname.split('.')[1]
+          获取对应类型
+          let type = mimes[t]
+          if(type){
+              response.setHeader('content-type',type)
+          }else{
+              没匹配到进行下载
+              response.setHeader('content-type','application/octet-stream')
+          }
+          response.end(data)
+      })
+  })
