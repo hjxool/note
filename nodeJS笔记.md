@@ -375,3 +375,12 @@ server.listen(端口号,()=>{ 回调函数在 服务启动成功 后被调用
         将module.exports的 值 写入缓存
         return catchs[absolute_path] = module.exports
     }
+    ```
+
+## npm
+
+- ==初始化==
+  - 以一个文件夹目录启动命令行，执行`npm init`
+  - 本质是将当前文件夹==初始化==为`包`，在目标文件夹下生成`package.json`文件
+  - 每个`包`都必须要有`package.json`
+  - `包`名默认是==文件夹名==，不能是==中文==！所以文件夹最好不要用中文
