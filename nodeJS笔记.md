@@ -68,12 +68,12 @@
 
 - [createWriteStream]()：文件流式写入
 
-  - ```js
-    let ws = fs.createWriteStream('文件路径')
-    ws.write('内容')
-    ws.write('内容2')
-    ws.close() 关闭通道 可选 因为脚本执行完毕资源也会被回收 通道会自动关闭
-    ```
+  ```js
+  let ws = fs.createWriteStream('文件路径')
+  ws.write('内容')
+  ws.write('内容2')
+  ws.close() 关闭通道 可选 因为脚本执行完毕资源也会被回收 通道会自动关闭
+  ```
 
   - 类似于websocket==推流==的方式，即当前执行脚本和文件之间==连接不断开==，有需要就写人，适合==高频次==写入或者==大文件==写入
 
@@ -90,16 +90,16 @@
 
 - [createReadStream]()：文件流式读取
 
-  - ```js
-    let rs = fs.createReadStream('路径') 可读取视频等文件
-    rs.on('data',chunk => { 必须写 data 绑定的是 data事件 不是 自定义事件名
-        事件在 读取完一块 后执行回调
-        chunk是读取到的 Buffer数据 不是什么数据都能用toString转 比如读取视频 就无法转换
-    })
-    rs.on('end',()=>{ 没有参数 同 createWriteStream 可以不绑定end事件 脚本执行完会自动释放
-        console.log('读取完成')
-    })
-    ```
+  ```js
+  let rs = fs.createReadStream('路径') 可读取视频等文件
+  rs.on('data',chunk => { 必须写 data 绑定的是 data事件 不是 自定义事件名
+      事件在 读取完一块 后执行回调
+      chunk是读取到的 Buffer数据 不是什么数据都能用toString转 比如读取视频 就无法转换
+  })
+  rs.on('end',()=>{ 没有参数 同 createWriteStream 可以不绑定end事件 脚本执行完会自动释放
+      console.log('读取完成')
+  })
+  ```
 
   - 将文件一块一块读取，读取效率高
 
@@ -157,7 +157,7 @@
 
   - ==URL对象==里的==pathname==只有`/index.css`单斜线，会省略`../`和`./`，因此path方法处理时会==重新定位到根目录==
 
-- ```js
+  ```js
   const path = require('path')
   path.resolve(__dirname,'index.js') => D:\node\index.js
   path.resolve(__dirname,'./index.js') => D:\node\index.js
@@ -173,19 +173,19 @@
 
 ## http模块
 
-- ```js
-  const http = require('http')
-  
-  const server = http.createServer((request, response)=>{ 回调函数 在 *每次*收到请求后都会调用
-      第一个参数 request => 浏览器发来的 请求报文 对象，包括 请求行、请求头、请求体
-      第二个参数 response => 服务器的 响应报文 对象，可以设置 返回结果
-  })
-  
-  listen方法 监听端口、创建服务
-  server.listen(端口号,()=>{ 回调函数在 服务启动成功 后被调用
-      console.log('服务已启动')
-  })
-  ```
+```js
+const http = require('http')
+
+const server = http.createServer((request, response)=>{ 回调函数 在 *每次*收到请求后都会调用
+    第一个参数 request => 浏览器发来的 请求报文 对象，包括 请求行、请求头、请求体
+    第二个参数 response => 服务器的 响应报文 对象，可以设置 返回结果
+})
+
+listen方法 监听端口、创建服务
+server.listen(端口号,()=>{ 回调函数在 服务启动成功 后被调用
+    console.log('服务已启动')
+})
+```
 
 - ==重启==服务==修改==才能==生效==
 
@@ -225,7 +225,7 @@
 
 - 用于解析地址栏url，一般用于提取、解析==query==参数
 
-- ```js
+  ```js
   const url = require('url') 引入url内置模块
   ...
   const server = http.createServer((request,response)=>{
@@ -306,7 +306,7 @@
 
   - `exports`和`module.exports`有隐性的关系，`exports = module.exports = {}`，所以`exports.name = xxx`暴露出来的是`{name:xxx}`，且不能用`export = xxx`的方式去暴露
 
-  - ```js
+    ```js
     第一种方式——直接赋值变量
     function fn(){
         console.log('hhhh')
