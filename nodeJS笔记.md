@@ -296,3 +296,82 @@
           response.end(data)
       })
   })
+  ```
+
+## 模块化
+
+- ==暴露==数据的方式
+
+  - `module.exports`是==固定==写法
+
+  - `exports`和`module.exports`有隐性的关系，`exports = module.exports = {}`，所以`exports.name = xxx`暴露出来的是`{name:xxx}`，且不能用`export = xxx`的方式去暴露
+
+  - ```js
+    第一种方式——直接赋值变量
+    function fn(){
+        console.log('hhhh')
+    }
+    module.exports = fn
+    
+    第二种方式——用对象整体暴露
+    function fn(){}
+    let a = '123'
+    module.exports = {fn,a} 简写形式 等同于 {fn:fn,a:a}
+    
+    第三种方式——exports.name
+    function fn(){}
+    let a = '455'
+    exports.fn = fn 等同于 module.exports={fn,a}
+    exports.a = a
+    ```
+
+- ==导入==模块的方式
+
+  - `require`返回的是`module.exports`的==值==
+
+  - 对于自己创建的模块，**不能**省略==相对路径==
+
+    - `js`、`json`文件可以省略后缀
+    - 当导入没写后缀的模块时，会==优先搜索`js`==后缀的文件，如：同一目录下有`module.js`和`module`文件夹，导入`require('./module')`会优先导入`module.js`
+
+  - 导入==文件夹==时，会搜索文件夹下`package.json`里的属性`"main":"./xxx.js"`所对应的文件
+
+    - 如果==main属性==不存在，则会尝试导入`index.js`和`index.json`
+
+  - 导入==内置==模块，无需路径或相对路径，直接写模块名称
+
+    ```js
+    第一种方式——导入文件
+    const f = require('模块文件路径')
+    f()
+    
+    第二种方式——导入文件夹
+    const f = require('./文件夹')
+    f()
+    
+    第三种方式——导入内置模块
+    const fs = require('fs')
+    ```
+
+  - ==require==原理
+
+    ```js
+    伪代码
+    function require(file_path){
+        拼接绝对路径
+        let absolute_path = path.resolve(__dirname,file_path)
+        检测缓存
+        if(catchs[absolute_path]){
+            return catchs[absolute_path]
+        }
+        如果没有缓存 读取文件代码 从Buffer转换到字符串
+        let code = fs.readFileSync(absolute_path).toString()
+        自执行读取的代码
+        let module = {}
+        let exports = module.exports = {}
+        (function (module, exports, __dirname, __filename, require){
+            code 内部对传入的 module.exports进行了赋值
+        })(module, exports, __dirname, __filename, require)
+        将module.exports的 值 写入缓存
+        return catchs[absolute_path] = module.exports
+    }
