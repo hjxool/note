@@ -422,7 +422,7 @@
 
   - js文件中想要==引入模块==，使用
 
-    - ==注意！==通过此方法引入的模块是==独立作用域==，不能在其他==script标签内使用==
+    - ==注意！==通过此方法引入的模块是==独立作用域==，不能在**其他**==script标签内使用==
     
     ```html
     <script type="module">
@@ -471,7 +471,7 @@
 
 - 要引入**css文件**，直接使用`**import 路径**`
 
-- ==引入Npm包==：`import 别名 from '包的名称'`即可使用，例：`import $ from 'jquery'`—`$(body).css('color','red')`
+- ==引入Npm包==：`import 别名 from '包的名称'`即可使用，例：`import $ from 'jquery'`=>`$(body).css('color','red')`
 
 
 ## async、await
