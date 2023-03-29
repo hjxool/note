@@ -402,4 +402,17 @@ server.listen(端口号,()=>{ 回调函数在 服务启动成功 后被调用
     - 包信息存在`package.json`中==dependencies==属性
   - ==全局==安装
     - 命令：`npm i -g 包名 `
-    - 任何工作目录下均可执行
+    - 任何工作目录下均可执行安装
+    - 无需`require`函数
+    - 查看全局安装位置：`npm root -g`
+  - 切换安装版本：`npm i 包名@版本号`
+  - 删除依赖
+    - 局部：`npm remove 包名`或`npm r 包名`
+    - 全局：`npm remove -g 包名`
+  - 配置别名
+    - `package.json`文件中有个`scripts`属性，在其中添加`server: "node 执行路径及额外参数"`，即可使用`npm run server`运行，省去了冗余的命令参数
+    - 也可以在`script`属性中配置`start: "node 执行路径"`，同样可以使用`npm run start`运行，不过start可以省略run`npm start`
+    - `npm run`会自动向上级目录查找`package.json`
+- Tips
+  - ==nodemon==工具的使用，用`nodemon ./xx.js`代替`node ./xx.js`
+  - 开发环境中的`node_modules`文件夹，是不会上传服务器的，主要是为了去除冗余的安装包文件。所以协同开发时，都是下载`package.json`和`package-lock.json`文件，根据里面的`dependence`属性重新在本地安装依赖包，而`npm i`命令可以快捷安装json里所有依赖
