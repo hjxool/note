@@ -384,6 +384,7 @@ server.listen(端口号,()=>{ 回调函数在 服务启动成功 后被调用
   - 本质是将当前文件夹==初始化==为`包`，在目标文件夹下生成`package.json`文件
   - 每个`包`都必须要有`package.json`
   - `包`名默认是==文件夹名==，不能是==中文==！所以文件夹最好不要用中文
+  - 意义：创建==项目==必须的操作，因为直接npm安装，`package.json`里只有`dependencies`属性
 - [搜索工具包](https://www.npmjs.com)
 
 - ==导入==工具包
@@ -413,6 +414,23 @@ server.listen(端口号,()=>{ 回调函数在 服务启动成功 后被调用
     - `package.json`文件中有个`scripts`属性，在其中添加`server: "node 执行路径及额外参数"`，即可使用`npm run server`运行，省去了冗余的命令参数
     - 也可以在`script`属性中配置`start: "node 执行路径"`，同样可以使用`npm run start`运行，不过start可以省略run`npm start`
     - `npm run`会自动向上级目录查找`package.json`
+  - NodeJs==版本管理==软件：[nvm]()
+    - 显示可下载`Node.js`版本：`nvm list available`
+    - 已安装版本：`nvm list`
+    - 安装某一指定版本：`nvm install 16.11.12`
+    - 安装最新版本：`nvm install latest`
+    - ==删除==某版本：`nvm uninstall 16.11.12`
+    - ==**切换**==版本：`nvm use 16.11.12`
 - Tips
   - ==nodemon==工具的使用，用`nodemon ./xx.js`代替`node ./xx.js`
   - 开发环境中的`node_modules`文件夹，是不会上传服务器的，主要是为了去除冗余的安装包文件。所以协同开发时，都是下载`package.json`和`package-lock.json`文件，根据里面的`dependence`属性重新在本地安装依赖包，而`npm i`命令可以快捷安装json里所有依赖
+
+## express框架
+
+- 也是一个==工具包==，封装了多个功能，便于开发HTTP服务
+  - 导入的工具包是**函数**，使用需创建==应用对象==，`const app = express()`
+- express==路由==
+  - 替代了http模块开启的服务里，对`pathname`进行的复杂分类跳转。例：`exporessObj.get('/home',(req,res)=>{...})`，表示：接收请求类型为get、且`pathname`为/home的请求
+  - 格式：`app.<method>(path,callback)`
+  - Tips
+    - 一般登陆首页是没写路径的，因此服务端收到的路径是`/`，所以要监听`app.get('/',callback)`
