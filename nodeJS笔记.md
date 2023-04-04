@@ -430,7 +430,38 @@ server.listen(端口号,()=>{ 回调函数在 服务启动成功 后被调用
 - 也是一个==工具包==，封装了多个功能，便于开发HTTP服务
   - 导入的工具包是**函数**，使用需创建==应用对象==，`const app = express()`
 - express==路由==
-  - 替代了http模块开启的服务里，对`pathname`进行的复杂分类跳转。例：`exporessObj.get('/home',(req,res)=>{...})`，表示：接收请求类型为get、且`pathname`为/home的请求
+  - 替代了http模块开启的服务里，对`pathname`进行的复杂分类跳转。例：`app.get('/home',(req,res)=>{...})`，表示：接收请求类型为get、且`pathname`为/home的请求
   - 格式：`app.<method>(path,callback)`
+    - `<method>`
+      - `post`、`get`：表示匹配post、get请求
+      - `all`：表示匹配==任意==请求类型
+    - `path`
+      - 形如`'/home'`形式
+      - `'*'`：表示匹配==任意路径==
   - Tips
-    - 一般登陆首页是没写路径的，因此服务端收到的路径是`/`，所以要监听`app.get('/',callback)`
+    - 一般登陆首页是没写路径的，因此服务端收到的路径是`/`，所以要监听`app.get('/',callback)`，跳转到主页
+    - 匹配是按照代码中从上至下的书写顺序，如`app.all('*',callback)`写在前，那之后所有的匹配规则都不会触发，全被`all('*')`接收，所以要注意匹配的优先顺序
+- 获取==请求报文==参数
+  - 兼容==http模块==的属性方法
+  - express操作
+    - `req.path`：等同于`new URL`里的`pathname`属性，会省略==query参数==，只返回路径
+    - `req.query`：返回对象。以键值对的形式保存query参数
+    - `req.ip`：获取ip
+    - `req.get('key')`：获取请求头。
+      - 只能通过get获取，因为请求头存在==Symbol==值为键名的对象里
+
+- 获取==路由==参数
+
+  - 在==路径==中使用占位符来**匹配**获取对应参数值
+
+    - `:命名`：占位符格式
+
+    - 除了占位符以外的其他字符会做==格式==匹配
+
+      ```js
+      页面请求:http://www.jd.com/abc.7.8.html
+      
+      匹配示例
+      app.get('/:a.html',callback) //得到{a:'abc.7.8'}
+      app.get('/:a.:b') //得到{a:'abc', b:'7.8.html'}
+      app.get('/:a.:b.html') //得到{a:'abc.7', b:'8'}
