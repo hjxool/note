@@ -355,6 +355,8 @@ server.listen(端口号,()=>{ 回调函数在 服务启动成功 后被调用
 
   - ==require==原理
 
+    - require实际在内部执行了一次[fs模块]()文件读取，再转字符串
+  
     ```js
     伪代码
     function require(file_path){
@@ -376,6 +378,12 @@ server.listen(端口号,()=>{ 回调函数在 服务启动成功 后被调用
         return catchs[absolute_path] = module.exports
     }
     ```
+  
+  - require**只能**导入==JSON==和==JS==文件
+  
+    - 导入txt等格式文件会以JS格式去运行
+    - 导入==JSON==文件，返回的就是JSON文件保存的对象，可以直接进行取值操作
+    - 导入==JS==文件，会先运行一遍，再返回`module.exports`的值。如果JS文件没有给`module.exports`赋值，则返回`{}`
 
 ## npm
 
@@ -456,7 +464,7 @@ server.listen(端口号,()=>{ 回调函数在 服务启动成功 后被调用
 
     - `:命名`：占位符格式
 
-    - 除了占位符以外的其他字符会做==格式==匹配
+    - 除了占位符以外的其他字符会做==格式==匹配，不匹配的字符串集合到最后一个占位符
 
       ```js
       页面请求:http://www.jd.com/abc.7.8.html
@@ -464,4 +472,7 @@ server.listen(端口号,()=>{ 回调函数在 服务启动成功 后被调用
       匹配示例
       app.get('/:a.html',callback) //得到{a:'abc.7.8'}
       app.get('/:a.:b') //得到{a:'abc', b:'7.8.html'}
-      app.get('/:a.:b.html') //得到{a:'abc.7', b:'8'}
+      app.get('/:a.:b.html') //得到{a:'abc', b:'7.8'}
+      ```
+  
+  - `request.params`属性集合了所有占位符存储的==路由参数==，没有占位符，`params`返回值为空
