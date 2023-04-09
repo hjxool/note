@@ -506,12 +506,60 @@ server.listen(端口号,()=>{ 回调函数在 服务启动成功 后被调用
     - 响应的文件内容是==原格式==，如果在地址栏发送请求，响应HTML文件会==直接运行==！
 
 - ==中间件==函数
+  
+  ```js
+  function middleware(req,res,next){
+      接收三个参数，分别是 请求报文对象、响应报文对象、next函数
+      next函数执行后会运行后续的 路由回调函数 或 中间件回调函数
+  }
+  ```
+  
   - 是个回调函数，用于过滤、预处理请求数据
-  - `app.use(中间件函数)`：专门解析中间件函数的方法。
-    - 会将http请求交给中间件
-    - `app.use((req,res,next)=>{})`：
-      - 中间件函数会接收三个参数，分别是==请求==报文对象、==响应==报文对象、next==函数==
-      - next函数执行后会==运行后续==的==**路由**==回调函数**或**==**中间件**==回调函数
-  - 全局中间件：在所有路由之前执行
-    - 
-  - 路由中间件：在路由匹配规则触发后执行
+  - ==全局==中间件：在所有路由之前执行
+  
+    - **必须**要将`app.use`方法写在所有路由规则前，写在`app.<method>('path')`后会先执行路由匹配。由此可见执行顺序是从上到下，谁写在前面先执行谁。
+    - **并且**将`app.use`写到路由后也不会执行！除非`app.use`前的路由一个都没匹配上才会执行==中间件函数==
+    - `app.use(中间件函数)`：专门解析中间件函数的方法
+      - `use`方法设置的是==**全局**==中间件
+      - 会将http请求交给中间件
+  - ==路由==中间件：在路由匹配规则触发后执行，并先于`callback`回调前执行
+  
+    - 使用方法`app.<method>(path, 中间件函数, callback)`
+    - 同样会传入上述三个参数
+  
+  - ==静态资源==中间件
+  
+    ```js
+    http模块读取静态资源文件
+    const http = require('http')
+    const fs = require('fs')
+    const server = http.createServer((req,res)=>{
+        let {pathname} = new URL(`http://127.0.0.1${req.url}`)
+        if(pathname === '/xxx'){
+            ...
+        } else if(pathname === 'path'){
+            
+        } else {
+            需要一大串ifelse解析路由和静态资源读取
+            fs.readFile(`.${pathname}`,(err,data)=>{
+                if(err){
+                    res.end()
+                    return
+                }
+                res.end(data)
+            })
+        }
+    })
+    
+    express框架读取静态资源
+    const express = require('express')
+    const app = express()
+    app.use(express.static(__dirname + '/存放静态资源的文件夹路径')) //如 __dirname+'/img'
+    app.<method>('path',callback)
+    ```
+  
+    - 不过一般而言HTML页面上的静态资源都是相对路径，以当前html文件所在文件夹为==__dirname==，路径一般为`./img/xxx.png`等，因此请求url为`http://127.0.0.1:port/img/xxx.png`，这种情况下静态资源路径应写为`express.static(__dirname)`即可，因为静态资源路径写为`express.static(__dirname+'/img')`，请求url必须为`http://127.0.0.1:port/xxx.png`，不能加`/img`，相当于[express.static]()方法已经帮你把存放静态资源的文件夹路径拼上了
+    - [use]()方法都是==全局中间件==，因此要写在路由前
+    - `express.static`方法会自动为静态资源加上对应响应头类型和字符集
+    - Tips
+      - ==小技巧==：当处理类似`https://www.baidu.com`这种无路径、端口的请求时，可以用`res.redirect('./index.html')`重定向到导航页的静态文件，就会触发`express.static`方法
