@@ -1054,7 +1054,7 @@ offsetTop/Left是相对父级（注：滚动显示容器里，里面的每一个
 
 - ==父获取子==iframe的window：[iframeElement.contentWindow]()
 
-  - 子获取父的window：[window.parent]()
+  - ==子获取父==的window：[window.parent]()
 
 - 通过[window.parent.父级方法]()调用、传参到父级
 

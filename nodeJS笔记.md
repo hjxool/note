@@ -190,12 +190,12 @@ server.listen(端口号,()=>{ 回调函数在 服务启动成功 后被调用
 
 - ==重启==服务==修改==才能==生效==
 - [request]()：创建服务传入函数的第一个参数，用于==解析请求报文==
-
   - `request.method`：属性。获取请求方法，如post、get
   - `request.url`：属性。获取==端口号后==的内容，如`/api?name=xxx`
     - **但是**使用不便，一般不会用这种方法提取参数，而是使用[url模块]()，详情见后
   - `request.on('data', chunk =>{解析})`：读取收到的==请求体==数据。request是==流数据==，所以要绑定==data事件==一片一片取数据
     - **注意**此处只能提取到==post==方式发送的参数，**无法获取**拼接到地址栏的参数，如`?xxx1=123&xxx2=456`
+    - `chunk`是==Buffer==类型数据
   - `request.on('end', () => {})`：读取完成事件。在回调里执行返回页面结果
 - [response]()：创建服务传入函数的第二个参数，用于设置==返回结果==
 
@@ -253,6 +253,7 @@ server.listen(端口号,()=>{ 回调函数在 服务启动成功 后被调用
   - ==query参数==不是**对象**，需要用==get方法==获取里面的内容
     - `url.searchParams.get('name')`
 - URL对象里的`pathname`属性会省略相对路径前的`./`或`../`
+- `url.hostname`：IP域名。不包括http协议及端口号
 
 ## mime资源类型
 
@@ -438,128 +439,185 @@ server.listen(端口号,()=>{ 回调函数在 服务启动成功 后被调用
 - 也是一个==工具包==，封装了多个功能，便于开发HTTP服务
   - 导入的工具包是**函数**，使用需创建==应用对象==，`const app = express()`
 
-- express==路由==
-  - 替代了http模块开启的服务里，对`pathname`进行的复杂分类跳转。例：`app.get('/home',(req,res)=>{...})`，表示：接收请求类型为get、且`pathname`为/home的请求
-  - 格式：`app.<method>(path,callback)`
-    - `<method>`
-      - `post`、`get`：表示匹配post、get请求
-      - `all`：表示匹配==任意==请求类型
-    - `path`
-      - 形如`'/home'`形式
-      - `'*'`：表示匹配==任意路径==
-  - Tips
-    - 一般登陆首页是没写路径的，因此服务端收到的路径是`/`，所以要监听`app.get('/',callback)`，跳转到主页
-    - 匹配是按照代码中从上至下的书写顺序，如`app.all('*',callback)`写在前，那之后所有的匹配规则都不会触发，全被`all('*')`接收，所以要注意匹配的优先顺序
 
-- 获取==请求报文==参数
-  - 兼容==http模块==的属性方法
-  - express操作
-    - `req.path`：等同于`new URL`里的`pathname`属性，会省略==query参数==，只返回路径
-    - `req.query`：返回对象。以键值对的形式保存query参数
-    - `req.ip`：获取ip
-    - `req.get('key')`：获取请求头。
-      - 只能通过get获取，因为请求头存在==Symbol==值为键名的对象里
+### express==路由==
 
-- 获取==路由==参数
+- 替代了http模块开启的服务里，对`pathname`进行的复杂分类跳转。例：`app.get('/home',(req,res)=>{...})`，表示：接收请求类型为get、且`pathname`为/home的请求
+- 格式：`app.<method>(path,callback)`
+  - `<method>`
+    - `post`、`get`：表示匹配post、get请求
+    - `all`：表示匹配==任意==请求类型
+  - `path`
+    - 形如`'/home'`形式
+    - `'*'`：表示匹配==任意路径==
+- Tips
+  - 一般登陆首页是没写路径的，因此服务端收到的路径是`/`，所以要监听`app.get('/',callback)`，跳转到主页
+  - 匹配是按照代码中从上至下的书写顺序，如`app.all('*',callback)`写在前，那之后所有的匹配规则都不会触发，全被`all('*')`接收，所以要注意匹配的优先顺序
 
-  - 在==路径==中使用占位符来**匹配**获取对应参数值
+### 获取==请求报文==参数
 
-    - `:命名`：占位符格式
+- 兼容==http模块==的属性方法
+- express操作
+  - `req.path`：等同于`new URL`里的`pathname`属性，会省略==query参数==，只返回路径
+  - `req.query`：返回对象。以键值对的形式保存query参数
+  - `req.ip`：获取ip
+  - `req.get('key')`：获取==请求头==。
+    - 只能通过get获取，因为请求头存在==Symbol==值为键名的对象里
 
-    - 除了占位符以外的其他字符会做==格式==匹配，不匹配的字符串集合到最后一个占位符
+### 获取==路由==参数
 
-      ```js
-      页面请求:http://www.jd.com/abc.7.8.html
-      
-      匹配示例
-      app.get('/:a.html',callback) //得到{a:'abc.7.8'}
-      app.get('/:a.:b') //得到{a:'abc', b:'7.8.html'}
-      app.get('/:a.:b.html') //得到{a:'abc', b:'7.8'}
-      ```
+- 在==路径==中使用占位符来**匹配**获取对应参数值
 
-  - `request.params`属性集合了所有占位符存储的==路由参数==，没有占位符，`params`返回值为空
+  - `:命名`：占位符格式
 
-- ==响应==设置
+  - 除了占位符以外的其他字符会做==格式==匹配，不匹配的字符串集合到最后一个占位符
 
-  - 兼容http模块方式
-  - express响应设置可以==链式==调用。例：`res.status(500).set('aaa','123').send(xxx)`
-  - `res.status(500)`：设置==状态码==。等同于http模块的`res.status = 500`
-  - `res.set('aaa','123')`：设置==响应头==。等于http模块`res.setHeader`
-  - `res.send('中文xxx')`：设置==响应体==。等同于http模块`res.end`
-    - **但是**send方法会自动添加`text/html;charset=utf-8`响应头，因此不需要设置响应头也可正常显示中文
-    - 同`res.end`一样，只能有一个
-    - `send`后不能写`res.download`等方法
-  - `res.redirect(url,状态码)`：==重定向==
-    - 将==**当前**请求==转向新的url，并不会修改当前页面
-    - `url`可以是`./path`、`/path`，也可以是完整的url`http...`
-    - **只能**有一个`redirect`，同`res.end`一样
-  - `res.download(path,重命名,失败回调)`：==下载==响应。后面两个参数可以省略
-    - `path`只能是本地/服务器资源路径，==不能是url==！
-    - 和`res.send`放在一起执行会==失效==，因为`res.download`执行完会断开请求连接
-    - 只有新开页签发送的get请求才会触发下载，如果是页面内元素、事件触发则不会自动下载
-  - `res.json(任何类型数据)`：==JSON==响应
-    - 同样执行完会断开连接
-    - 会自动设置==响应头==类型为`application/json`
-    - 如果传读取的文件内容，依然是Buffer类型数据，即使`toString`转换成字符串，也会有`\n`等字符，因此不适合传文件
-  - `res.sendFile(绝对路径)`：响应==文件==内容
-    - 只能是**绝对**路径！因此需要用[path.resolve]()或者`__dirname + '/path'`
-    - 响应的文件内容是==原格式==，如果在地址栏发送请求，响应HTML文件会==直接运行==！
-
-- ==中间件==函数
-  
-  ```js
-  function middleware(req,res,next){
-      接收三个参数，分别是 请求报文对象、响应报文对象、next函数
-      next函数执行后会运行后续的 路由回调函数 或 中间件回调函数
-  }
-  ```
-  
-  - 是个回调函数，用于过滤、预处理请求数据
-  - ==全局==中间件：在所有路由之前执行
-  
-    - **必须**要将`app.use`方法写在所有路由规则前，写在`app.<method>('path')`后会先执行路由匹配。由此可见执行顺序是从上到下，谁写在前面先执行谁。
-    - **并且**将`app.use`写到路由后也不会执行！除非`app.use`前的路由一个都没匹配上才会执行==中间件函数==
-    - `app.use(中间件函数)`：专门解析中间件函数的方法
-      - `use`方法设置的是==**全局**==中间件
-      - 会将http请求交给中间件
-  - ==路由==中间件：在路由匹配规则触发后执行，并先于`callback`回调前执行
-  
-    - 使用方法`app.<method>(path, 中间件函数, callback)`
-    - 同样会传入上述三个参数
-  
-  - ==静态资源==中间件
-  
     ```js
-    http模块读取静态资源文件
-    const http = require('http')
-    const fs = require('fs')
-    const server = http.createServer((req,res)=>{
-        let {pathname} = new URL(`http://127.0.0.1${req.url}`)
-        if(pathname === '/xxx'){
-            ...
-        } else if(pathname === 'path'){
-            
-        } else {
-            需要一大串ifelse解析路由和静态资源读取
-            fs.readFile(`.${pathname}`,(err,data)=>{
-                if(err){
-                    res.end()
-                    return
-                }
-                res.end(data)
-            })
-        }
-    })
+    页面请求:http://www.jd.com/abc.7.8.html
     
-    express框架读取静态资源
-    const express = require('express')
-    const app = express()
-    app.use(express.static(__dirname + '/存放静态资源的文件夹路径')) //如 __dirname+'/img'
-    app.<method>('path',callback)
+    匹配示例
+    app.get('/:a.html',callback) //得到{a:'abc.7.8'}
+    app.get('/:a.:b') //得到{a:'abc', b:'7.8.html'}
+    app.get('/:a.:b.html') //得到{a:'abc', b:'7.8'}
     ```
+
+- `request.params`属性集合了所有占位符存储的==路由参数==，没有占位符，`params`返回值为空
+
+### ==响应==设置
+
+- 兼容http模块方法
+- express响应设置可以==链式==调用。例：`res.status(500).set('aaa','123').send(xxx)`
+- `res.status(500)`：设置==状态码==。等同于http模块的`res.status = 500`
+- `res.set('aaa','123')`：设置==响应头==。等于http模块`res.setHeader`
+- `res.send('中文xxx')`：设置==响应体==。等同于http模块`res.end`
+  - **但是**send方法会自动添加`text/html;charset=utf-8`响应头，因此不需要设置响应头也可正常显示中文
+  - 同`res.end`一样，只能有一个
+  - `send`后不能写`res.download`等方法
+- `res.redirect(url,状态码)`：==重定向==
+  - 将==**当前**请求==转向新的url，并不会修改当前页面
+  - `url`可以是`./path`、`/path`，也可以是完整的url`http...`
+  - **只能**有一个`redirect`，同`res.end`一样
+- `res.download(path,重命名,失败回调)`：==下载==响应。后面两个参数可以省略
+  - `path`只能是本地/服务器资源路径，==不能是url==！
+  - 和`res.send`放在一起执行会==失效==，因为`res.download`执行完会断开请求连接
+  - 只有新开页签发送的get请求才会触发下载，如果是页面内元素、事件触发则不会自动下载
+- `res.json(任何类型数据)`：==JSON==响应
+  - 同样执行完会断开连接
+  - 会自动设置==响应头==类型为`application/json`
+  - 如果传读取的文件内容，依然是Buffer类型数据，即使`toString`转换成字符串，也会有`\n`等字符，因此不适合传文件
+- `res.sendFile(绝对路径)`：响应==文件==内容
+  - 只能是**绝对**路径！因此需要用[path.resolve]()或者`__dirname + '/path'`
+  - 响应的文件内容是==原格式==，如果在地址栏发送请求，响应HTML文件会==直接运行==！
+- Tips
+  - 当访问`http(s)://ip:port`时
+    - 一种是可以`res.redirect('./index.html')`==重定向==，让`app.use(express.static(__diranme))`静态资源获取服务器上的首页
+    - 另一种是`res.sendFile(__dirname + '/index.html')`直接==返回==首页==文件==
+    - 如果首页文件名为`index.html`，则可以省略上述方法，因为没有path路径时默认访问`http(s)://ip:port/index.html`，静态资源中间件会直接返回文件
+
+### ==中间件==函数
+
+```js
+function middleware(req,res,next){
+    接收三个参数，分别是 请求报文对象、响应报文对象、next函数
+    next函数执行后会运行后续的 路由回调函数 或 中间件回调函数
+}
+```
+
+- 是个回调函数，用于过滤、预处理请求数据
+- ==全局==中间件：在所有路由之前执行
+
+  - **必须**要将`app.use`方法写在所有路由规则前，写在`app.<method>('path')`后会先执行路由匹配。由此可见执行顺序是从上到下，谁写在前面先执行谁。
+  - **并且**将`app.use`写到路由后也不会执行！除非`app.use`前的路由一个都没匹配上才会执行==中间件函数==
+  - `app.use(中间件函数)`：专门解析中间件函数的方法
+    - `use`方法设置的是==**全局**==中间件
+    - 会将http请求交给中间件
+- ==路由==中间件：在路由匹配规则触发后执行，并先于`callback`回调前执行
+
+  - 使用方法`app.<method>(path, 中间件函数, callback)`
+  - 同样会传入上述三个参数
+
+- ==静态资源==中间件
+
+  ```js
+  http模块读取静态资源文件
+  const http = require('http')
+  const fs = require('fs')
+  const server = http.createServer((req,res)=>{
+      let {pathname} = new URL(`http://127.0.0.1${req.url}`)
+      if(pathname === '/xxx'){
+          ...
+      } else if(pathname === 'path'){
+          
+      } else {
+          需要一大串ifelse解析路由和静态资源读取
+          fs.readFile(`.${pathname}`,(err,data)=>{
+              if(err){
+                  res.end()
+                  return
+              }
+              res.end(data)
+          })
+      }
+  })
   
-    - 不过一般而言HTML页面上的静态资源都是相对路径，以当前html文件所在文件夹为==__dirname==，路径一般为`./img/xxx.png`等，因此请求url为`http://127.0.0.1:port/img/xxx.png`，这种情况下静态资源路径应写为`express.static(__dirname)`即可，因为静态资源路径写为`express.static(__dirname+'/img')`，请求url必须为`http://127.0.0.1:port/xxx.png`，不能加`/img`，相当于[express.static]()方法已经帮你把存放静态资源的文件夹路径拼上了
-    - [use]()方法都是==全局中间件==，因此要写在路由前
-    - `express.static`方法会自动为静态资源加上对应响应头类型和字符集
-    - Tips
-      - ==小技巧==：当处理类似`https://www.baidu.com`这种无路径、端口的请求时，可以用`res.redirect('./index.html')`重定向到导航页的静态文件，就会触发`express.static`方法
+  express框架读取静态资源
+  const express = require('express')
+  const app = express()
+  app.use(express.static(__dirname + '/存放静态资源的文件夹路径')) //如 __dirname+'/img'
+  app.<method>('path',callback)
+  ```
+
+  - 不过一般而言HTML页面上的静态资源都是相对路径，以当前html文件所在文件夹为==__dirname==，路径一般为`./img/xxx.png`等，因此请求url为`http://127.0.0.1:port/img/xxx.png`，这种情况下静态资源路径应写为`express.static(__dirname)`即可，因为静态资源路径写为`express.static(__dirname+'/img')`，请求url必须为`http://127.0.0.1:port/xxx.png`，不能加`/img`，相当于[express.static]()方法已经帮你把存放静态资源的文件夹路径拼上了
+  - [use]()方法都是==全局中间件==，因此要写在路由前
+  - `express.static`方法会自动为静态资源加上对应响应头类型和字符集
+  - Tips
+    - ==小技巧==：当处理类似`https://www.baidu.com`这种无路径、端口的请求时，可以用`res.redirect('./index.html')`重定向到导航页的静态文件，就会触发`express.static`方法
+
+### 获取==请求体==数据
+
+- express框架获取不到==post==发送的请求体数据，只能用兼容http模块的方法`req.on('data',callback)`、`req.on('end',callback)`才能取到请求体
+
+- 因此需要引入外部包[body-parser]()
+
+- [body-parser]()的使用
+
+  ```js
+  const parser = require('body-parser')
+  // 解析 JSON 格式请求体的中间件
+  const jsonp = parser.json()
+  // 解析 查询字符串 格式请求体的中间件 如 name=123&password=111
+  const queryp = parser.urlencoder({extended:false}) // 固定写法
+  // 建议请求体中间件用作路由中间件
+  app.<method>('path', queryp或jsonp, (req,res)=>{
+      // 因为是同一个请求对象 请求体中间件执行完后会往 req对象 身上添加 body 属性
+      res.send(req.body) // {name:123, password:111}
+  })
+  ```
+
+### 防盗链
+
+- ==请求头==中的`referer`字段会显示==发送请求的网站==，可以根据这个字段决定是否返回内容，这即是防盗链
+
+- **注意**==第一次==访问页面**没有**`referer`字段，之后页面中的静态资源以及触发的请求才有
+
+  ```js
+  app.use((req, res, next) => {
+  	let url = req.get('referer');
+  	if (url) {
+  		// 第一种方法 正则
+  		let reg = /^https?:\/\/(?<a>[0-9\.a-zA-Z]+)(:[0-9]+)?\//g;
+  		req.cus_params = reg.exec(url).groups.a;
+  		// 第二种方法 URL API
+  		let obj = new URL(url);
+  		req.cus_params = obj.hostname;
+  		if (req.cus_params !== '127.0.0.1') {
+  			res.status(404).send('<h1>404 NOT FOUND</h1>');
+  			return;
+  		}
+  	}
+  	next();
+  });
+  app.use(express.static(__dirname));
+  app.post('/login', (req, res) => {
+  	res.send(req.cus_params);
+  });
