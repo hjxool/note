@@ -535,8 +535,8 @@ methods中方法互相调用：通过this.$options.methods.方法名查找method
   - 接收到的都是对象
 
   ```html
-  匿名插槽                                              剧名插槽
-  <slot :存值名="组件内响应式变量名"></slot>             <slot name="t-t" :存值名="组件内响应式变量名"></slot>
+  匿名插槽                                              具名插槽
+  <slot :存值名="组件内响应式变量"></slot>             <slot name="t-t" :存值名="组件内响应式变量"></slot>
   
   HTML页面
   <template v-slot:default="接收数据名">                <template v-slot:t-t="接收数据名">
