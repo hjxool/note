@@ -437,7 +437,7 @@ server.listen(端口号,()=>{ 回调函数在 服务启动成功 后被调用
 ## express框架
 
 - 也是一个==工具包==，封装了多个功能，便于开发HTTP服务
-  - 导入的工具包是**函数**，使用需创建==应用对象==，`const app = express()`
+  - 导入的工具包是**函数**，使用前需创建==应用对象==，`const app = express()`
 
 
 ### express==路由==
@@ -621,3 +621,27 @@ function middleware(req,res,next){
   app.post('/login', (req, res) => {
   	res.send(req.cus_params);
   });
+  ```
+
+### 路由模块化
+
+- 使用前需创建==路由对象==，`const router = express.Router()`
+- ==路由==对象跟==应用==对象`app`一样，使用同样的方法，**只不过**需要模块化暴露出去，并在其他地方==导入==`app.use(router)`使用
+
+- 示例
+
+  ```js
+  模块1.js
+  const express = require('express')
+  const router = express.Router()
+  router.get('/',(req,res)=>{...})
+  module.exports = router
+                             
+  模块2.js
+  const express = require('express')
+  const router = express.Router()
+  // 不同模块间也可以互相导入
+  const router2 = require('./模块1.js')
+  router.use(router2)
+  router.post('/login',(req,res)=>{...})
+  module.exports = router
