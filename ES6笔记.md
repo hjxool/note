@@ -620,34 +620,31 @@
 
 ## 数据代理
 
-  在ES6之前使用·defineProperty(要代理的对象，自命名属性，{ get()，set() })·，很笨拙，需要知道代理对象的属性名才能检测数据变化，且需要一个一个设置get和set
+- 在ES6之前使用`defineProperty(要代理的对象, 自命名属性, {get(), set()})`，很笨拙，需要知道代理对象的属性名才能检测数据变化，且需要一个一个设置get和set
 
-  在ES6之后提出了·**proxy**·，它不用笨拙的对属性一个个进行代理，而是对整个目标对象代理
+- 在ES6之后提出了`proxy`，它不用笨拙的对属性一个个进行代理，而是对整个目标对象代理
 
-​    使用方法：
+  - 使用方法：`proxy(target, {get(target, name), set(target, name, value)}, deleteProperty(target，name))`
 
-​      1、·**proxy(target，{ get(target，name)，set(target，name，value) }，deleteProperty(target，name))**·
+    - get函数中有两个默认参数：`target`是==要代理的对象==、`name`是==检测到读取的**属性名**==。所以get中的return要这么写`return target[name]`
 
-​      2、get函数中有两个默认参数：`**target**`是·**要代理的对象**·、·**name**·是·**检测到读取的属性名**·，·**string类型**·。所以get中的return要这么写·return **target[name]**·
+    - set函数有三个默认参数：前两个target、name和get函数的相同、第三个`value`是==修改传入的值==
+      - ==defineProperty==监测不到劫持对象的==增删==，而==proxy==的set加入了监测==**增**==的能力，当`obj.新属性`时，也可以监测的到
 
-​      3、set函数有三个默认参数：前两个target和name和get函数的相同、第三个·**value**·是·修改传入的值·
+    - ==**delete**Property==函数有两个默认参数，同get函数，**必须**要有返回值，`return delete target[name]`
 
-​        Tips：原版·defineProperty·监测不到劫持对象的·**增删**·，而·**proxy**·的set加入了监测·**增**·的能力，当使用·**obj.新属性时**·，也可以监测的到
+- Tips：
 
-​      4、deleteProperty函数有两个默认参数，同get函数，**必须**要有返回值，返回·return **delete target[name]**·
+  - 当省略第三个参数==deleteProperty==时，对象可以==直接==删除操作，当写了==deleteProperty==，**必须**要在==return时==执行删除，不然删除无效，其实就是当你删除操作时，js帮你把删除操作放到了==deleteProperty==函数中执行，**同时**帮你**监测**删除动作
 
-​        Tips：
+  - 没有使用脚手架时，用`<script/>`标签引入等同于==import==导入，同样都可以用vue的==mixins==等导入外部配置项对象
 
-​          1、当·**没使用**·deleteProperty函数时，对象数据是可以直接删除操作的，当写了以后，**必须**要在·**return时**·执行删除，不然会删除失败，其实就是当你删除操作时，js帮你把删除放到了·**deleteProperty**·函数中执行，**同时**帮你**监测**删除动作
-
-​          2、没有使用脚手架时，用·**<script/>**·标签引入等同于·**import**·导入，同样都可以用vue的·**mixins**·等导入外部对象配置项
-
-​          3、对数据代理本质的理解：对原始数据的操作是无法监测的，而数据代理就像一道筛网，通过另一个对象来映射原始数据，同时在映射对象身上添加了对应各种操作的拦截方法，从而达到修改映射对象时，既可以修改原始数据，同时还能拦截到操作
+  - 对数据代理本质的理解：对原始数据的操作是无法监测的，而数据代理就像一道筛网，通过另一个对象来映射原始数据，同时在映射对象身上添加了对应各种操作的拦截方法，从而达到修改映射对象时，既可以修改原始数据，同时还能拦截到操作
 
 ## Reflect
 
-- 最大的作用是——不需要·**try{}catch(error){}**·，最典型的一个例子就是·defineProperty·出错时，整个单线程程序都会挂掉，所以封装的框架中通常都要用·try catch·来捕获错误，同时保证程序正常运行。**而**·**reflect**·则不用，它在使用·defineProperty·时，会返回·**执行成功或失败**·，而不会使整个代码都挂掉，**同时**·**reflect**·身上还有全套的object对象操作方法
-- [Reflect.deleteProperty(obj,  '属性名')]()：删除对象身上的属性
+- 最大的作用是：不需要`try{}catch(error){}`，最典型的一个例子就是==defineProperty==出错时，整个单线程程序都会挂掉，所以封装的框架中通常都要用==try catch==来捕获错误，同时保证程序正常运行。**而**==reflect==则不用，它在使用==defineProperty==时，会返回==执行成功或失败==，而不会使整个代码都挂掉，**同时**==reflect==身上还有全套的object对象操作方法
+- `Reflect.deleteProperty(obj, '属性名')`：删除对象身上的属性
 
 ## 私有属性
 
