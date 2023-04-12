@@ -52,7 +52,7 @@
 
 - vue3方法创建的实例对象，不能直接使用，只有在 `mount()` 挂载后所赋值的变量，才能取到里面的值，等同于Vue2中的`let vm = new Vue`
 
-![img](https://upload-images.jianshu.io/upload_images/6322775-67f17ff8c53c9978.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+  ![img](https://upload-images.jianshu.io/upload_images/6322775-67f17ff8c53c9978.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
 
 - 挂载vue实例：
 
@@ -156,9 +156,19 @@
 
 - 不指定监听对象，只指定回调，当使用和依赖数据变化时会触发回调
 
-- 使用方法：`watchEffect(()=>{ const a = 外部数据 触发时执行逻辑 })`，当`a`依赖的外部数据变化时，执行**通用**逻辑，这点跟**计算属性**很像。
+- 使用方法：
 
-- 与**watch**的**不同**：watch是每个监听对象，都可以有不同的回调，而==watchEffect==是共用回调
+  ```js
+  watchEffect(()=>{
+      let params1 = 外部数据 如 obj.name
+      let params2 = 外部数据 如 obj.age
+      触发时执行逻辑
+  })
+  ```
+
+  - 当`params`依赖的外部数据变化时，执行==通用==逻辑，这点跟**计算属性**很像
+
+- 与**watch**的**不同**：watch是每个监听对象，都可以有不同的回调，而watchEffect是==共用回调函数==。本质是为了方便代码复用，当一堆监听对象都有一样的执行回调方法，就可以watchEffect写到一起
 
 ## vue3新增hook函数
 
