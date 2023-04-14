@@ -643,7 +643,7 @@
 
 ## Reflect
 
-- 最大的作用是：不需要`try{}catch(error){}`，最典型的一个例子就是==defineProperty==出错时，整个单线程程序都会挂掉，所以封装的框架中通常都要用==try catch==来捕获错误，同时保证程序正常运行。**而**==reflect==则不用，它在使用==defineProperty==时，会返回==执行成功或失败==，而不会使整个代码都挂掉，**同时**==reflect==身上还有全套的object对象操作方法
+- 最大的作用是：不需要`try{}catch(error){}`，最典型的一个例子就是==defineProperty==出错时，整个单线程程序都会挂掉，所以封装的框架中通常都要用==try catch==来捕获错误，同时保证程序正常运行。**而**==reflect==则不用，它在使用==defineProperty==时，会返回==执行成功或失败==，而不会使整个代码都挂掉，**同时**==reflect==身上还有==全套的object对象操作方法==
 - `Reflect.deleteProperty(obj, '属性名')`：删除对象身上的属性
 
 ## 私有属性

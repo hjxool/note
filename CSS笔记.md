@@ -354,7 +354,7 @@ text-overflow：必须搭配overflow：hidden（溢出内容隐藏）和white-sp
   - ==margin坍塌==：指==垂直相邻==两块级元素，使用垂直方向的margin会取相邻边margin的较大值，而不是求和
     - 只有==块元素==会坍缩，flex等弹性布局下不会
   - box-sizing：属性。border-box下相当于把padding和border算在content里，盒模型会自动根据padding和border的值来调整content的值
-  - ==背景色==会给除了margin内的所有区域都上色，使用`background-clip:content-box`可以将边框底部的背景色去除
+  - ==背景色==会给除了==margin内的所有区域==都上色，使用`background-clip:content-box`可以将边框底部的背景色去除
 
 ## 文字
 

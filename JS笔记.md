@@ -1044,7 +1044,7 @@ offsetTop/Left是相对父级（注：滚动显示容器里，里面的每一个
 
 - 内部执行的任何方法都==获取不到==iframe==父级==的元素
 
-  - **只能**通过==获取父级页面window对象==`window.parent.document`才能操作document元素
+  - **只能**通过==获取父级页面window对象==`window.parent.document`才能操作==父页面==document元素
 
 - iframe内的元素获取==相对视窗==的位置都是以==iframe为边界==
 
