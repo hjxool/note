@@ -303,6 +303,8 @@ computed计算属性和methods是不同的，computed是基于响应式的，dat
 
   - “计算属性”跟“methods和data”中的属性不同，因为它里面没有默认函数，但是计算属性有，所以vue对象上绑定的其实是计算属性中“get()”的返回值，然后赋值给了跟计算属性名称同名的“新属性”
 
+  - 计算属性命名不能是`'obj.key'`这种，只能是单层的`'key':{get(), set()}`或者`key(){}`
+  
   - 侦听器虽然可以监控数据变动，但是书写比计算属性更麻烦，需要将改变的属性先声明再监听，但是计算属性可以省略声明
 
 ![img](https://upload-images.jianshu.io/upload_images/6322775-a57846b8a587abaf.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
@@ -654,6 +656,14 @@ Tips：
 -  **appear：**是否在初始渲染时使用过度
 
 - **enter-class等：**适合搭配第三方样式库
+
+- ==列表排序过渡==：新增`v-move`class。会从原位置平滑过渡到新位置
+
+  ```css
+  <transition-group/>
+  .v-move{
+   transition: all 0.3s;   
+  }
 
 - TIps：
   1. `<transition/>`只能应用在**单个标签**
