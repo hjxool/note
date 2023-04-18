@@ -947,7 +947,7 @@ js**原生**事件处理函数事件名必须叫“event”
 - [getFullYear()]()：获取当前==年份==
 - [setTime(时间戳)]()：==改变原Date对象==。`date.setTime(xxx)`，date就会变为时间戳对应的时间
 
-## Math对象方法：
+## Math对象方法
 
 - [Math.floor]()：向下取整(floor意为地板)
 
