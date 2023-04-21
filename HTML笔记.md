@@ -269,6 +269,7 @@ HTML**属性名**对大小写不敏感，会统一转换成小写，在js中是�
   - [readonly]()：标签属性。输入框变成只读，可选中但不能输入
   - ==type="file"==：display：none也可以触发[click]()方法
     - input身上的[change]()事件也可以响应
+    - input节点的files虽然存储着所选文件，但是==只读==，**只能**通过==清空==`inputDom.value = null/''`来==重置选择文件==
   - 虽然不同type时获取input节点取的字段不同，但是input节点上有所有不同类型的字段
   
 - `<!Doctype HTML>`就是==文档声明==，用来告诉浏览器当前网页版本
