@@ -36,6 +36,13 @@
 
 - [slot-scope=“{node，data}”]()：==node==是element节点的一些属性、==data==则是自己定义的数据
 
+- 推荐使用`@check`而不是`@check-change`事件
+
+  - `@check-change`会点一次多次触发
+  - `@check-change`返回的是点击节点上下级等一干无关节点
+  - `@check`会返回两个参数，第二个参数是==树中所有选中节点==
+
+
 ## form表单
 
 ### 表单验证

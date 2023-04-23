@@ -365,6 +365,28 @@
     	})()
     执行文件中 直接调用模块对象里的方法
     	module.add()
+    ```
+  
+  - Tips：
+  
+    - for循环在闭包的的差异性
+  
+      ```js
+      // 基础for循环，每次循环都是 单独作用域 包括索引index
+      for(let i = 0;i < 3;i++){
+          setTimeout(()=>{
+              console.log(i) // 0 1 2
+          },100)
+      }
+      // for循环外声明的变量即父级作用域的变量，在异步函数中是唯一的，即指向的内存地址只有一处
+      // 因此会叠加传递
+      let index = 0
+      for(let val of array){
+          setTimeout(()=>{
+              console.log(index) // 3 3 3
+          },100)
+          index++
+      }
 
 ## 自执行函数
 
