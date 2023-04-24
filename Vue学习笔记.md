@@ -453,6 +453,7 @@ methods中方法互相调用：通过this.$options.methods.方法名查找method
 ![img](https://upload-images.jianshu.io/upload_images/6322775-43c0d72fa179b58c.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
 
 - [template]()内如果想写入多个标签，需要用标签包裹，其原因是组件中==只能有一个根元素==
+
 - 每个同名的**组件**会**独立**维护自己的数据，每创建一个同名组件都有新**实例**被创建
 
 - data
@@ -464,13 +465,18 @@ methods中方法互相调用：通过this.$options.methods.方法名查找method
   - prop在用变量赋值时，需要用v-bind表示传入的是一个表达式而不是字符串
 
 - ==与extend({配置项})的区别==：
-  - component是“**全局注册！**”，而extend是`let **对象名** = Vue.extend({})`的形式注册的`**局部组件**`
+  - component是“**全局注册！**”，而extend是`let 对象名 = Vue.extend({})`的形式注册的`局部组件`
   - component('组件名'，extend对象名)
   - extend使用时：`new Vue({ components:{ **组件名：extend赋值对象** } })`
+  
 - 在根实例对象使用组件是==平级的==，但是组件中可以用`components：{}`包裹其他组件，并在`template`中调用
+
 - 组件之所以能`**同名且维护不同的对象**`，就是因为`**extend**`中返回的是`**新创建的function Vuecomponent()**`，就是每次调用都创建一个新的函数
+
 - ※组件是在==挂载==时就已经==执行完==身上立即执行的方法了！
+
 - 给组件上添加的==class==、==style==会直接添加到组件==根节点==上
+
 - [局部注册组件]()
 
   ```js
@@ -490,7 +496,9 @@ methods中方法互相调用：通过this.$options.methods.方法名查找method
       components:{component} 同上
   })
   ```
+  
 - 不管是==全局==组件还是==局部==组件，[mixins]()==混入==对象**必须**==声明在组件**之前**！==
+
 - [mixins: [ 变量1,变量2, ... ] ]()：将外部文件/变量混入当前组件/根实例
 
   - 组件是独立作用域，所以每个组件都要混入才能使用外部声明的变量和方法
