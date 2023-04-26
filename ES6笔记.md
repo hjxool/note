@@ -149,6 +149,16 @@
 
 - 除了then里传入两个函数，还可以用[promise对象.catch(函数)]()接收失败回调方法
 
+  ```js
+  //第一种 then里传入两个函数 用来接收 成功和失败的值
+  new Promise().then(successDate => successDate, errMsg => errMsg)
+  
+  //第二种 then只传入一个函数 用来接收成功值 用.catch函数接收失败值
+  new Promise().then(successDate => successDate).catch(errMsg => errMsg)
+  
+  //第三种 then只传入一个函数也没有catch 只能接收成功值
+  new Promise().then(successDate => successDate)
+
 - `then()`**返回值**还是==Promise对象==
 
   - **但是**then里的函数如果没有`return`，`then()`返回的是==值为undefined的Promise对象==
@@ -480,7 +490,20 @@
 
 - async==函数==
 
-  - 返回值为==promise对象==
+  - 可以使用`await`关键字
+
+  - **返回值**会自动加工成==Promise对象==！哪怕返回的是基本类型数据，得到的返回值也是Promise对象
+
+    - **但**如果async函数返回给==父级==函数(父级函数也是async)，父级函数用`await`关键字可以把==状态成功==的Promise对象值取出来，即==原数据类型==
+
+      ```js
+      async child(){
+          return '123'
+      }
+      async parent(){
+          console.log(child()) // 输出 [object promise]{...}
+          console.log(await child()) // 输出 '123'
+      }
 
   - promise对象的==状态==是==成功==或是==失败==，由==return==后的值决定
 
@@ -499,18 +522,46 @@
     result.then(value => {},reason => {})
     ```
 
+  - 在对象中声明的函数可以省略function，在函数前加async
+
+    ```js
+    // 普通用法
+    async function fn(){}
+    
+    // 对象内
+    let obj = {
+        async fn(){} // 简写形式
+        fn: async function(){} // 完整形式
+    	fn: async ()=>{} // 箭头函数形式
+    }
+
 - await==表达式==
 
   - ==必须==写在async函数**里**
 
-  - await后跟==Promise对象==
+  - await后可以跟==Promise对象==，及任意数据类型
 
-  - ==返回值==是==promise对象==状态==成功==的值，即then方法里传入的参数
+    - 但是跟==Promise对象==，会自动帮你把Promise对象中的==值==取出来返回
+
+      - 除了状态==成功==的Promise对象，其余状态不会进行操作，也==不会继续往下执行代码！==且==没有返回值==
+
+        ```js
+        async fn(){
+            await new Promise((success,fail)=>{}) // 状态为待处理，不会执行后续代码
+            await new Promise((success,fail)=>{fail('err')})// 状态为失败，不会执行后续代码
+            console.log('后续')
+        }
+
+    - 当需要promise返回值时，不能`await let data = new Promise().then(res=>res)`
+
+      - 而是`let data = await new Promise().then(res=>res)`
+
+  - [await]()==返回值==是==promise对象==状态==成功==的**值**，即`.then(success=>data,err=>err)`then成功回调方法==返回的值==data
 
   - ==await后==跟异步方法返回的==promise对象！==会等该异步方法==执行返回==成功或失败结果后==才会继续==执行后续的代码
 
   - 要搭配==try...catch==，因为promise对象状态==失败会抛出异常==，影响后续执行
-  
+
     ```js
     let r = new Promise((success,reject)=>{
         success('xxx')
@@ -522,6 +573,25 @@
             console.log(err)
         }
     }
+    ```
+
+- Tips
+
+  ```js
+  asycn child(){
+      // 这样无法等待异步执行完后再返回
+      // 因为return 是立即执行的 而这时await还未返回值 相当于 return 空
+      // 但因为child是async函数 因此返回的空值也被包装成Promise对象
+      return await new Promise((success,fail)=>{
+        // 异步操作
+        setTimeout(()=>{
+            success('yes')
+        },2000)
+      })
+  }
+  function parent(){
+      console.log(child())// 输出 状态为“待处理”的Promise对象
+  }
 
 ## 扩展运算符和rest参数
 
