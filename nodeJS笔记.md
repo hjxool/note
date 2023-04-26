@@ -395,7 +395,6 @@ server.listen(端口号,()=>{ 回调函数在 服务启动成功 后被调用
   - `包`名默认是==文件夹名==，不能是==中文==！所以文件夹最好不要用中文
   - 意义：创建==项目==必须的操作，因为直接npm安装，`package.json`里只有`dependencies`属性
 - [搜索工具包](https://www.npmjs.com)
-
 - ==导入==工具包
   - [require]()函数：`const xx = require('包名')`
   - 导入的包会作为自己所创建的包的依赖包
@@ -410,10 +409,13 @@ server.listen(端口号,()=>{ 回调函数在 服务启动成功 后被调用
     - 命令：`npm -S 包名`
     - `-S`是默认选项
     - 包信息存在`package.json`中==dependencies==属性
+  - 普通安装
+    - 命令：`npm i 包名`
+    - 会一层层向上级目录查找`node_modules`文件夹，因此不必在根目录下执行安装命令，在子文件夹下安装即可
   - ==全局==安装
     - 命令：`npm i -g 包名 `
     - 任何工作目录下均可执行安装
-    - 无需`require`函数
+    - 无需`require`函数，而是通过命令行指令去调用，如：`nodemon`，安装完后自动运行，需要调用指令时`nodemon xxx`去执行
     - 查看全局安装位置：`npm root -g`
   - 切换安装版本：`npm i 包名@版本号`
   - 删除依赖
@@ -508,6 +510,10 @@ server.listen(端口号,()=>{ 回调函数在 服务启动成功 后被调用
 - `res.sendFile(绝对路径)`：响应==文件==内容
   - 只能是**绝对**路径！因此需要用[path.resolve]()或者`__dirname + '/path'`
   - 响应的文件内容是==原格式==，如果在地址栏发送请求，响应HTML文件会==直接运行==！
+  - 响应的文件视浏览器是否支持在线预览，不同的浏览器可能会直接打开或者跳转下载
+    - 因为浏览器默认自动解析添加`Content-Disposition:video/mp4`等响应头，识别不了的会添加`Content-Disposition:attachment`，从而进行下载
+    - **但**如果手动添加响应头`res.set('Content-Disposition','attachment')`，则**所有**响应文件均会**下载**
+    - 哪怕是`res.send('字符串')`也会当做文件下载
 - Tips
   - 当访问`http(s)://ip:port`时
     - 一种是可以`res.redirect('./index.html')`==重定向==，让`app.use(express.static(__diranme))`静态资源获取服务器上的首页
@@ -598,7 +604,7 @@ function middleware(req,res,next){
 
 - ==请求头==中的`referer`字段会显示==发送请求的网站==，可以根据这个字段决定是否返回内容，这即是防盗链
 
-- **注意**==第一次==访问页面**没有**`referer`字段，之后页面中的静态资源以及触发的请求才有
+- **注意**==第一次==访问页面**没有**`referer`字段，之后页面中的静态资源以及触发的事件请求才有
 
   ```js
   app.use((req, res, next) => {
