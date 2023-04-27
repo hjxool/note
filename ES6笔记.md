@@ -57,20 +57,21 @@
   - 遍历只会返回yield后的语句，但是[生成器对象.next( )]()会yield分隔开的前、后代码块，如
 
     ```js
-    function * gen(){
-        console.log(1)
-        yield 123;
-        console.log(2)
-        yield 456;
-        console.log(3)
-    }
-    let t = gen()
-    t.next() // 1
+    // 普通写法             // 对象内简写1              // 对象内简写2
+    function * gen(){      let obj ={                 let obj = {
+        console.log(1)       * fn(){                     fn:function *(){
+        yield 123;             console.log(1)              console.log(1) 
+        console.log(2)         yield                       yield
+        yield 456;             console.log(2)              console.log(2)
+        console.log(3)        }                          }
+    }                       }                          }
+    let t = gen()          let t = obj.fn()            let t = obj.fn()
+    t.next() // 1          同左                         同左
     t.next() // 2
     t.next() // 3
     t.next() // 空
     ```
-
+  
   - [next( )]()会返回yield后的内容
   
     - 与==for循环==不同的是，for循环拿到的是yield后的结果，比如`yield 123`，那for循环得到的就是123
