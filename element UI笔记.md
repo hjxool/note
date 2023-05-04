@@ -123,6 +123,20 @@
 
 - ==el-form-item==不一定是==el-form==的下一层，可以被==div标签==包裹==el-form-item==里也可以包裹==el-form-item==
 
+
+### Tips
+
+- 表单并不是只能一竖排列，在`<el-form/>`标签内用布局样式灵活排列
+
+  ```html
+  <el-form ref="form">
+  	<head>...</head>
+      <body>
+      	<left>...</left>
+          <right>...</right>
+      </body>
+  </el-form>
+
 ## 单选/多选
 
 - 单选
@@ -267,3 +281,10 @@
   }).catch((ss)=>{
       console.log(ss)
   })
+  ```
+
+## 计数器
+
+- `precision`：属性
+  - 不能设置为==小于==0的数
+  - 设置为==0==表示只取整
