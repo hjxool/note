@@ -739,6 +739,8 @@
   - 如果传入空字符串`""`，则拆分每个字符
   - `split("a")`或`split(/[A-z]/)`
 
+- `string.charCodeAt(index)`：返回字符串索引位置的字符的==Unicode码==
+
 ### object方法：
 
 - [Object.keys(对象)]()：返回对象**键**组成的==数组==
@@ -1112,24 +1114,101 @@ offsetTop/Left是相对父级（注：滚动显示容器里，里面的每一个
 
 ## 下载
 
-1. “window.location.href = down_url”下载会打开一个空白页，体验不好
+1. `window.location.href = down_url`下载会打开一个空白页，体验不好
+
 2. [download]()属性，以==下载文件的方式==下载href属性上的链接。必须要加，不然无法下载文件流
+
    - 决定下载文件的文件名，**但是**==跨域==文件下载==不会生效==！此时就需要用==get==从文件地址获取==流文件==，再下载！
+
 3. `a.target = '_blank'`在空白页打开
+
 4. 请求==返回类型==必须设置`responseType: "blob"`
    - 加了`responseType: "blob"`就不需要再用`new Blob([res.data])`了，因为已经是二进制流文件，只要`a.download`写好文件名称，就不会出现无格式的txt下载
+
 5. `URL.createObjectURL(File对象/Blob对象)`将文件流转换成==a标签==可识别的==链接==形式
+
    - 下载完后需[URL.revokeObjectURL(url)]()释放内存
+   - 与`fileReader.readAsDataURL(file)`的区别
+     - `readAsDataURL`
+       - 生成的是==base64==字符串
+       - 返回值很长
+       - JS垃圾回收机制自动清除
+       - 异步方法
+       - 处理==多文件==时，每个文件要对应一个`FileReader`对象
+     - `createObjectURL`
+       - 生成的是==对象在内存中的URL==！
+       - 很短的一个==url地址==
+       - 永存于当前`document`中，只能通过`revokeObjectURL`手动清除
+       - 同步方法
 
-![image-20221114112003852](C:/Users/admin/AppData/Roaming/Typora/typora-user-images/image-20221114112003852.png)
+6. 实例
 
-![image-20221114104516632](C:/Users/admin/AppData/Roaming/Typora/typora-user-images/image-20221114104516632.png)
+   ![image-20221114112003852](C:/Users/admin/AppData/Roaming/Typora/typora-user-images/image-20221114112003852.png)
+
+   ![image-20221114104516632](C:/Users/admin/AppData/Roaming/Typora/typora-user-images/image-20221114104516632.png)
 
 - Tips:
   - 有时候需要从回包里获取==响应头==里的字段，但是默认暴露出来的字段有限，需要后端设置允许访问的字段。
     - 使用`res.headers['content-disposition']`取出额外文件信息
+  
   - 链接可以直接访问文件的可以用`a.download = '文件名' a.href = url`下载文件
     - 浏览器可以识别并自动下载的才行，图片应该是直接打开
+  
+  - 本地文件==导入导出==
+  
+    ```js
+    // 导出 存储到本地文件
+    function save(){
+        let obj = {}
+        let str = JSON.stringify(obj)
+        let blob = new Blob([str], {type:'application/json'})//将JSON转成二进制字符串
+        let url = URL.createObjectURL(blob)// 必要 将Blob对象转成指向这个对象在内存中的url
+        let a = document.createElement('a')// 创建a标签进行下载
+        a.download = '测试.mp4'
+        a.href = url
+        a.target = '_blank'
+        document.body.appendChild(a)
+        a.click()
+        document.body.removeChild(a)
+        URL.revokeObjectURL(url)
+    }
+    // 导入 读取文件内容 获取数据 或 预览
+    function read(e){
+        let file = e.target.files[0]
+        let reader = new FileReader()
+        // 读取json
+        reader.readAsBinaryString(file)
+        reader.onload = (data)=>{
+            console.log(data.target.result)
+        }
+        // 读取视频图片 生成base64字符串 放入<img>/<video>预览
+        reader.readAsDataURL(file)
+        reader.onload = ()=>{
+            let video = document.createElement('video')
+            video.src = data.target.result
+            video.style.width = '200px'
+            video.style.height = '200px'
+            video.autoplay = true
+            document.body.appendChild(video)
+        }
+    }
+    ```
+  
+  - base64转==Blob==和==File==。关键点都在于得到字符串的Unicode码
+  
+    ```js
+    let arr = base64.split(',')// base64中,号前时数据类型,后是base-64编码的字符串
+    let str = atob(arr[1])// atob是js原生方法 用于解码base64 返回解码字符串
+    let n = str.length
+    let u8arr = new Unit8Array(n)// 生成 长度同字符串 元素全是0的数组
+    while(n--){
+        u8arr[n] = str.charCodeAt(n)// charCodeAt返回字符串指定位置Unicode码
+    }
+    let option = {type: arr[0].match(/:(.*?);/)[1]}
+    // 转Blob
+    let blob = new Blob([u8arr], option)
+    // 转File对象
+    let file = new File([u8arr], fileName, option)
 
 
 ##  JSON
@@ -1399,3 +1478,4 @@ offsetTop/Left是相对父级（注：滚动显示容器里，里面的每一个
   }catch(e){
       console.log(e.m,e.name) 对应上面自定义函数中的属性
   }
+  ```

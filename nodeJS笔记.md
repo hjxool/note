@@ -409,20 +409,26 @@ server.listen(端口号,()=>{ 回调函数在 服务启动成功 后被调用
     - 命令：`npm -S 包名`
     - `-S`是默认选项
     - 包信息存在`package.json`中==dependencies==属性
-  - 普通安装
+  - 普通(==局部==)安装
     - 命令：`npm i 包名`
     - 会一层层向上级目录查找`node_modules`文件夹，因此不必在根目录下执行安装命令，在子文件夹下安装即可
+    - 执行安装的工具包
+      - 第一种方法：`path\node_modules\.bin\指令 -v`
+      - 第二种方法：
+        - 配置package.json文件中`script`属性别名，`"name":"nodemon -v"`
+        - 再执行`npm run name`
   - ==全局==安装
     - 命令：`npm i -g 包名 `
     - 任何工作目录下均可执行安装
     - 无需`require`函数，而是通过命令行指令去调用，如：`nodemon`，安装完后自动运行，需要调用指令时`nodemon xxx`去执行
     - 查看全局安装位置：`npm root -g`
+    - 执行安装的工具包：`指令 -v`
   - 切换安装版本：`npm i 包名@版本号`
   - 删除依赖
     - 局部：`npm remove 包名`或`npm r 包名`
     - 全局：`npm remove -g 包名`
   - 配置别名
-    - `package.json`文件中有个`scripts`属性，在其中添加`server: "node 执行路径及额外参数"`，即可使用`npm run server`运行，省去了冗余的命令参数
+    - `package.json`文件中有个`scripts`属性，在其中添加==自定义名==，如`"server": "node 执行路径及额外参数"`，即可使用`npm run server`运行，省去了冗余的命令参数
     - 也可以在`script`属性中配置`start: "node 执行路径"`，同样可以使用`npm run start`运行，不过start可以省略run`npm start`
     - `npm run`会自动向上级目录查找`package.json`
   - NodeJs==版本管理==软件：[nvm]()
@@ -654,3 +660,10 @@ function middleware(req,res,next){
   router.use(router2)
   router.post('/login',(req,res)=>{...})
   module.exports = router
+  ```
+
+### express中使用ejs模板
+
+- `app.set(key,value)`：express==应用对象==的set方法，用于设置==系统配置==
+  - `app.set('view engine', 'ejs')`
+  - `app.set('view', path模块.resolve(__dirname, '/HTML模板存储文件夹'))`
