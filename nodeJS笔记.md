@@ -665,5 +665,5 @@ function middleware(req,res,next){
 ### express中使用ejs模板
 
 - `app.set(key,value)`：express==应用对象==的set方法，用于设置==系统配置==
-  - `app.set('view engine', 'ejs')`
-  - `app.set('view', path模块.resolve(__dirname, '/HTML模板存储文件夹'))`
+  - `app.set('view engine', 'ejs')`，`view engine`和`views`是固定写法
+  - `app.set('views', path模块.resolve(__dirname, '/HTML模板存储文件夹'))`
