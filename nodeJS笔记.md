@@ -55,6 +55,7 @@
     - writeFile方法写入的内容会==覆盖==源文件内容
     - 回调函数内形参是==失败==后的==对象==，==成功==则返回==nul==l
     - 还有第三个配置项`fs.writeFile('写入路径','写入内容',{flag:'a'},回调函数)`，配置flag值为`a`表示==追加==内容==而不是覆盖==
+    - 写入内容**只能**是==字符串==！如果收到的是二进制文件，是不能写入文件的！
   - [writeFileSync]()：文件同步写入
     - ==没有回调函数==
     - ==同步==执行，等文件写入完后才会执行后续的代码
@@ -194,8 +195,12 @@ server.listen(端口号,()=>{ 回调函数在 服务启动成功 后被调用
   - `request.url`：属性。获取==端口号后==的内容，如`/api?name=xxx`
     - **但是**使用不便，一般不会用这种方法提取参数，而是使用[url模块]()，详情见后
   - `request.on('data', chunk =>{解析})`：读取收到的==请求体==数据。request是==流数据==，所以要绑定==data事件==一片一片取数据
+    
     - **注意**此处只能提取到==post==方式发送的参数，**无法获取**拼接到地址栏的参数，如`?xxx1=123&xxx2=456`
     - `chunk`是==Buffer==类型数据
+    - 请求体数据`toString()`后得到的结果
+    
+      ![image-20230509172920446](C:/Users/admin/AppData/Roaming/Typora/typora-user-images/image-20230509172920446.png)
   - `request.on('end', () => {})`：读取完成事件。在回调里执行返回页面结果
 - [response]()：创建服务传入函数的第二个参数，用于设置==返回结果==
 
@@ -511,7 +516,7 @@ server.listen(端口号,()=>{ 回调函数在 服务启动成功 后被调用
 - `res.download(path,重命名,失败回调)`：==下载==响应。后面两个参数可以省略
   - `path`只能是本地/服务器资源路径，==不能是url==！
   - 和`res.send`放在一起执行会==失效==，因为`res.download`执行完会断开请求连接
-  - 只有新开页签发送的get请求才会触发下载，如果是页面内元素、事件触发则不会自动下载
+  - 只有新开页签发送的==get请求才会触发下载==，如果是页面内元素、事件触发则不会自动下载
 - `res.json(任何类型数据)`：==JSON==响应
   - 同样执行完会断开连接
   - 会自动设置==响应头==类型为`application/json`
@@ -546,6 +551,7 @@ function middleware(req,res,next){
   - `app.use(中间件函数)`：专门解析中间件函数的方法
     - `use`方法设置的是==**全局**==中间件
     - 会将http请求交给中间件
+    - 可以传两个参数`app.use('前缀', 路由对象)`，第一个参数是路由匹配规则前缀，第二个是路由对象
 - ==路由==中间件：在路由匹配规则触发后执行，并先于`callback`回调前执行
 
   - 使用方法`app.<method>(path, 中间件函数, callback)`
@@ -590,11 +596,11 @@ function middleware(req,res,next){
 
 ### 获取==请求体==数据
 
-- express框架获取不到==post==发送的请求体数据，只能用兼容http模块的方法`req.on('data',callback)`、`req.on('end',callback)`才能取到请求体
+- express框架获取不到==post==发送的请求体数据，只能用兼容http模块的方法`req.on('data',callback)`、`req.on('end',callback)`才能取到请求体数据，但是难以解析
 
-- 因此需要引入外部包[body-parser]()
+- 因此需要引入外部包[body-parser]()以解析好的==对象==形式获取请求体数据
 
-- [body-parser]()的使用
+  - `body-parser`**只有**`JSON(application/json)`、`表单(application/x-www-form)`、`字符串(text/plain)`、`二进制数据(application/octet-stream)`准备了解析模块。分别为`json()`、`urlencoded()`、`text()`、`raw()`，对==文件==类型的数据没有方法处理
 
   ```js
   const parser = require('body-parser')
@@ -608,6 +614,23 @@ function middleware(req,res,next){
       res.send(req.body) // {name:123, password:111}
   })
   ```
+
+- `body-parser`不能处理文件的==二进制文件流==，因此需要引入[formidable]()工具
+
+  ```js
+  const formidable = require('formidable')
+  app.post('/test', (req,res)=>{
+      // 创建formidable对象
+      let form = formidable({mutiples:true})
+      form.parse(req, (err,fields,files)=>{
+          // fields对象内存储着 除了文件之外 字段
+          // files对象内存储着 文件数据 没传文件则为 空对象
+          if(err){
+              next(err)
+              return
+          }
+      })
+  })
 
 ### 防盗链
 
@@ -643,13 +666,15 @@ function middleware(req,res,next){
 - 使用前需创建==路由对象==，`const router = express.Router()`
 - ==路由==对象跟==应用==对象`app`一样，使用同样的方法，**只不过**需要模块化暴露出去，并在其他地方==导入==`app.use(router)`使用
 
+- `app.use('/user',router)`use可以设置==路由前缀==，即引用的路由都会加上`/user`等前缀，在路由文件的匹配规则中就不用写`/user`了
+
 - 示例
 
   ```js
   模块1.js
   const express = require('express')
   const router = express.Router()
-  router.get('/',(req,res)=>{...})
+  router.get('/home',(req,res)=>{...}) // 因为有前缀 相当于匹配get('/excel/home',callback)
   module.exports = router
                              
   模块2.js
@@ -657,7 +682,7 @@ function middleware(req,res,next){
   const router = express.Router()
   // 不同模块间也可以互相导入
   const router2 = require('./模块1.js')
-  router.use(router2)
+  router.use('/excel', router2) // 加前缀
   router.post('/login',(req,res)=>{...})
   module.exports = router
   ```

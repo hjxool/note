@@ -260,7 +260,9 @@ HTML**属性名**对大小写不敏感，会统一转换成小写，在js中是�
 - `<form>`标签属性[action="url"]()：将包裹范围内带name属性的元素值通过地址栏方式提交
   - 提交的数据格式`url?name1=xxx&name2=xxx`
 - 点击`<input type="submit"`才会提交
-- `<input name="mima">`才会将值提交
+  - `<button>`：默认`<button type="submit">`，只要有`type="submit"`就可以提交
+
+- `<input name="mima">`有`name`才会将**值**提交
 
 ## 标签细节
 
@@ -271,7 +273,7 @@ HTML**属性名**对大小写不敏感，会统一转换成小写，在js中是�
     - input身上的[change]()事件也可以响应
     - input节点的files虽然存储着所选文件，但是==只读==，**只能**通过==清空==`inputDom.value = null/''`来==重置选择文件==
   - 虽然不同type时获取input节点取的字段不同，但是input节点上有所有不同类型的字段
-  
+
 - `<!Doctype HTML>`就是==文档声明==，用来告诉浏览器当前网页版本
 
 - `<meta>`表示声明==字符集==，只有用正确的字符集去==解码==，才不会出现乱码
@@ -289,5 +291,3 @@ HTML**属性名**对大小写不敏感，会统一转换成小写，在js中是�
   ![img](https://upload-images.jianshu.io/upload_images/6322775-c743b6a11f347c74.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
 
 - `<pre/>`：放入预先格式化的文本。==保留空格==和==换行符==
-
-  
