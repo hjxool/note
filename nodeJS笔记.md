@@ -621,7 +621,9 @@ function middleware(req,res,next){
   const formidable = require('formidable')
   app.post('/test', (req,res)=>{
       // 创建formidable对象
-      let form = formidable({mutiples:true})
+      let form = formidable({
+          mutiples:true,
+      })
       form.parse(req, (err,fields,files)=>{
           // fields对象内存储着 除了文件之外 字段
           // files对象内存储着 文件数据 没传文件则为 空对象
