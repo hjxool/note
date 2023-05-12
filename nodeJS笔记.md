@@ -617,12 +617,17 @@ function middleware(req,res,next){
 
 - `body-parser`不能处理文件的==二进制文件流==，因此需要引入[formidable]()工具
 
+  - `formidable`函数中`uploadDir`配置项不能写**不存在**的文件夹！只能选已有的文件夹下保存
+  - 形参`files`是对象，存储着文件的详细信息，因为上传的文件会重新命名，所以有`newFilename`和`oldFilename`属性
+  
   ```js
   const formidable = require('formidable')
   app.post('/test', (req,res)=>{
       // 创建formidable对象
       let form = formidable({
           mutiples:true,
+          uploadDir:__dirname+'/src', //配置项 上传文件保存目录
+          keepExtensions:true, //配置项 是否保留文件后缀
       })
       form.parse(req, (err,fields,files)=>{
           // fields对象内存储着 除了文件之外 字段
@@ -633,6 +638,7 @@ function middleware(req,res,next){
           }
       })
   })
+  
 
 ### 防盗链
 
