@@ -35,8 +35,18 @@
 
 - vue3中==data选项==必须写为==函数形式==
 
+- 在单文件组件(SFC)中，可以使用`<script setup>`简化，无需使用`setup(){ return {...} }`省去了手动暴露
 
-## 创建组件
+  ```vue
+  <script setup>
+  	import {ref} from 'vue'
+      let n = ref(123)
+      fn(){...}
+  </script>
+
+
+
+## 组件
 
 ![](https://upload-images.jianshu.io/upload_images/6322775-5708bc097d7f0416.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
 
@@ -47,6 +57,49 @@
 ![img](https://upload-images.jianshu.io/upload_images/6322775-71d852e4d355f256.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
 
 <center>component 属性挂载需要的组件</center>
+
+- 注意在==组合式API==中`components`配置项和`setup(){}`是**同级**
+
+  ```js
+  import componentA from './xxx.js'
+  let vm = {
+      components:{componentA},
+      setup(){...}
+  }
+  ```
+
+- 子组件接收父组件值
+
+  - 直接在模板中使用即可，只是`setup()`中会接收`props`，并不是说一定要在`setup(prop)`中`return`才能使用
+
+  ```js
+  export default{
+      props:{msg:''},
+      setup(prop){
+          //props会作为第一个参数传递给setup()
+      }
+  }
+  ```
+
+- 子组件触发父组件==事件==
+
+  - 与Vue2不同的是，==父组件==在==子组件**标签**==身上监听的事件，需要在==子组件==中**声明**
+  - 注意`setup()`中第二个参数使用==解构赋值==取得参数中的`emit()`方法！
+  - `emit()`第一个参数是==事件名称==，第二个参数是传递给事件监听器的值，传多个值最好使用数组或对象形式包裹
+
+  ```js
+  export default{
+      emits:['eventA'],
+      setup(props,{ emit }){
+          emit('eventA', 'value')// 触发事件
+      }
+  }
+
+- 组件新写法
+
+  - 在 `<head>` 内写 `<script type="自定义" id="组件挂载id">`
+
+    ![img](https://upload-images.jianshu.io/upload_images/6322775-98fc500bb756ae16.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
 
 ## 创建根实例对象
 
@@ -59,12 +112,6 @@
   ```js
   let vm = {...}
   Vue.createApp(vm).mount('所要挂载的html元素ID或者class')
-
-## 组件新写法
-
-- 在 `<head>` 内写 `<script type="自定义" id="组件挂载id">`
-
-![img](https://upload-images.jianshu.io/upload_images/6322775-98fc500bb756ae16.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
 
 ## 常用修饰符
 
@@ -130,8 +177,9 @@
 
 - vue3中计算属性也变成了==组合式API==，即需要import导入后才能使用 
   - 使用方法：在==setup函数==中用==函数==形式`computed()`，该方法会返回一个响应式变量
+    - 创建的计算属性是`ref`，这意味着取值需要`.value`
   - 简写形式：`reactive对象.xxx = computed(()=>{})`，简写形式只能读不能写
-  - 完整写法：`reactive对象.xxx = computed({get(), set()})`，在页面上调用时用`{{reactive对象.xxx}}`来使用
+  - 完整写法：`reactive对象.xxx = computed({get(), set()})`，在==页面上==调用时用`{{reactive对象.xxx}}`来使用
 
 
 ## watch监听器
@@ -150,6 +198,27 @@
   - 对于`reactive对象`，默认开启==深度监听==，对于==reactive对象**下的某一层级对象**==，则需要手动开启监听`watch(xxx, callback, {deep:true})`
   - watch监听的是一个==结构==，不是==值==，所以监听时不能用`watch(ref对象.value)`，只有==修改==ref对象**值**的时候才需要`ref对象.value`
     - **但**如果监听的是`let obj = ref(obj2)`的`obj`，则需要`watch(obj.value)`，因为如果是`watch(obj)`，监听的是`obj`的地址值，因为`obj`是一个`RefImpl`对象，`obj.value = obj2地址值`，相当于在`obj2`外包了一层，修改`obj`里的属性值`obj2`的地址值不会改变，因此监测不到
+
+## 注册模板引用ref
+
+- 在==Vue2==和==选项式API==中，`<div ref="dom">`ref引用会被注册在`this.$refs`对象里
+
+- **而**在==组合式API==中，ref引用存储在与名字匹配的ref里
+
+  ```vue
+  <template>
+  	<div ref="dom"></div>
+  </template>
+  
+  <script>
+  	import {ref} from 'vue'
+  	setup(){
+      	let dom = ref()
+      	return {
+          	dom
+      	}
+  	}
+  </script>
 
 
 ## vue3新增watchEffect
@@ -207,13 +276,3 @@
       	<h3>加载中。。。</h3>
       </template>
   </Suspense>
-
-## Vue脚手架创建
-
-![img](https://upload-images.jianshu.io/upload_images/6322775-a3fc6b3b9e436def.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
-
-## 尚硅谷课程方向
-
-![img](https://upload-images.jianshu.io/upload_images/6322775-45d8605da3191c36.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
-
-**打包**vue文件**生成**可读**html文件**使用·**npm run build**(与npm run serve截然相反)·

@@ -1086,17 +1086,51 @@ offsetTop/Left是相对父级（注：滚动显示容器里，里面的每一个
 
 ## 数据劫持/代理
 
-- 所谓==劫持/代理==即用==另一个变量==去获取/修改==原数据==身上的属性。==注：==不能给要监听的==原数据==添加代理，因为调用[get]()/[set]()方法会造成==死循环==，因为一调用get/set，就又会读取/修改，然后再次触发get/set方法
+- 所谓==劫持/代理==即用==另一个变量==去获取/修改==原数据==身上的属性。==注：==监听==原数据==添加代理，调用[get]()/[set]()方法可能会造成==死循环==，因为一调用get/set，就又会读取/修改，然后再次触发get/set方法
+
+  - 监听==源对象==时，为了避免==死循环==
+
+    - `get()`中不能使用`源对象.属性`或`源对象[key]`的方式取值，这样会触发`get()`导致死循环
+    - `set()`中不用`源对象.属性 = newValue`
+    - 需要中自定义函数中转一下，避免直接取值，并且通过==闭包==为==源对象==自身及每一个属性添加不会死亡的局部变量值
+
+    ```js
+    let obj = {test:111}
+    function setWatcher(target,key,value){
+        observe(value) // 遍历子属性
+        Object.defineProperty(target,key,{
+            get(){
+                return value // ※注意
+            },
+            set(newValue){
+                value = newValue // ※注意
+            }
+        })
+    }
+    function observe(obj){
+        if(!obj || typeof obj !== 'object'){
+            return
+        }
+        Object.keys(obj).forEach((key)=>{
+            //这步非常关键！设置监听前必须先取值，为了闭包中创建不会回收的局部变量
+            setWatcher(obj,key,obj[key])
+        })
+    }
+    observe(obj)
+    obj.test = 'hhh' // 触发set() 修改了局部变量
+    console.log(obj.test) //触发get() 返回修改后的局部变量
 
 - [object.defineProperty(对象名，'键'，{ 配置项 })]()
 
   - ```js
-    Object.defineProperty(this,key,{
+    let obj = {}
+    let name = ''
+    Object.defineProperty(obj,'key',{
         get(){
-            return 代理对象.属性
+            return name
         },
         set(value){
-            代理对象.属性 = value 注意 这里不是修改代理的值 所有的修改/读取操作均发生在原始数据身上 
+            obj['key'] = value 注意 这里不是修改代理的值 所有的修改/读取操作均发生在原始数据身上 
             				    代理对象本身只是一个空壳 映射 到原始对象
         }
     })
