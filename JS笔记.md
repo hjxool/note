@@ -1513,3 +1513,14 @@ offsetTop/Left是相对父级（注：滚动显示容器里，里面的每一个
       console.log(e.m,e.name) 对应上面自定义函数中的属性
   }
   ```
+
+## 虚拟DOM树DocumentFragment
+
+- 没有父对象的最小文档对象，并不是真实DOM树的一部分，改变虚拟DOM不会触发DOM树的重新渲染
+- `let dom = document.createDocumentFragment()`：创建虚拟节点对象，包含节点对象中所有属性、方法
+- `dom.appedn(childDom)`：在虚拟节点中==最后==一个子对象后插入子节点
+- `dom.preend(childDom)`：在虚拟节点中==第一个==子元素前插入子节点
+
+- 需要注意的地方
+  - 将真实DOM树中的节点添加到虚拟DOM中，真实DOM中的节点会==消失==
+  - 将==虚拟==DOM添加到真实DOM树中后，会留下一个==空的==`DocumentFragment`
