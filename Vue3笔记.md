@@ -109,9 +109,34 @@
 
 - 挂载vue实例：
 
-  ```js
-  let vm = {...}
-  Vue.createApp(vm).mount('所要挂载的html元素ID或者class')
+  ```html
+  <!-- 通过CDN使用，Vue大写 -->
+  <script src=""https://unpkg.com/vue@3/dist/vue.esm-browser.js></script>
+  <script>
+  	let vm = {...}
+  	Vue.createApp(vm).mount('所要挂载的html元素ID或者class')
+      或者
+      let { createApp } = Vue
+  </script>
+  
+  <!-- 通过ES模块，因为export {...}，所以必须是路径 -->
+  <script type="module">
+  	import { createApp } from 'https://unpkg.com/vue@3/dist/vue.esm-browser.js'
+      createApp(vm).mount('#app')
+  </script>
+  
+  <!-- 通过Import maps，自定义名 -->
+  <script type="importmap">
+  	{
+  	  "imports":{
+  	    "hhh": "https://unpkg.com/vue@3/dist/vue.esm-browser.js"
+  	  }
+  	}
+  </script>
+  <script type="module">
+  	import { createApp } from 'hhh'
+      createApp(vm).mount('#app')
+  </script>
 
 ## 常用修饰符
 
