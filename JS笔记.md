@@ -773,9 +773,20 @@
   - [prompt(string)]()：类似==alert()==，传入一个==字符串==作为提示文字，会弹出一个输入框，输入的内容作为`prompt函数`的返回值
 - **history**.pushState/**replaceState**(state,title,url)可以在**不跳转页面**的情况下**改写**当前页面的url
 - **跳转页面**：window.location.**href** = "地址?键值对"，跳转页面后使用`**location.search**`获取到`？`之后的内容，对获取的内容进行字符串分割，创建对象obj = { }，使用**obj['key'] = '值'**，将分割好的键值对装入对象
-- [sessionStroage]()：本地存储
+- [sessionStroage]()：会话存储
   - 使用`sessionStroage.自定义变量名 = 值`，就可以将**值**存入**自定义变量**名，取用的时候直接用**sessionStroage.自定义变量名**就可以获取值
   - ==删除==的时候使用`sessionStroage.removeItem("自定义变量名")`
+- [localStorage]()：本地存储
+  - 保存：`localStorage.setItem('key', 'value')`
+  - 读取：`localStorage.getItem('key')`
+  - 删除：`localStorage.removeItem('key')`
+  - 与`sessionStroage`相同点
+    - 都要求协议、IP、端口一致才能读写
+
+  - 与`sessionStroage`不同点
+    - `sessionStroage`还要求在==同一浏览器标签页下==
+    - 生存周期不同：`localStorage`只要不主动清除不会消失，`sessionStroage`关闭浏览器**标签页**就会消失
+
 
 
 ### document方法：

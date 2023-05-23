@@ -4,6 +4,10 @@
   - 通用的只有==console==、==定时器==
 - 虽然没有`window`，但是有等同于`window`的[global]()对象
   - ES新特新中也可以使用[globalThis]()，这两是相等的
+- 想要使用==ES6==模块语法，需要在`package.json`里添加`"type":"module"`配置项
+  - 但是这样就无法使用`require(path)`方法，会报错
+  - 并且没有`__dirname`全局变量了，需要根据控制台==当前==目录，使用`import.meta.url`作为替代
+
 
 ## Buffer缓冲器
 
@@ -544,6 +548,7 @@ function middleware(req,res,next){
 ```
 
 - 是个回调函数，用于过滤、预处理请求数据
+
 - ==全局==中间件：在所有路由之前执行
 
   - **必须**要将`app.use`方法写在所有路由规则前，写在`app.<method>('path')`后会先执行路由匹配。由此可见执行顺序是从上到下，谁写在前面先执行谁。
@@ -552,6 +557,7 @@ function middleware(req,res,next){
     - `use`方法设置的是==**全局**==中间件
     - 会将http请求交给中间件
     - 可以传两个参数`app.use('前缀', 路由对象)`，第一个参数是路由匹配规则前缀，第二个是路由对象
+  
 - ==路由==中间件：在路由匹配规则触发后执行，并先于`callback`回调前执行
 
   - 使用方法`app.<method>(path, 中间件函数, callback)`
@@ -596,9 +602,11 @@ function middleware(req,res,next){
 
 ### 获取==请求体==数据
 
-- express框架获取不到==post==发送的请求体数据，只能用兼容http模块的方法`req.on('data',callback)`、`req.on('end',callback)`才能取到请求体数据，但是难以解析
+- `express`自身也有解析请求体的方法
+  - `app.use(express.json()/urlencoded()/text()/raw())`：同`body-parser`一样有四钟方法解析请求体
+  - `app.use(express.urlencoded({ extended:false }))`：必写方法。同`body-parser`一样必须要有这个配置项才能解析请求体
 
-- 因此需要引入外部包[body-parser]()以解析好的==对象==形式获取请求体数据
+- [body-parser]()将请求体数据解析成==对象==形式
 
   - `body-parser`**只有**`JSON(application/json)`、`表单(application/x-www-form)`、`字符串(text/plain)`、`二进制数据(application/octet-stream)`准备了解析模块。分别为`json()`、`urlencoded()`、`text()`、`raw()`，对==文件==类型的数据没有方法处理
 
@@ -619,7 +627,7 @@ function middleware(req,res,next){
 
   - `formidable`函数中`uploadDir`配置项不能写**不存在**的文件夹！只能选已有的文件夹下保存
   - 形参`files`是对象，存储着文件的详细信息，因为上传的文件会重新命名，所以有`newFilename`和`oldFilename`属性
-  
+
   ```js
   const formidable = require('formidable')
   app.post('/test', (req,res)=>{
@@ -697,6 +705,75 @@ function middleware(req,res,next){
 
 ### express中使用ejs模板
 
+- 使用ejs模块渲染html结构有两种方式
+
+  - 读取`.html`文件生成字符串，放入ejs函数渲染
+
+    ```js
+    const express = require('express')
+    const app = express()
+    const ejs = require('ejs')
+    let content = '内容'
+    let title = '标题'
+    const fs = require('fs')
+    let fileString = fs.readFileSync("./index.html").toString()
+    let result = ejs(fileString, {title, content})
+    app.get('/', (req,res)=>{
+        res.send(result) // 注意 此处用的是express的send
+    })
+    app.listen('80', ()=>{})
+    ```
+
+  - 在`.ejs`文件内写html结构，并用ejs在响应设置添加的方法渲染
+
+    ```js
+    const express = require('express')
+    const app = express()
+    const ejs = require('ejs')
+    app.set('view engine', 'ejs')
+    app.set('views', __dirname)
+    app.get('/', (req,res)=>{
+       let text = 'hahah'
+       res.render('ejsPageName', { title: text })//注意,此处使用render,且不需要写文件后缀
+    })
+
 - `app.set(key,value)`：express==应用对象==的set方法，用于设置==系统配置==
+
   - `app.set('view engine', 'ejs')`，`view engine`和`views`是固定写法
-  - `app.set('views', path模块.resolve(__dirname, '/HTML模板存储文件夹'))`
+  - `app.set('views', path模块.resolve(__dirname, '/HTML模板存储文件夹'))`：指定`res.render()`渲染页面文件存放位置
+
+- 用例
+
+  - js页面
+
+    ```js
+    const express = require('express')
+    const app = express()
+    app.set('view engine', 'ejs')
+    app.set('views', `${__dirname}`)
+    app.get('/', (req,res)=>{
+        let text = 'hahahah'
+        res.render('ejsPageName', {title:text})
+    })
+    ```
+
+  - ejsPageName.ejs页面
+
+    ```ejs
+    <!-- html结构 -->
+    <h2><%= title %></h2>
+    ```
+
+- Tips
+
+  - 模板中写的变量==必须==传值进去
+
+  - `.ejs`需要换行的地方==必须用==`<% %>`==包裹==
+
+    ```ejs
+    <% array.forEach(item => { %> <!-- 注意此处只有半个括号 -->
+    	<li><%= item %></li>
+    <% }) %>
+    ```
+
+  - 模板中可以写js语句，如：`<%= title || 'title为false' %>`
