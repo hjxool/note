@@ -777,3 +777,134 @@ function middleware(req,res,next){
     ```
 
   - 模板中可以写js语句，如：`<%= title || 'title为false' %>`
+
+## Mongodb
+
+- 三个重要概念
+  - ==数据库(database)==：数据仓库，数据库==服务==下可以创建多个数据库，用以存放多个==集合==
+    - 一个项目使用一个数据库
+    - 一台电脑安装一个mongodb，这台电脑就是一个==节点==
+  - ==集合(collection)==：类似==数组==，集合中存放多个==文档==
+    - 一个集合存储==同一类型==的数据
+  - ==文档(document)==：文档是数据库中最小单位，类似==对象==。文档中的属性称之为==字段==
+
+- 安装数据库注意事项
+
+  - 在安装或解压目录下的`bin`目录打开cmd，执行`mongod --dbpath=..\data\test`指定数据库路径为`..\data\test`(以bin文件目录为起点同级的data下的test)目录，并启动==mongodb服务==，注意不是==HTTP服务==，在浏览器端无法直接访问，因为是HTTP==协议==向mongodb服务发起请求
+    - 为了能连接Mongodb==服务==，还需要启动Mongodb==客户端==，以客户端连接服务
+      - 客户端启动命令`mongo`，**注意**不是`mongod`，有两个`.exe`文件
+    - ==服务==开启后**不能**关闭，否则==客户端==访问不到
+    - Mongodb默认存放数据位置`C:\data\db`，如果用默认目录可以执行`mongod`直接启动服务，但使用自定义目录，就需要每次执行`mongod --dbpath=..\data\test`来启动服务
+  - 命令行`mongod`指令其实是执行`bin`目录下的`mongod.exe`，可能会提示缺少`xxx.dll`文件，下载后放在`c:\Windows\System32`下即可
+  - 配置环境变量，便于命令启动
+    - 复制mongodb的bin文件夹目录，在系统——高级系统设置——环境变量——Path中新建粘贴文件夹目录
+    - 以后启动客户端就可以直接`mongo`，无需在`bin`目录下
+      - 但是因为是自定义数据存放目录，因此启动服务还需要在`bin`目录下执行
+  - **不要**在服务窗口选中文本，会导致服务暂停，客户端操作无法返回结果
+    - 解决方法：服务端窗口按下回车
+
+- 命令行交互
+
+  - 数据库命令
+
+    - 显示==所有==数据库：`show dbs`
+    - 切换到指定数据库：`use 数据库名`
+      - 如果不存在，则自动创建
+    - 显示当前所在的数据库：`db`
+    - 删除当前数据库：`use 库名`——`db.dropDatabase()`
+      - 删除当前库后，再使用`db`查看当前库，会发现还是当前库，并且依然可以通过创建集合等方法填入内容，再次`show dbs`就又可以看到被删的库
+
+  - 集合命令
+
+    - 创建集合：`db.createCollection('集合名')`
+    - 显示==当前==数据库中所有集合：`show collections`
+    - 删除==某个==集合：`db.集合名.drop()`
+    - 重命名集合：`db.集合名.renameCollection('newName')`
+
+  - 文档命令
+
+    - 插入文档：`db.集合名.insert(文档对象)`
+    - 查询文档：`db.集合名.find(查询条件)`
+      - `_id`是mongodb自动生成的唯一编号，用来唯一标识文档
+      - 查询条件可以是文档中某一字段，但**必须**是对象的形式，如`db.test1.find({age:20})`
+        - 字段必须完全匹配，不支持模糊搜索
+        - 可以多字段同时查询
+    - 更新文档：
+      - 用新内容全部替换：`db.集合名.update(查询条件， 新的文档)`
+      - 修改对应字段：`db.集合名.update({name:'xxx'}, {$set:{age:19}})`
+      - 当有多个查询结果符合条件时，修改更新失败
+
+    - 删除文档：`db.集合名.remove(查询条件)`
+      - 当有多个查询结果符合条件，一起删除
+
+- Tips
+
+  - 与`MySQL`的区别
+    - `Mongodb`属于==非关系型==数据库，`MySQL`属于==关系型==数据库
+      - ==关系型==数据库特点是以**行**和**列**的方式存储数据，类似Excel，一系列行和列组成**表**，一组**表**组成**数据库**，每一列的==字段名==都是==固定==的
+      - ==非关系型==数据库的特点是类JSON，没有行和列，以文档为最小单元，每个文档中==字段名==可以==不固定==
+      - ==关系型==数据库中**表**对应==非关系型==数据库中**集合**，**一组**表或集合组成一个数据库
+    - `MySQL`必须用==SQL语句==操作，而`Mongodb`不只用SQL语句，还可以用其他语言操作
+    - `MySQL`适合**读写**操作==密集==的场景，`Mongodb`适合灵活更改==数据类型==场景
+
+## Mongoose
+
+- 是一个工具包使用`npm i mongoose`安装，作用是便于用==代码操作==Mongodb数据库
+
+  - 绕过`mongo`客户端命令行操作数据库，而是通过`mongoose`直连`mongodb`服务用代码进行操作
+
+- 导入mongoose：`const mongoose = require('mongoose')`
+
+- 连接mongodb服务：`mongoose.connect('协议名://IP地址:端口号/数据库名')`
+
+  - 协议名`mongodb`
+  - 端口号默认`27017`
+  - 数据库名不存在会自动创建
+  - **注意**本地连接时，IP地址不能用`localhost`只能用`127.0.0.1`
+
+- 设置事件回调
+
+  - 连接成功回调：`mongoose.connection.on('open',()=>{})`
+    - 连接成功会执行一系列内置操作，使用`on`监听会导致掉线重连时，重复触发回调及内置操作，官方推荐使用`mongoose.connection.once('open',callback)`，只会触发一次
+  - 连接失败回调：`mongoose.connection.on('error',()=>{})`
+    - 连接失败有一个==超时==的过程，不会立即返回结果
+  - 连接关闭回调：`mongoose.connection.on('close',()=>{})`
+    - 关闭连接：`mongoose.disconnect()`
+
+- 连接数据库后在集合中添加文档
+
+  ```js
+  const mongoose = require('mongoose')
+  
+  // 连接Mongodb服务中指定数据库
+  mongoose.connect('mongodb://127.0.0.1:27017/customdb')
+  
+  mongoose.connection.once('open',()=>{
+      // 首先创建文档结构对象 其实就是定义数据类型
+      let dataType = new mongoose.Schema({
+          name: String,
+  		price: String,
+  		num: Number,
+      })
+      
+      // 然后创建对象模型 其实就是所连接数据库下指定要操作哪个集合，并限制文档字段数据类型
+      // 没有对应集合则会新建
+      let obj = mongoose.model('集合名', dataType)
+      
+      // ※注意Mongoose@6.0以后的版本不支持create中传入回调函数 而是返回一个Promise对象
+      obj.create({
+          name:'菠萝',
+          price:'30',
+          num:2
+      }).then( data =>{
+          console.log('创建成功' + data)
+      }, err =>{
+          console.log('创建失败' + err)
+      })
+  })
+  mongoose.connection.on('error', () => {
+  	console.log('连接失败');
+  });
+  mongoose.connection.on('close', () => {
+  	console.log('连接关闭');
+  });
