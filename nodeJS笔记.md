@@ -871,7 +871,7 @@ function middleware(req,res,next){
   - 连接关闭回调：`mongoose.connection.on('close',()=>{})`
     - 关闭连接：`mongoose.disconnect()`
 
-- 连接数据库后在集合中添加文档
+- 连接数据库后在集合中==添加==文档
 
   ```js
   const mongoose = require('mongoose')
