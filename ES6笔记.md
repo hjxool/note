@@ -162,7 +162,7 @@
   //第三种 then只传入一个函数也没有catch 只能接收成功值
   new Promise().then(successDate => successDate)
 
-- `then()`**返回值**还是==Promise对象==
+- ※`then()`**返回值**还是==Promise对象==
 
   - **但是**then里的函数如果没有`return`，`then()`返回的是==值为undefined的Promise对象==
 

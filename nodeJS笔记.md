@@ -908,3 +908,95 @@ function middleware(req,res,next){
   mongoose.connection.on('close', () => {
   	console.log('连接关闭');
   });
+  ```
+
+- ==删除==文档
+
+  ```js
+  mongoose.connection.once('open',()=>{
+      let dataType = new mongoose.Schema({
+          name: String,
+  		price: String,
+  		num: Number,
+      })
+      let obj = mongoose.model('集合名', dataType)
+      // ※注意Mongoose@6.0以后的版本不支持delete中传入回调函数 而是返回一个Promise对象
+      // 删除一条 可以有多个符合查询条件的 但只会删除第一条匹配到的
+      obj.deleteOne({name:'菠萝'}).then( data =>{
+          console.log('删除成功' + data)
+      }, err =>{
+          console.log('删除失败' + err)
+      })
+      // 删除多条
+      obj.deleteMany({price:'30'}).then( data =>{
+          console.log('删除成功' + data)
+      }, err =>{
+          console.log('删除失败' + err)
+      })
+  })
+  ```
+
+- ==更新==文档
+
+  ```js
+  mongoose.connection.once('open',()=>{
+      let dataType = new mongoose.Schema({
+          name: String,
+  		price: String,
+  		num: Number,
+      })
+      let obj = mongoose.model('集合名', dataType)
+      // ※注意Mongoose@6.0以后的版本不支持update中传入回调函数 而是返回一个Promise对象
+      // 更新一条 传入两个参数 第一个参数是查询条件 第二个参数是更新内容
+      obj.updateOne({name:'菠萝'},{price:'10'}).then( data =>{
+          console.log('更新成功' + data)
+      }, err =>{
+          console.log('更新失败' + err)
+      })
+      // 更新多条
+      obj.updateMany({price:'10'},{name:'荔枝'})then( data =>{
+          console.log('更新成功' + data)
+      }, err =>{
+          console.log('更新失败' + err)
+      })
+  })
+
+- ==文档==结构可选字段类型
+
+  - 字符串：`String`
+  - 数字：`Number`
+  - 布尔值：`Boolean`
+  - 数组：`Array`，也可以用`[]`
+  - 日期：`Date`
+  - Buffer对象：`Buffer`
+  - 任意类型：`mongoose.Schema.Types.Mixed`
+  - 对象ID：`mongoose.Schema.Types.ObjectId`
+    - 主要用于==关联表==，也就是==外键==，通过文档中这个字段来==查找其他表==，以联合搜索内容
+  - 高精度数字：`mongoose.Schema.Types.Decimal128`
+  - Tips
+    - 写入文档的字段名和文档结构中==不符==，则会==忽视==
+    - 写入文档==字段类型==与文档结构==不符==，则会==报错==
+
+- ==字段值==验证，mongoose内置功能
+
+  ```json
+  name:{
+      type: String, // 指定类型
+      required: true, // 设置为必填
+  },
+  price:{
+      type: String,
+      default: '10', // 设置默认值 此处default值类型和type不一致会被忽略
+  },
+  options:{
+      type: String,
+      // 设置的值 必须 是数组中的 比如options:'test2'
+      // enum中值类型和type 必须 一致
+      enum: ['test1','test2']
+  },
+  name:{
+      type: String,
+      // 设置为独一无二 重复会报错
+      // 注意 要使用此项必须一开始就用 不能在旧集合中使用此项 会失效
+      unique: true,
+  }
