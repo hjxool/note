@@ -21,6 +21,9 @@
 14. 输入框有默认选中样式，使用outline：none清除，再设置自己的样式;
 
     - 如果要选中样式和不选中样式一样，则不需要设置：focus样式
+15. 进行3D旋转的时候一定要给每个面设置绝对定位
+16. **cursor**：not-allowed和no-drop是**禁用**样式
+17. 父级没设宽高，自动撑大，子元素宽高百分比会自动往上一级找
 
 ## float
 
@@ -301,20 +304,6 @@ text-overflow：必须搭配overflow：hidden（溢出内容隐藏）和white-sp
 
   - [transform-style]()：默认值flat，2D平面效果。可选值，==preserve-3d==3D效果
   - [transform-origin]()：变形原点。默认值在中心点。
-
-
-
-------
-
-进行3D旋转的时候一定要给每个面设置绝对定位
-
-------
-
-**cursor**：not-allowed和no-drop是**禁用**样式
-
-------
-
-父级没设宽高，自动撑大，子元素宽高百分比会自动往上一级找
 
 ## table
 
