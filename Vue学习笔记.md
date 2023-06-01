@@ -594,14 +594,12 @@ methods中方法互相调用：通过this.$options.methods.方法名查找method
 ## $refs对象
 
 - 可以获取到用ref=“name”注册的**dom元素**或者**component实例对象**；
-
 - 但是ref不是响应式，不能用v-bind；
-
 - ref是在渲染结束后才存在，created的时候还不存在；
 - 避免在component和计算属性中应用；
 - 用在**v-for**中会返回子组件**数组**；
 - 通过“vue.**$ref.name**”(标签中使用过ref属性的都会被$ref对象记录在册)获取到整个标签对象
-- **※**·**ref节点**·**===**·event.**currentTarget**·
+- ref获取到的节点和dom节点不一样！ref虽然指向dom节点，但是身上绑的属性都是不同的
 - 有==多个同名==`ref对象`时，会`this.$refs.ref对象`会得到一个数组
 
 ## VueAPI：
