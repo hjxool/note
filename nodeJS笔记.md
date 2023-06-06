@@ -339,17 +339,54 @@ server.listen(端口号,()=>{ 回调函数在 服务启动成功 后被调用
 
   - `require`返回的是`module.exports`的==值==
 
-  - 对于自己创建的模块，**不能**省略==相对路径==
+  - `require`本身就会运行一遍文件
 
+    ```js
+    // 如果需要的是文件执行后得到的对象
+    // index.js文件
+    let dataType = new mg.Schema({...});
+    let model = mg.model('test2', dataType);
+    module.exports = model;
+    // index2.js文件
+    const model = require('./index.js')
+    // 在某事件回调中
+    model.create(...).then(...)
+    
+    // 如果需要的是函数，选择时机执行
+    // index.js文件
+    module.exports = function (success, error) {
+    	mg.connect(...);
+    	mg.connection.once('open', () => {
+    		console.log('连接成功');
+    		success();
+    	});
+    	mg.connection.on('error', () => {
+    		if (typeof error !== 'function') {
+    			error = () => {
+    				console.log('连接失败');
+    			};
+    		}
+    		error();
+    	});
+    	mg.connection.on('close', () => {
+    		console.log('连接关闭');
+    	});
+    };
+    // index2.js文件
+    const connect = require('./index.js')
+    connect(()=>{...})
+  
+  - 对于自己创建的模块，**不能**省略==相对路径==
+  
     - `js`、`json`文件可以省略后缀
     - 当导入没写后缀的模块时，会==优先搜索`js`==后缀的文件，如：同一目录下有`module.js`和`module`文件夹，导入`require('./module')`会优先导入`module.js`
-
+  
   - 导入==文件夹==时，会搜索文件夹下`package.json`里的属性`"main":"./xxx.js"`所对应的文件
-
+  
     - 如果==main属性==不存在，则会尝试导入`index.js`和`index.json`
-
+  
   - 导入==内置==模块，无需路径或相对路径，直接写模块名称
-
+  
     ```js
     第一种方式——导入文件
     const f = require('模块文件路径')
@@ -362,9 +399,9 @@ server.listen(端口号,()=>{ 回调函数在 服务启动成功 后被调用
     第三种方式——导入内置模块
     const fs = require('fs')
     ```
-
+  
   - ==require==原理
-
+  
     - require实际在内部执行了一次[fs模块]()文件读取，再转字符串
   
     ```js
@@ -455,6 +492,39 @@ server.listen(端口号,()=>{ 回调函数在 服务启动成功 后被调用
 
 - 也是一个==工具包==，封装了多个功能，便于开发HTTP服务
   - 导入的工具包是**函数**，使用前需创建==应用对象==，`const app = express()`
+
+- 与node原生http模块区别
+
+  ```js
+  // http模块
+  const http = require('http')
+  const server = http.createServer((req,res)=>{
+      let url = new URL(req.url,'http://127.0.0.1')
+      switch (url.pathname){
+          case '/':
+              res.end(页面)
+            break;
+          case '/login':
+              req.on('data',chunk =>{解析})
+              req.on('end',()=>{res.end('数据')})
+            break;
+      }
+  })
+  server.listen(30,()=>{
+      console.log('服务已启动')
+  })
+  
+  // express
+  const express = require('express')
+  const app = express()
+  app.use(express.json())
+  app.use(express.urlencoded({extended:false}))
+  app.get('/',(req,res)=>{
+      res.send(页面)
+  })
+  app.post('/login',(req,res)=>{
+      res.send('收到数据' + req.body + '对象')
+  })
 
 
 ### express==路由==
@@ -888,7 +958,7 @@ function middleware(req,res,next){
       })
       
       // 然后创建对象模型 其实就是所连接数据库下指定要操作哪个集合，并限制文档字段数据类型
-      // 没有对应集合则会新建
+      // ※没有对应集合则会新建
       let obj = mongoose.model('集合名', dataType)
       
       // ※注意Mongoose@6.0以后的版本不支持create中传入回调函数 而是返回一个Promise对象
@@ -999,6 +1069,23 @@ function middleware(req,res,next){
   		mg.disconnect();
   		console.log('读取成功' + data);
   	});
+      // 读取筛选 读取到符合条件的记录只显示需要的字段内容
+      // select 接收对象作为参数 对象内要读取的字段值为1
+      // 省略或值设置为0 表示不显示
+      obj.find().select({price:1,name:1}).then(data =>{
+          console.log('旧版本需要exec执行回调，将find里的回调方法放到exec中执行，新版返回的是Promise对象，因此不需要回调');
+      })
+      // 读取数据排序
+      // select等方法可以链式调用
+      obj.find().select({price:1}).sort({price:1}).then(data =>{
+          console.log('升序1 降序-1');
+      })
+      // 数据截取
+      // skip跳过num条 limit取前num条 数据
+      obj.find().sort({price:-1}).skip(3).limit(3).then(data=>{
+          console.log('price从降序排列，取4~6位置(skip跳过3条，limit只取前3条)的记录');
+          console.log('常用于分页')
+      })
   });
 
 - ==文档==结构可选字段类型
@@ -1040,3 +1127,18 @@ function middleware(req,res,next){
       // 注意 要使用此项必须一开始就用 不能在旧集合中使用此项 会失效
       unique: true,
   }
+  ```
+
+- ==条件==控制
+
+  - mongodb不能使用`<>=!=`等运算符，需要使用符号代替
+  - 运算符：例`{price:{$gt:10}}`price大于10的记录
+    - `>`：`$gt`
+    - `<`：`$lt`
+    - `>=`：`$gte`
+    - `<=`：`$lte`
+    - `!==`：`$ne`
+  - 逻辑运算
+    - `$or`逻辑或：`{$or:[{price:{$lt:10}}, {price:{$gt:30}}]}`price小于10**或大**于30的记录
+    - `$and`逻辑与：`{$and:[{price:{$gt:10}}, {price:{$lt:30}}]}`price大于10**且**小于30的记录
+  - 正则匹配：`{price:/[1-3]{1}[0-9]{1}/}`
