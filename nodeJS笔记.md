@@ -1142,3 +1142,6 @@ function middleware(req,res,next){
     - `$or`逻辑或：`{$or:[{price:{$lt:10}}, {price:{$gt:30}}]}`price小于10**或大**于30的记录
     - `$and`逻辑与：`{$and:[{price:{$gt:10}}, {price:{$lt:30}}]}`price大于10**且**小于30的记录
   - 正则匹配：`{price:/[1-3]{1}[0-9]{1}/}`
+
+- Tips
+  - mongoose除了`_id`字段会自动往文档里添加`id`字段

@@ -1222,7 +1222,7 @@ offsetTop/Left是相对父级（注：滚动显示容器里，里面的每一个
         let file = e.target.files[0]
         let reader = new FileReader()
         // 读取json
-        reader.readAsBinaryString(file)
+        reader.readAsBinaryString(file)//注意此方法读取到的中文字符是乱码 需要用readAsText
         reader.onload = (data)=>{
             console.log(data.target.result)
         }
