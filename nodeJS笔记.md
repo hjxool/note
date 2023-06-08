@@ -1145,3 +1145,35 @@ function middleware(req,res,next){
 
 - Tips
   - mongoose除了`_id`字段会自动往文档里添加`id`字段
+
+## 接口
+
+- [RESTful API]()
+
+  - 一种特殊风格的接口
+
+  - URL的路径表示==资源==，路径中不能有==动词==，例如`create`，`delete`，`update`等这些都不能有
+
+  - 操作资源要与`HTTP 请求方法`对应
+
+  - 操作结果要与`HTTP 响应状态码`对应
+
+  - | 请求类型 | 返回                                       |
+    | -------- | ------------------------------------------ |
+    | GET      | 资源信息                                   |
+    | POST     | 新增并返回新的资源信息                     |
+    | PUT      | 更新并返回新的资源信息(完整更新替换)       |
+    | DELETE   | 删除资源返回空文档                         |
+    | PATCH    | 更新并返回新的资源信息(局部更新同名属性值) |
+
+- [json-server]()工具包
+
+  - 用于快速搭建`RESTful API`服务
+  - 安装：`npm i -g json-server`
+
+- 接口测试工具[apipost](https://www.apipost.cn/)
+
+  - `none`表示没有请求体
+  - `form-data`表示表单形式的数据
+  - `x-www-form-urlencoded`表示`query`查询字符串
+  - `raw`表示`json`等格式的原生请求体
