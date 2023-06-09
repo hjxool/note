@@ -152,6 +152,9 @@
 
 - 除了then里传入两个函数，还可以用[promise对象.catch(函数)]()接收失败回调方法
 
+  - ※`.catch(callback)`后不会再执行后续`.then`！
+
+
   ```js
   //第一种 then里传入两个函数 用来接收 成功和失败的值
   new Promise().then(successDate => successDate, errMsg => errMsg)
@@ -159,7 +162,8 @@
   //第二种 then只传入一个函数 用来接收成功值 用.catch函数接收失败值
   new Promise().then(successDate => successDate).catch(errMsg => errMsg)
   
-  //第三种 then只传入一个函数也没有catch 只能接收成功值
+  //※第三种 then只传入一个函数也没有catch 只能接收成功值
+  // then默认接收 成功回调 这点是解决 回调地狱 的关键
   new Promise().then(successDate => successDate)
 
 - ※`then()`**返回值**还是==Promise对象==

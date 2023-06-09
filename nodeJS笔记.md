@@ -2,11 +2,29 @@
 
 - Web API的大多数都不可用，比如`window`、`document`等
   - 通用的只有==console==、==定时器==
+
 - 虽然没有`window`，但是有等同于`window`的[global]()对象
   - ES新特新中也可以使用[globalThis]()，这两是相等的
+
 - 想要使用==ES6==模块语法，需要在`package.json`里添加`"type":"module"`配置项
   - 但是这样就无法使用`require(path)`方法，会报错
   - 并且没有`__dirname`全局变量了，需要根据控制台==当前==目录，使用`import.meta.url`作为替代
+
+- > 流程
+  >
+  > <center>express开启服务、设置路由规则。决定如何返回静/动态资源、如何处理请求</center>
+  >
+  > <center>↓</center>
+  >
+  > <center>Mongodb/MySQL开启服务、在服务器负责存储数据</center>
+  >
+  > <center>↓</center>
+  >
+  > <center>Mongoose等工具包封装了操作数据库的命令、用代码形式便捷的操作数据库数据</center>
+  >
+  > <center>↓</center>
+  >
+  > <center>在Mongoose等工具包方法的回调中用express以接口需要的形式给页面返回数据</center>
 
 
 ## Buffer缓冲器
@@ -579,7 +597,7 @@ server.listen(端口号,()=>{ 回调函数在 服务启动成功 后被调用
 - express响应设置可以==链式==调用。例：`res.status(500).set('aaa','123').send(xxx)`
 - `res.status(500)`：设置==状态码==。等同于http模块的`res.status = 500`
 - `res.set('aaa','123')`：设置==响应头==。等于http模块`res.setHeader`
-- `res.send('中文xxx')`：设置==响应体==。等同于http模块`res.end`
+- `res.send('中文xxx')`：设置==响应体==。等同于http模块`res.end`，会==覆盖页面==
   - **但是**send方法会自动添加`text/html;charset=utf-8`响应头，因此不需要设置响应头也可正常显示中文
   - 同`res.end`一样，只能有一个
   - `send`后不能写`res.download`等方法
@@ -591,10 +609,12 @@ server.listen(端口号,()=>{ 回调函数在 服务启动成功 后被调用
   - `path`只能是本地/服务器资源路径，==不能是url==！
   - 和`res.send`放在一起执行会==失效==，因为`res.download`执行完会断开请求连接
   - 只有新开页签发送的==get请求才会触发下载==，如果是页面内元素、事件触发则不会自动下载
-- `res.json(任何类型数据)`：==JSON==响应
+- ※`res.json(任何类型数据)`
+  - ==接口==响应，返回JSON数据，不覆盖原页面，由==发起请求==的回调接收响应结果
   - 同样执行完会断开连接
   - 会自动设置==响应头==类型为`application/json`
   - 如果传读取的文件内容，依然是Buffer类型数据，即使`toString`转换成字符串，也会有`\n`等字符，因此不适合传文件
+  
 - `res.sendFile(绝对路径)`：响应==文件==内容
   - 只能是**绝对**路径！因此需要用[path.resolve]()或者`__dirname + '/path'`
   - 响应的文件内容是==原格式==，如果在地址栏发送请求，响应HTML文件会==直接运行==！
@@ -857,7 +877,6 @@ function middleware(req,res,next){
   - ==集合(collection)==：类似==数组==，集合中存放多个==文档==
     - 一个集合存储==同一类型==的数据
   - ==文档(document)==：文档是数据库中最小单位，类似==对象==。文档中的属性称之为==字段==
-
 - 安装数据库注意事项
 
   - 在安装或解压目录下的`bin`目录打开cmd，执行`mongod --dbpath=..\data\test`指定数据库路径为`..\data\test`(以bin文件目录为起点同级的data下的test)目录，并启动==mongodb服务==，注意不是==HTTP服务==，在浏览器端无法直接访问，因为是HTTP==协议==向mongodb服务发起请求
@@ -872,7 +891,6 @@ function middleware(req,res,next){
       - 但是因为是自定义数据存放目录，因此启动服务还需要在`bin`目录下执行
   - **不要**在服务窗口选中文本，会导致服务暂停，客户端操作无法返回结果
     - 解决方法：服务端窗口按下回车
-
 - 命令行交互
 
   - 数据库命令
@@ -906,7 +924,6 @@ function middleware(req,res,next){
 
     - 删除文档：`db.集合名.remove(查询条件)`
       - 当有多个查询结果符合条件，一起删除
-
 - Tips
 
   - 与`MySQL`的区别
@@ -1158,7 +1175,11 @@ function middleware(req,res,next){
 
   - 操作结果要与`HTTP 响应状态码`对应
 
-  - | 请求类型 | 返回                                       |
+  - 请求类型
+
+    - 其实是语义化的规范，里面逻辑还是自己写
+
+     | 请求类型 | 返回                                       |
     | -------- | ------------------------------------------ |
     | GET      | 资源信息                                   |
     | POST     | 新增并返回新的资源信息                     |
@@ -1177,3 +1198,25 @@ function middleware(req,res,next){
   - `form-data`表示表单形式的数据
   - `x-www-form-urlencoded`表示`query`查询字符串
   - `raw`表示`json`等格式的原生请求体
+  - 放入同一文件夹的接口可以设置通用`header`等
+
+## 日期对象
+
+- 存到数据库里的==时间==得是==日期对象==，因为后端内部调用接口时处理字符串形式的日期很麻烦，因此存成一个对象使用更方便
+- 有两种方式
+  - 一种`new Date()`传入日期时间字符串
+  - 另一种使用[moment](http://momentjs.cn/)工具包转换成`Date`对象
+    - `moment('2023-10-1').toDate()`
+
+## 权限控制
+
+- HTTP协议无法区分请求来自哪里，即==无法区分用户==
+- 常见的权限(会话)控制技术
+  - cookie
+    - HTTP==服务器==发送到浏览器保存的一小块数据
+    - 按==域名==划分保存
+    - `key=value;`形式的键值对
+    - 特性
+      - 浏览器向服务器发送请求时，会==自动==将==当前域名下==可用的cookie设置在==请求头==中，发送给==服务器==
+  - session
+  - token
