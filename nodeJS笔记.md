@@ -1051,6 +1051,9 @@ function middleware(req,res,next){
 
 - ==读取==文档
 
+  - 注意：读取结果都是==数组==
+
+
   ```js
   mg.connection.once('open', () => {
   	let datatype = new mg.Schema({
@@ -1211,12 +1214,114 @@ function middleware(req,res,next){
 ## 权限控制
 
 - HTTP协议无法区分请求来自哪里，即==无法区分用户==
+
 - 常见的权限(会话)控制技术
   - cookie
-    - HTTP==服务器==发送到浏览器保存的一小块数据
+    - HTTP服务器发送到==浏览器保存==的一小块数据
     - 按==域名==划分保存
     - `key=value;`形式的键值对
     - 特性
-      - 浏览器向服务器发送请求时，会==自动==将==当前域名下==可用的cookie设置在==请求头==中，发送给==服务器==
+      - 浏览器向服务器发送请求时，会==自动==将==当前域名下==可用的cookie设置在==请求头==中，发送给==服务器==，再由服务器发送`set-cookie: name=xxx;password=111`响应头，浏览器识别到这一响应头会自动将cookie存储到当前域名下
+      - 没有cookie不会有`cookie: name=xxx`请求头
+      - 当前域名指同一==IP==、==端口号==，都会携带cookie
+      - 对于没有设置生命时长的cookie，==浏览器==关闭时会自动清除；设置了时长的，时间一到也会自动清除
+      - 注意：==响应报文==中的`Max-Age=120`单位是==秒==
+    
+    - 应用
+    
+      ```js
+      // express文件
+      app.get('/login',(req,res)=>{
+          // 设置cookie
+          res.cookie('name','xxx')
+          
+          // 设置生命时长 单位毫秒
+          res.cookie('name','xxx',{maxAge:2*60*1000})// 2分钟
+          
+          // 清除cookie
+          // 只能一条条删
+          res.clearCookie('name')
+      })
+      // 读取cookie
+      // 需要安装cookie-parser工具包
+      let cookieparser = require('cookie-parser')
+      app.use(cookieparser())
+      app.get('/read',(req,res)=>{
+          res.json(req.cookies)
+      })
+    
   - session
+
+    - 保存在==服务器端==的数据
+
+    - 运行流程
+
+      1. 填写身份验证信息，校验通过后创建==session 对象==，将`session_id`的值通过`set-cookie`返回给浏览器
+      2. 浏览器下次请求就会携带`cookie`，服务器通过`cookie`中的`session_id`确定身份
+
+    - 应用
+
+      ```js
+      // 需要安装express-session、connect-mongo工具包
+      const session = require('express-session')
+      const cm = require('connect-mongo')
+      
+      const app = express()
+      // 设置session中间件 传入配置对象 返回一个函数
+      app.use(session({
+          name:'sid', //设置cookie的name，默认值：connect.sid
+          secret:'key', //参与加密的字符串(签名/密钥)
+          saveUninitialized:false, //是否每次请求设置一个cookie存储session的id，为true则不用session也会创建空对象
+          resave:true, //是否每次请求重新保存session(延续生命周期)，如20分钟过期，只要操作间隔不大于20分钟就一直不会过期
+          store:cm.create({
+              mongoUrl:'mongodb://127.0.0.1:27017/customdb', //数据库连接配置
+          }),
+          cookie:{
+              httpOnly:true, //前端是否可通过JS操作cookie
+              maxAge:60*1000, //控制 sessionID 的过期时间(包括浏览器cookie、数据库session过期时间)
+          }
+      }))
+      // 路由
+      app.get('/login',(req,res)=>{
+          if(req.query.name === 'admin' && req.query.password === 'admin'){
+              // 设置 session 信息
+              req.session.username = 'admin'
+              req.session.password = 'admin'
+              
+              res.send('登陆成功')
+          }else{
+              res.send('登陆失败')
+          }
+      })
+      // 读取 session
+      app.get('/home', (req, res) => {
+        	// 中间件已经根据浏览器请求中携带的cookie获取session id
+          // 并在数据库中查询将查询结果放入req对象中
+      	if (req.session.username) {
+      		res.send(`欢迎 ${req.session.username} 登录`);
+      	} else {
+      		res.send('你还没有登录');
+      	}
+      });
+      // 销毁 session
+      app.get('/loginout', (req, res) => {
+      	req.session.destroy(() => {
+      		res.send('退出登录');
+      	});
+      });
+
   - token
+
+- `session`和`cookie`的区别
+
+  - 存储位置
+    - `cookie`：浏览器端
+    - `session`：服务器端
+  - 安全性
+    - `cookie`是明文，安全性较低
+    - `session`数据存于服务器相对安全，即时暴露也只有cookie中的`session_id`
+  - 网络传输量
+    - `cookie`设置内容过多会影响传输效率
+    - `session`存在服务器，只通过`cookie`传`id`，不影响效率
+  - 存储限制
+    - 浏览器限制单个cookie保存数据不能超过==4K==，且==同域名==下存储条数也有限制
