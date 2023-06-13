@@ -341,12 +341,12 @@ server.listen(端口号,()=>{ 回调函数在 服务启动成功 后被调用
         console.log('hhhh')
     }
     module.exports = fn
-
+  
     第二种方式——用对象整体暴露
     function fn(){}
     let a = '123'
     module.exports = {fn,a} 简写形式 等同于 {fn:fn,a:a}
-
+  
     第三种方式——exports.name
     function fn(){}
     let a = '455'
@@ -539,7 +539,7 @@ server.listen(端口号,()=>{ 回调函数在 服务启动成功 后被调用
   server.listen(30, () => {
   	console.log("服务已启动");
   });
-
+  
   // express
   const express = require("express");
   const app = express();
@@ -593,7 +593,7 @@ server.listen(端口号,()=>{ 回调函数在 服务启动成功 后被调用
 
     ```js
     页面请求: //www.jd.com/abc.7.8.html
-
+  
     http: 匹配示例;
     app.get("/:a.html", callback); //得到{a:'abc.7.8'}
     app.get("/:a.:b"); //得到{a:'abc', b:'7.8.html'}
@@ -677,7 +677,7 @@ function middleware(req,res,next){
       if(pathname === '/xxx'){
           ...
       } else if(pathname === 'path'){
-
+  
       } else {
           需要一大串ifelse解析路由和静态资源读取
           fs.readFile(`.${pathname}`,(err,data)=>{
@@ -689,7 +689,7 @@ function middleware(req,res,next){
           })
       }
   })
-
+  
   express框架读取静态资源
   const express = require('express')
   const app = express()
@@ -796,7 +796,7 @@ function middleware(req,res,next){
   const router = express.Router()
   router.get('/home',(req,res)=>{...}) // 因为有前缀 相当于匹配get('/excel/home',callback)
   module.exports = router
-
+  
   模块2.js
   const express = require('express')
   const router = express.Router()
@@ -1305,10 +1305,10 @@ function middleware(req,res,next){
       app.get("/login", (req, res) => {
       	// 设置cookie
       	res.cookie("name", "xxx");
-
+    
       	// 设置生命时长 单位毫秒
       	res.cookie("name", "xxx", { maxAge: 2 * 60 * 1000 }); // 2分钟
-
+    
       	// 清除cookie
       	// 只能一条条删
       	res.clearCookie("name");
@@ -1337,7 +1337,7 @@ function middleware(req,res,next){
       // 需要安装express-session、connect-mongo工具包
       const session = require("express-session");
       const cm = require("connect-mongo");
-
+    
       const app = express();
       // 设置session中间件 传入配置对象 返回一个函数
       app.use(
@@ -1361,7 +1361,7 @@ function middleware(req,res,next){
       		// 设置 session 信息
       		req.session.username = "admin";
       		req.session.password = "admin";
-
+    
       		res.send("登陆成功");
       	} else {
       		res.send("登陆失败");
@@ -1398,12 +1398,36 @@ function middleware(req,res,next){
         - 即使`token`泄露，但==服务端==掌握的==加密字符串(钥匙)==不会泄露，就无法解析`token`获得加密信息
       - 拓展性强，可服务间共享、增加服务节点更简单
 
-    - 应用
+    - Tips
 
+      - 记录`token`中携带的用户信息，便于取用
+    
+        ```js
+        let checklogin = (req, res, next)=>{
+            let token = req.get("token");
+        	if (token && token !== "undefined") {
+        		// 不要把空token传入校验会报错
+        		jwt.verify(token, "myKey", (err, data) => {
+        			if (err) {
+        				console.log(err);
+        				return res.json(json(null, "登陆已过期！"));
+        			}
+                    req.userInfo = data;//将用户信息保存起来
+        			next();
+        		});
+        	} else {
+        		res.json(json(null, "登陆已过期！"));
+        	}
+        }
+        app.use(checklogin)
+        // 路由规则
+    
+    - 应用
+    
       ```js
       // 需要安装 jsonwebtoken 工具包
       const jwt = require("jsonwebtoken");
-
+      
       // 创建 token
       // jwt.sign(数据, 加密字符串, 配置项)
       let token = jwt.sign(
@@ -1415,7 +1439,7 @@ function middleware(req,res,next){
       		expiresIn: 60, //单位 秒
       	}
       );
-
+      
       // 解析 token
       jwt.verify(token, "secretkey", (err, data) => {
       	if (err) {
