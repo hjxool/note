@@ -1389,7 +1389,7 @@ offsetTop/Left是相对父级（注：滚动显示容器里，里面的每一个
   - [href]()：完整的URL
   - [reload(参数)]()：`location.reload(true)`传入参数`true`可强制刷新缓存，等同`ctrl+F5`
 - [history]()：负责保存历史记录
-  - [replaceState(null，null，url)]()：第三个参数用于修改当前地址栏历史记录
+  - `history.replaceState(null，null，url)`：第三个参数用于修改当前地址栏历史记录
 - [window]()
   - `window.onblur`事件可以控制切换不同页面时的动作，同理还有`window.onfocus`
   - `window`是`Window`的实例，像`postMessage`等方法在`window`实例身上

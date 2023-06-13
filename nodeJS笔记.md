@@ -234,7 +234,7 @@ server.listen(端口号,()=>{ 回调函数在 服务启动成功 后被调用
 
     - 不写end，会导致请求一直是==待处理==状态，从而占用资源，以致==其他请求==无法返回结果
 
-    - end执行完不会终止，会继续向后执行
+    - ※end执行完不会终止，会继续向后执行
 
   - `end`和`write`均可以接收==Buffer==类型的数据！因此可以将[fs模块]()读取的==html文件==数据传入，从而根据==路径名==返回对应的页面
     - 当页面解析返回的html文件，其内`<img>`、`<link>`等引入了外部文件，就又会发起请求，**并且**是==异步==请求获取外部文件
@@ -601,10 +601,12 @@ server.listen(端口号,()=>{ 回调函数在 服务启动成功 后被调用
   - **但是**send方法会自动添加`text/html;charset=utf-8`响应头，因此不需要设置响应头也可正常显示中文
   - 同`res.end`一样，只能有一个
   - `send`后不能写`res.download`等方法
+  - 同http模块的`res.end`，会继续执行后续代码
 - `res.redirect(url,状态码)`：==重定向==
   - 将==**当前**请求==转向新的url，并不会修改当前页面
   - `url`可以是`./path`、`/path`，也可以是完整的url`http...`
   - **只能**有一个`redirect`，同`res.end`一样
+  - 会继续执行后续代码
 - `res.download(path,重命名,失败回调)`：==下载==响应。后面两个参数可以省略
   - `path`只能是本地/服务器资源路径，==不能是url==！
   - 和`res.send`放在一起执行会==失效==，因为`res.download`执行完会断开请求连接
@@ -614,6 +616,7 @@ server.listen(端口号,()=>{ 回调函数在 服务启动成功 后被调用
   - 同样执行完会断开连接
   - 会自动设置==响应头==类型为`application/json`
   - 如果传读取的文件内容，依然是Buffer类型数据，即使`toString`转换成字符串，也会有`\n`等字符，因此不适合传文件
+  - 会继续执行后续代码
   
 - `res.sendFile(绝对路径)`：响应==文件==内容
   - 只能是**绝对**路径！因此需要用[path.resolve]()或者`__dirname + '/path'`
@@ -1053,76 +1056,86 @@ function middleware(req,res,next){
 
   - 注意：读取结果都是==数组==
 
-
   ```js
-  mg.connection.once('open', () => {
-  	let datatype = new mg.Schema({
-  		name: String,
-  		price: String,
-  		num: Number,
-  	});
-  	let obj = mg.model('test2', datatype);
-  	// 读取不到也不会读取失败 只会返回null
-  	// 读取单条
-  	obj.findOne({ name: '茄子2' }).then(
-  		(data) => {
-  			mg.disconnect();
-  			console.log('读取成功', data);
-  		},
-  		(err) => {
-  			mg.disconnect();
-  			console.log('读取失败');
-  		}
-  	);
-  	// 通过id读取
-  	obj.findById('646dddcc94cf30cef7076975').then((data) => {
-  		mg.disconnect();
-  		console.log('读取成功' + data);
-  	});
-  	// 批量查询
-  	obj.find({ name: 'test2' }).then((data) => {
-  		mg.disconnect();
-  		console.log('读取成功' + data);
-  	});
-      // 读取所有
-  	obj.find().then((data) => {
-  		mg.disconnect();
-  		console.log('读取成功' + data);
-  	});
-      // 读取筛选 读取到符合条件的记录只显示需要的字段内容
-      // select 接收对象作为参数 对象内要读取的字段值为1
-      // 省略或值设置为0 表示不显示
-      obj.find().select({price:1,name:1}).then(data =>{
-          console.log('旧版本需要exec执行回调，将find里的回调方法放到exec中执行，新版返回的是Promise对象，因此不需要回调');
-      })
-      // 读取数据排序
-      // select等方法可以链式调用
-      obj.find().select({price:1}).sort({price:1}).then(data =>{
-          console.log('升序1 降序-1');
-      })
-      // 数据截取
-      // skip跳过num条 limit取前num条 数据
-      obj.find().sort({price:-1}).skip(3).limit(3).then(data=>{
-          console.log('price从降序排列，取4~6位置(skip跳过3条，limit只取前3条)的记录');
-          console.log('常用于分页')
-      })
+   mg.connection.once('open', () => {
+    	let datatype = new mg.Schema({
+    		name: String,
+    		price: String,
+    		num: Number,
+    	});
+    	let obj = mg.model('test2', datatype);
+    	// ※读取不到也不会读取失败 只会返回空数组[] 旧版本返回null
+    	// 读取单条
+    	obj.findOne({ name: '茄子2' }).then(
+    		(data) => {
+    			mg.disconnect();
+    			console.log('读取成功', data);
+    		},
+    		(err) => {
+    			mg.disconnect();
+    			console.log('读取失败');
+    		}
+    	);
+    	// 通过id读取
+    	obj.findById('646dddcc94cf30cef7076975').then((data) => {
+    		mg.disconnect();
+    		console.log('读取成功' + data);
+    	});
+    	// 批量查询
+    	obj.find({ name: 'test2' }).then((data) => {
+    		mg.disconnect();
+    		console.log('读取成功' + data);
+    	});
+        // 读取所有
+    	obj.find().then((data) => {
+    		mg.disconnect();
+    		console.log('读取成功' + data);
+    	});
+        // 读取筛选 读取到符合条件的记录只显示需要的字段内容
+        // select 接收对象作为参数 对象内要读取的字段值为1
+        // 省略或值设置为0 表示不显示
+        obj.find().select({price:1,name:1}).then(data =>{
+            console.log('旧版本需要exec执行回调，将find里的回调方法放到exec中执行，新版返回的是Promise对象，因此不需要回调');
+        })
+        // 读取数据排序
+        // select等方法可以链式调用
+        obj.find().select({price:1}).sort({price:1}).then(data =>{
+            console.log('升序1 降序-1');
+        })
+        // 数据截取
+        // skip跳过num条 limit取前num条 数据
+        obj.find().sort({price:-1}).skip(3).limit(3).then(data=>{
+            console.log('price从降序排列，取4~6位置(skip跳过3条，limit只取前3条)的记录');
+            console.log('常用于分页')
+        })
   });
+  ```
 
 - ==文档==结构可选字段类型
 
-  - 字符串：`String`
-  - 数字：`Number`
-  - 布尔值：`Boolean`
-  - 数组：`Array`，也可以用`[]`
-  - 日期：`Date`
-  - Buffer对象：`Buffer`
-  - 任意类型：`mongoose.Schema.Types.Mixed`
-  - 对象ID：`mongoose.Schema.Types.ObjectId`
-    - 主要用于==关联表==，也就是==外键==，通过文档中这个字段来==查找其他表==，以联合搜索内容
-  - 高精度数字：`mongoose.Schema.Types.Decimal128`
-  - Tips
-    - 写入文档的字段名和文档结构中==不符==，则会==忽视==
-    - 写入文档==字段类型==与文档结构==不符==，则会==报错==
+    - 字符串：`String`
+
+    - 数字：`Number`
+
+    - 布尔值：`Boolean`
+
+    - 数组：`Array`，也可以用`[]`
+
+    - 日期：`Date`
+
+    - Buffer对象：`Buffer`
+
+    - 任意类型：`mongoose.Schema.Types.Mixed`
+
+    - 对象ID：`mongoose.Schema.Types.ObjectId`
+      - 主要用于==关联表==，也就是==外键==，通过文档中这个字段来==查找其他表==，以联合搜索内容
+
+    - 高精度数字：`mongoose.Schema.Types.Decimal128`
+
+    - Tips
+      - 写入文档的字段名和文档结构中==不符==，则会==忽视==
+      - 写入文档==字段类型==与文档结构==不符==，则会==报错==
+
 
 - ==字段值==验证，mongoose内置功能
 
@@ -1211,7 +1224,7 @@ function middleware(req,res,next){
   - 另一种使用[moment](http://momentjs.cn/)工具包转换成`Date`对象
     - `moment('2023-10-1').toDate()`
 
-## 权限控制
+## 权限控制(用户身份识别)
 
 - HTTP协议无法区分请求来自哪里，即==无法区分用户==
 
@@ -1312,6 +1325,42 @@ function middleware(req,res,next){
 
   - token
 
+    - 由==服务端==返回给客户端的加密字符串，保存着==用户信息==
+  
+    - 与`cookie`不同的是，`token`是由客户端发送请求时手动添加到请求报文中，一般放在请求头
+  
+    - 特点
+  
+      - 数据存储在客户端，服务端压力更小
+      - 更安全，数据加密避免伪造请求攻击
+        - 即使`token`泄露，但==服务端==掌握的==加密字符串(钥匙)==不会泄露，就无法解析`token`获得加密信息
+      - 拓展性强，可服务间共享、增加服务节点更简单
+  
+    - 应用
+  
+      ```js
+      // 需要安装 jsonwebtoken 工具包
+      const jwt = require('jsonwebtoken')
+      
+      // 创建 token
+      // jwt.sign(数据, 加密字符串, 配置项)
+      let token = jwt.sign({
+          username:'xxx'
+      },'secretkey',{
+          expiresIn: 60, //单位 秒
+      })
+      
+      // 解析 token
+      jwt.verify(token, 'secretkey', (err, data) => {
+      	if (err) {
+              // 使用加密字符串解析token不正确时触发
+      		console.log(err);
+      		return;
+      	}
+          //解析得到得数据 {username:'xxx', iat: 注册时间戳, exp: 过期时间戳}
+      	console.log(data);
+      })
+  
 - `session`和`cookie`的区别
 
   - 存储位置
