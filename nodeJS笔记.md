@@ -1000,6 +1000,24 @@ function middleware(req,res,next){
   		console.log('读取成功' + data);
   	});
   });
+  ```
+
+- ==条件==控制
+
+  - 运算符：`mongodb`不能使用`<>=!==`等运算符，而是用替代符号
+    - `>`用`$gt`
+    - `<`用`$lt`
+    - `>=`用`$gte`
+    - `<=`用`$lte`
+    - `!==`用`$ne`
+    - 使用示例：`db.test.find({ price: { $gt: 10 } })`，表示价格比10大的记录
+  - 逻辑运算
+    - 逻辑==或==：`$or`
+      - 示例：`db.test.find({ $or:[{price:10}, {price:30}] })`，价格10或30的
+    - 逻辑==与==：`$and`
+      - 示例：`db.test.find({ $and:[{price:{$gt:10}, {price:{$lt:30}}] })`，价格==大于==10==小于==30的
+  - 正则匹配
+    - 示例：`db.test.find({name:/[A-Z0-9]+/})`
 
 - ==文档==结构可选字段类型
 
