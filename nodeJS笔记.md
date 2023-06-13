@@ -1,15 +1,35 @@
 ## 注意事项
 
-- Web API的大多数都不可用，比如`window`、`document`等
+- Web API 的大多数都不可用，比如`window`、`document`等
+
   - 通用的只有==console==、==定时器==
+
 - 虽然没有`window`，但是有等同于`window`的[global]()对象
-  - ES新特新中也可以使用[globalThis]()，这两是相等的
+
+  - ES 新特新中也可以使用[globalThis]()，这两是相等的
+
 - 想要使用==ES6==模块语法，需要在`package.json`里添加`"type":"module"`配置项
+
   - 但是这样就无法使用`require(path)`方法，会报错
   - 并且没有`__dirname`全局变量了，需要根据控制台==当前==目录，使用`import.meta.url`作为替代
 
+- > 流程
+  >
+  > <center>express开启服务、设置路由规则。决定如何返回静/动态资源、如何处理请求</center>
+  >
+  > <center>↓</center>
+  >
+  > <center>Mongodb/MySQL开启服务、在服务器负责存储数据</center>
+  >
+  > <center>↓</center>
+  >
+  > <center>Mongoose等工具包封装了操作数据库的命令、用代码形式便捷的操作数据库数据</center>
+  >
+  > <center>↓</center>
+  >
+  > <center>在Mongoose等工具包方法的回调中用express以接口需要的形式给页面返回数据</center>
 
-## Buffer缓冲器
+## Buffer 缓冲器
 
 - 类似于==数组==的`对象`，是用于处理==二进制数据==的内存空间
 
@@ -19,13 +39,13 @@
 
 - 每个元素大小为==1byte==(字节)，而一个元素由==8==个==bit==组成
 
-  - 其实是8个==二进制==转换成1个==16进制==显示
-  - 转换字符/数组时，是将每个==字符==或数组中==每个元素==在==码表==中的十进制转换成16进制
-    - 对于数组中的元素是==对象==或==字符串==的会表示为00
+  - 其实是 8 个==二进制==转换成 1 个==16 进制==显示
+  - 转换字符/数组时，是将每个==字符==或数组中==每个元素==在==码表==中的十进制转换成 16 进制
+    - 对于数组中的元素是==对象==或==字符串==的会表示为 00
 
 - 创建
 
-  - `Buffer.alloc(num)`：表示创建==num字节==的Buffer
+  - `Buffer.alloc(num)`：表示创建==num 字节==的 Buffer
 
     - 每一个二进制位都会归零
 
@@ -35,43 +55,40 @@
 
     - 性能更快，因为不用清零
 
-  - `Buffer.from(params)`：将==数组==、==字符串==转换成Buffer
+  - `Buffer.from(params)`：将==数组==、==字符串==转换成 Buffer
 
-- `b.toString()`：将Buffer按照==utf-8==编码方式转换为==字符串==
+- `b.toString()`：将 Buffer 按照==utf-8==编码方式转换为==字符串==
 
 - 读写
 
   - 通过数组下标的方式读取，内容为==十进制==表示方式
   - 通过数组下标的方式修改，只能写十进制
-    - **注意**，==最大==只能写255，因为8个二进制数最大只能表示255，多的会溢出，遵循==高位数字舍弃==原则
+    - **注意**，==最大==只能写 255，因为 8 个二进制数最大只能表示 255，多的会溢出，遵循==高位数字舍弃==原则
 
-## fs模块
+## fs 模块
 
 - **不能**使用`import`方式导入模块
 
-- ==相对路径==参照的是==命令行工作目录==，**不是**JS所在目录
-  - 要解决这个问题使用`__dirname`变量，它会保存JS==文件夹==位置的==绝对路径==（不包含文件），如`__dirname + './index.js'`
+- ==相对路径==参照的是==命令行工作目录==，**不是**JS 所在目录
+  - 要解决这个问题使用`__dirname`变量，它会保存 JS==文件夹==位置的==绝对路径==（不包含文件），如`__dirname + './index.js'`
     - `__filename`是==文件==的==绝对路径==
-  
 - [writeFile]()：文件写入
   - `fs.writeFile('写入路径','写入内容',回调函数)`
     - 写入路径下没有对应文件会新建
-    - writeFile方法写入的内容会==覆盖==源文件内容
+    - writeFile 方法写入的内容会==覆盖==源文件内容
     - 回调函数内形参是==失败==后的==对象==，==成功==则返回==nul==l
-    - 还有第三个配置项`fs.writeFile('写入路径','写入内容',{flag:'a'},回调函数)`，配置flag值为`a`表示==追加==内容==而不是覆盖==
+    - 还有第三个配置项`fs.writeFile('写入路径','写入内容',{flag:'a'},回调函数)`，配置 flag 值为`a`表示==追加==内容==而不是覆盖==
     - 写入内容**只能**是==字符串==！如果收到的是二进制文件，是不能写入文件的！
   - [writeFileSync]()：文件同步写入
     - ==没有回调函数==
     - ==同步==执行，等文件写入完后才会执行后续的代码
   - **只能**在==已有路径目录==下创建文件！
-  
 - [appendFile]()：文件追加写入
   - `fs.appendFile('路径','内容',回调函数)`
   - ==不会覆盖==文件内容，而是==追加==内容
   - [appendFileSync]()
   - 在需要换行的字符串前使用`\r\n`==换行==
   - 写入路径下没有对应文件会新建
-  
 - [createWriteStream]()：文件流式写入
 
   ```js
@@ -81,7 +98,7 @@
   ws.close() 关闭通道 可选 因为脚本执行完毕资源也会被回收 通道会自动关闭
   ```
 
-  - 类似于websocket==推流==的方式，即当前执行脚本和文件之间==连接不断开==，有需要就写人，适合==高频次==写入或者==大文件==写入
+  - 类似于 websocket==推流==的方式，即当前执行脚本和文件之间==连接不断开==，有需要就写人，适合==高频次==写入或者==大文件==写入
 
   - 同样会==覆盖==源文件内容
 
@@ -153,15 +170,15 @@
 - [stat]()：获取文件状态信息(比如：创建时间、大小等)
 
   - `fs.stat('路径'(err,data)=>{})`
-    - data是文件状态==对象==
-    - data方法`data.isFile()`，返回true/false，表示是否是文件，是文件夹的话会返回false
-    - data方法`data.isDirectory()`，返回true/false，表示是否是文件夹
+    - data 是文件状态==对象==
+    - data 方法`data.isFile()`，返回 true/false，表示是否是文件，是文件夹的话会返回 false
+    - data 方法`data.isDirectory()`，返回 true/false，表示是否是文件夹
 
-## path模块
+## path 模块
 
 - 用于==拼接==、规范路径格式，`resolve(多个参数)`，从第一个参数往后拼接
 
-  - ==URL对象==里的==pathname==只有`/index.css`单斜线，会省略`../`和`./`，因此path方法处理时会==重新定位到根目录==
+  - ==URL 对象==里的==pathname==只有`/index.css`单斜线，会省略`../`和`./`，因此 path 方法处理时会==重新定位到根目录==
 
   ```js
   const path = require('path')
@@ -173,11 +190,10 @@
 
 - ==地址拼接==
 
-  - `__dirname + '/../xxx' + pathname`当前==执行js的文件夹为**根目录**==，`/../`表示返回**根目录**的**上一级**，下的`xxx`文件夹下的`pathname`路径
-    - 不能用path方法把这个路径整合，会变成`D:\xxx\pathname`
+  - `__dirname + '/../xxx' + pathname`当前==执行 js 的文件夹为**根目录**==，`/../`表示返回**根目录**的**上一级**，下的`xxx`文件夹下的`pathname`路径
+    - 不能用 path 方法把这个路径整合，会变成`D:\xxx\pathname`
 
-
-## http模块
+## http 模块
 
 ```js
 const http = require('http')
@@ -195,16 +211,17 @@ server.listen(端口号,()=>{ 回调函数在 服务启动成功 后被调用
 
 - ==重启==服务==修改==才能==生效==
 - [request]()：创建服务传入函数的第一个参数，用于==解析请求报文==
-  - `request.method`：属性。获取请求方法，如post、get
+  - `request.method`：属性。获取请求方法，如 post、get
   - `request.url`：属性。获取==端口号后==的内容，如`/api?name=xxx`
-    - **但是**使用不便，一般不会用这种方法提取参数，而是使用[url模块]()，详情见后
-  - `request.on('data', chunk =>{解析})`：读取收到的==请求体==数据。request是==流数据==，所以要绑定==data事件==一片一片取数据
-    
+    - **但是**使用不便，一般不会用这种方法提取参数，而是使用[url 模块]()，详情见后
+  - `request.on('data', chunk =>{解析})`：读取收到的==请求体==数据。request 是==流数据==，所以要绑定==data 事件==一片一片取数据
+
     - **注意**此处只能提取到==post==方式发送的参数，**无法获取**拼接到地址栏的参数，如`?xxx1=123&xxx2=456`
     - `chunk`是==Buffer==类型数据
     - 请求体数据`toString()`后得到的结果
-    
+
       ![image-20230509172920446](C:/Users/admin/AppData/Roaming/Typora/typora-user-images/image-20230509172920446.png)
+
   - `request.on('end', () => {})`：读取完成事件。在回调里执行返回页面结果
 - [response]()：创建服务传入函数的第二个参数，用于设置==返回结果==
 
@@ -212,27 +229,29 @@ server.listen(端口号,()=>{ 回调函数在 服务启动成功 后被调用
     - 如果`response.end`也有内容，则也会拼接在一起
     - 如果不写`response.end`设置的响应内容==不会返回==给页面，必须要有`end`！
   - `response.end(内容)`：设置==响应体==，**并**==断开通信==，**但是**中文显示在页面上会是乱码，需要设置==字符集==
+
     - `response.end()`只能存在**一个**，不然会报错
 
-    - 不写end，会导致请求一直是==待处理==状态，从而占用资源，以致==其他请求==无法返回结果
+    - 不写 end，会导致请求一直是==待处理==状态，从而占用资源，以致==其他请求==无法返回结果
 
-    - end执行完不会终止，会继续向后执行
+    - ※end 执行完不会终止，会继续向后执行
 
-  - `end`和`write`均可以接收==Buffer==类型的数据！因此可以将[fs模块]()读取的==html文件==数据传入，从而根据==路径名==返回对应的页面
-    - 当页面解析返回的html文件，其内`<img>`、`<link>`等引入了外部文件，就又会发起请求，**并且**是==异步==请求获取外部文件
-    - 通过解析==URL对象.[pathname]()==，可以区分是带路由的请求还是加载==外部资源==文件，如，获取`./index.css`文件时发送的请求是`http.../index.css`，而路由的请求是`http.../login?name=xxx`
+  - `end`和`write`均可以接收==Buffer==类型的数据！因此可以将[fs 模块]()读取的==html 文件==数据传入，从而根据==路径名==返回对应的页面
+    - 当页面解析返回的 html 文件，其内`<img>`、`<link>`等引入了外部文件，就又会发起请求，**并且**是==异步==请求获取外部文件
+    - 通过解析==URL 对象.[pathname]()==，可以区分是带路由的请求还是加载==外部资源==文件，如，获取`./index.css`文件时发送的请求是`http.../index.css`，而路由的请求是`http.../login?name=xxx`
   - `response.setHeader(键,值)`：设置==响应头==
-    - `setHeader('content-type','text/html;charset=utf-8')`，告诉浏览器==返回内容==是HTML，内容对应的==字符集==是UTF-8
+    - `setHeader('content-type','text/html;charset=utf-8')`，告诉浏览器==返回内容==是 HTML，内容对应的==字符集==是 UTF-8
     - `setHeader('test',[1, 2, 3])`，第二个参数传入==数组==可以创建==多个同名==请求头
   - `response.statusCode = 404`：**设置**==响应状态码==，但是并不影响请求返回结果
   - `response.statusMessage = 'xxx'`：设置==响应状态描述==，比如==Not Found==就是状态描述
+
 - [listen(端口号，回调函数)]()：监听端口、创建服务
 
-  - ==80==是==http协议==默认端口号，==https协议==默认端口号是==443==，默认端口号不会在地址栏显示
+  - ==80==是==http 协议==默认端口号，==https 协议==默认端口号是==443==，默认端口号不会在地址栏显示
 
-## url模块(旧版)
+## url 模块(旧版)
 
-- 用于解析地址栏url，一般用于提取、解析==query==参数
+- 用于解析地址栏 url，一般用于提取、解析==query==参数
 
   ```js
   const url = require('url') 引入url内置模块
@@ -243,28 +262,28 @@ server.listen(端口号,()=>{ 回调函数在 服务启动成功 后被调用
   })
   ```
 
-- `url.parse(url字符串,true/false)`：解析url字符串，返回==对象==
+- `url.parse(url字符串,true/false)`：解析 url 字符串，返回==对象==
 
-  - 第一个参数是请求行的url，可以是完整形式`http:...`，也可以是端口号后内容`request.url`
-  - 第二个参数是==是否将query属性解析为对象==，可选true/false
+  - 第一个参数是请求行的 url，可以是完整形式`http:...`，也可以是端口号后内容`request.url`
+  - 第二个参数是==是否将 query 属性解析为对象==，可选 true/false
     - 解析后的结果`{ name:'xxx',password:'123' }`
 
 ## URL API
 
-- 与HTML页面的URL通用
+- 与 HTML 页面的 URL 通用
 - 与旧版的区别
   - ==无需引入模块==
-  - 默认将url携带参数整合成对象
-  - 必须传入完整url地址，包括域名、协议、端口，或者在第二个参数中补全域名协议端口号
+  - 默认将 url 携带参数整合成对象
+  - 必须传入完整 url 地址，包括域名、协议、端口，或者在第二个参数中补全域名协议端口号
     - `let url = new URL(request.url,'http://127.0.0.1')`
     - 或者`let url = new URL('http://127.0.0.1' + request.url)`
     - 可以==省略端口号==
-  - ==query参数==不是**对象**，需要用==get方法==获取里面的内容
+  - ==query 参数==不是**对象**，需要用==get 方法==获取里面的内容
     - `url.searchParams.get('name')`
-- URL对象里的`pathname`属性会省略相对路径前的`./`或`../`
-- `url.hostname`：IP域名。不包括http协议及端口号
+- URL 对象里的`pathname`属性会省略相对路径前的`./`或`../`
+- `url.hostname`：IP 域名。不包括 http 协议及端口号
 
-## mime资源类型
+## mime 资源类型
 
 - 结构`[type]/[subType]`
 
@@ -276,36 +295,36 @@ server.listen(端口号,()=>{ 回调函数在 服务启动成功 后被调用
 
   ```js
   let mimes = {
-      html:'text/html',
-      css:'text/css',
-      js:'text/javascript',
-      png:'image/png',
-      jpg:'image/jpeg',
-      gif:'image/gif',
-      mp4:'video/mp4',
-      mp3:'audio/mpeg',
-      json:'application/json'
-  }
-  http.createServer((request,respone)=>{
-      let {pathname} = new URL(request.url,'http://127.0.0.1')
-      let file_path = __dirname + pathname
-      fs.readFile(file_path,(err,data)=>{
-          if(err) {
-              response.end()
-              return
-          }
-          let t = pathname.split('.')[1]
-          获取对应类型
-          let type = mimes[t]
-          if(type){
-              response.setHeader('content-type',type)
-          }else{
-              没匹配到进行下载
-              response.setHeader('content-type','application/octet-stream')
-          }
-          response.end(data)
-      })
-  })
+  	html: "text/html",
+  	css: "text/css",
+  	js: "text/javascript",
+  	png: "image/png",
+  	jpg: "image/jpeg",
+  	gif: "image/gif",
+  	mp4: "video/mp4",
+  	mp3: "audio/mpeg",
+  	json: "application/json",
+  };
+  http.createServer((request, respone) => {
+  	let { pathname } = new URL(request.url, "http://127.0.0.1");
+  	let file_path = __dirname + pathname;
+  	fs.readFile(file_path, (err, data) => {
+  		if (err) {
+  			response.end();
+  			return;
+  		}
+  		let t = pathname.split(".")[1];
+  		获取对应类型;
+  		let type = mimes[t];
+  		if (type) {
+  			response.setHeader("content-type", type);
+  		} else {
+  			没匹配到进行下载;
+  			response.setHeader("content-type", "application/octet-stream");
+  		}
+  		response.end(data);
+  	});
+  });
   ```
 
 ## 模块化
@@ -322,12 +341,12 @@ server.listen(端口号,()=>{ 回调函数在 服务启动成功 后被调用
         console.log('hhhh')
     }
     module.exports = fn
-    
+
     第二种方式——用对象整体暴露
     function fn(){}
     let a = '123'
     module.exports = {fn,a} 简写形式 等同于 {fn:fn,a:a}
-    
+
     第三种方式——exports.name
     function fn(){}
     let a = '455'
@@ -339,6 +358,45 @@ server.listen(端口号,()=>{ 回调函数在 服务启动成功 后被调用
 
   - `require`返回的是`module.exports`的==值==
 
+  - `require`本身就会运行一遍文件
+
+    ```js
+    // 如果需要的是文件执行后得到的对象
+    // index.js文件
+    let dataType = new mg.Schema({...});
+    let model = mg.model('test2', dataType);
+    module.exports = model;
+    // index2.js文件
+    const model = require('./index.js')
+    // 在某事件回调中
+    model.create(...).then(...)
+
+    // 如果需要的是函数，选择时机执行
+    // index.js文件
+    module.exports = function (success, error) {
+    	mg.connect(...);
+    	mg.connection.once('open', () => {
+    		console.log('连接成功');
+    		success();
+    	});
+    	mg.connection.on('error', () => {
+    		if (typeof error !== 'function') {
+    			error = () => {
+    				console.log('连接失败');
+    			};
+    		}
+    		error();
+    	});
+    	mg.connection.on('close', () => {
+    		console.log('连接关闭');
+    	});
+    };
+    // index2.js文件
+    const connect = require('./index.js')
+    connect(()=>{...})
+
+    ```
+
   - 对于自己创建的模块，**不能**省略==相对路径==
 
     - `js`、`json`文件可以省略后缀
@@ -346,7 +404,7 @@ server.listen(端口号,()=>{ 回调函数在 服务启动成功 后被调用
 
   - 导入==文件夹==时，会搜索文件夹下`package.json`里的属性`"main":"./xxx.js"`所对应的文件
 
-    - 如果==main属性==不存在，则会尝试导入`index.js`和`index.json`
+    - 如果==main 属性==不存在，则会尝试导入`index.js`和`index.json`
 
   - 导入==内置==模块，无需路径或相对路径，直接写模块名称
 
@@ -354,19 +412,19 @@ server.listen(端口号,()=>{ 回调函数在 服务启动成功 后被调用
     第一种方式——导入文件
     const f = require('模块文件路径')
     f()
-    
+
     第二种方式——导入文件夹
     const f = require('./文件夹')
     f()
-    
+
     第三种方式——导入内置模块
     const fs = require('fs')
     ```
 
   - ==require==原理
 
-    - require实际在内部执行了一次[fs模块]()文件读取，再转字符串
-  
+    - require 实际在内部执行了一次[fs 模块]()文件读取，再转字符串
+
     ```js
     伪代码
     function require(file_path){
@@ -388,12 +446,12 @@ server.listen(端口号,()=>{ 回调函数在 服务启动成功 后被调用
         return catchs[absolute_path] = module.exports
     }
     ```
-  
+
   - require**只能**导入==JSON==和==JS==文件
-  
-    - 导入txt等格式文件会以JS格式去运行
-    - 导入==JSON==文件，返回的就是JSON文件保存的对象，可以直接进行取值操作
-    - 导入==JS==文件，会先运行一遍，再返回`module.exports`的值。如果JS文件没有给`module.exports`赋值，则返回`{}`
+
+    - 导入 txt 等格式文件会以 JS 格式去运行
+    - 导入==JSON==文件，返回的就是 JSON 文件保存的对象，可以直接进行取值操作
+    - 导入==JS==文件，会先运行一遍，再返回`module.exports`的值。如果 JS 文件没有给`module.exports`赋值，则返回`{}`
 
 ## npm
 
@@ -402,7 +460,7 @@ server.listen(端口号,()=>{ 回调函数在 服务启动成功 后被调用
   - 本质是将当前文件夹==初始化==为`包`，在目标文件夹下生成`package.json`文件
   - 每个`包`都必须要有`package.json`
   - `包`名默认是==文件夹名==，不能是==中文==！所以文件夹最好不要用中文
-  - 意义：创建==项目==必须的操作，因为直接npm安装，`package.json`里只有`dependencies`属性
+  - 意义：创建==项目==必须的操作，因为直接 npm 安装，`package.json`里只有`dependencies`属性
 - [搜索工具包](https://www.npmjs.com)
 - ==导入==工具包
   - [require]()函数：`const xx = require('包名')`
@@ -424,7 +482,7 @@ server.listen(端口号,()=>{ 回调函数在 服务启动成功 后被调用
     - 执行安装的工具包
       - 第一种方法：`path\node_modules\.bin\指令 -v`
       - 第二种方法：
-        - 配置package.json文件中`script`属性别名，`"name":"nodemon -v"`
+        - 配置 package.json 文件中`script`属性别名，`"name":"nodemon -v"`
         - 再执行`npm run name`
   - ==全局==安装
     - 命令：`npm i -g 包名 `
@@ -438,7 +496,7 @@ server.listen(端口号,()=>{ 回调函数在 服务启动成功 后被调用
     - 全局：`npm remove -g 包名`
   - 配置别名
     - `package.json`文件中有个`scripts`属性，在其中添加==自定义名==，如`"server": "node 执行路径及额外参数"`，即可使用`npm run server`运行，省去了冗余的命令参数
-    - 也可以在`script`属性中配置`start: "node 执行路径"`，同样可以使用`npm run start`运行，不过start可以省略run`npm start`
+    - 也可以在`script`属性中配置`start: "node 执行路径"`，同样可以使用`npm run start`运行，不过 start 可以省略 run`npm start`
     - `npm run`会自动向上级目录查找`package.json`
   - NodeJs==版本管理==软件：[nvm]()
     - 显示可下载`Node.js`版本：`nvm list available`
@@ -449,40 +507,81 @@ server.listen(端口号,()=>{ 回调函数在 服务启动成功 后被调用
     - ==**切换**==版本：`nvm use 16.11.12`
 - Tips
   - ==nodemon==工具的使用，用`nodemon ./xx.js`代替`node ./xx.js`
-  - 开发环境中的`node_modules`文件夹，是不会上传服务器的，主要是为了去除冗余的安装包文件。所以协同开发时，都是下载`package.json`和`package-lock.json`文件，根据里面的`dependence`属性重新在本地安装依赖包，而`npm i`命令可以快捷安装json里所有依赖
+  - 开发环境中的`node_modules`文件夹，是不会上传服务器的，主要是为了去除冗余的安装包文件。所以协同开发时，都是下载`package.json`和`package-lock.json`文件，根据里面的`dependence`属性重新在本地安装依赖包，而`npm i`命令可以快捷安装 json 里所有依赖
 
-## express框架
+## express 框架
 
-- 也是一个==工具包==，封装了多个功能，便于开发HTTP服务
+- 也是一个==工具包==，封装了多个功能，便于开发 HTTP 服务
+
   - 导入的工具包是**函数**，使用前需创建==应用对象==，`const app = express()`
 
+- 与 node 原生 http 模块区别
+
+  ```js
+  // http模块
+  const http = require("http");
+  const server = http.createServer((req, res) => {
+  	let url = new URL(req.url, "http://127.0.0.1");
+  	switch (url.pathname) {
+  		case "/":
+  			res.end(页面);
+  			break;
+  		case "/login":
+  			req.on("data", (chunk) => {
+  				解析;
+  			});
+  			req.on("end", () => {
+  				res.end("数据");
+  			});
+  			break;
+  	}
+  });
+  server.listen(30, () => {
+  	console.log("服务已启动");
+  });
+
+  // express
+  const express = require("express");
+  const app = express();
+  app.use(express.json());
+  app.use(express.urlencoded({ extended: false }));
+  app.get("/", (req, res) => {
+  	res.send(页面);
+  });
+  app.post("/login", (req, res) => {
+  	res.send("收到数据" + req.body + "对象");
+  });
+  ```
 
 ### express==路由==
 
-- 替代了http模块开启的服务里，对`pathname`进行的复杂分类跳转。例：`app.get('/home',(req,res)=>{...})`，表示：接收请求类型为get、且`pathname`为/home的请求
+- 替代了 http 模块开启的服务里，对`pathname`进行的复杂分类跳转。例：`app.get('/home',(req,res)=>{...})`，表示：接收请求类型为 get、且`pathname`为/home 的请求
 - 格式：`app.<method>(path,callback)`
+
   - `<method>`
-    - `post`、`get`：表示匹配post、get请求
+    - `post`、`get`：表示匹配 post、get 请求
     - `all`：表示匹配==任意==请求类型
   - `path`
+
     - 形如`'/home'`形式
     - `'*'`：表示匹配==任意路径==
-  
+
   - `callback`
     - 回调函数，有两个参数`(request,result)=>{...}`，`request`表示请求报文对象，`result`表示响应报文对象
+
 - Tips
   - 一般登陆首页是没写路径的，因此服务端收到的路径是`/`，所以要监听`app.get('/',callback)`，跳转到主页
   - 匹配是按照代码中从上至下的书写顺序，如`app.all('*',callback)`写在前，那之后所有的匹配规则都不会触发，全被`all('*')`接收，所以要注意匹配的优先顺序
 
 ### 获取==请求报文==参数
 
-- 兼容==http模块==的属性方法
-- express操作
-  - `req.path`：等同于`new URL`里的`pathname`属性，会省略==query参数==，只返回路径
-  - `req.query`：返回对象。以键值对的形式保存query参数
-  - `req.ip`：获取ip
+- 兼容==http 模块==的属性方法
+- express 操作
+  - `req.path`：等同于`new URL`里的`pathname`属性，会省略==query 参数==，只返回路径
+  - `req.query`：返回对象。以键值对的形式保存 query 参数
+  - `req.ip`：获取 ip
   - `req.get('key')`：获取==请求头==。
-    - 只能通过get获取，因为请求头存在==Symbol==值为键名的对象里
+    - 只能通过 get 获取，因为请求头存在==Symbol==值为键名的对象里
 
 ### 获取==路由==参数
 
@@ -493,41 +592,45 @@ server.listen(端口号,()=>{ 回调函数在 服务启动成功 后被调用
   - 除了占位符以外的其他字符会做==格式==匹配，不匹配的字符串集合到最后一个占位符
 
     ```js
-    页面请求:http://www.jd.com/abc.7.8.html
-    
-    匹配示例
-    app.get('/:a.html',callback) //得到{a:'abc.7.8'}
-    app.get('/:a.:b') //得到{a:'abc', b:'7.8.html'}
-    app.get('/:a.:b.html') //得到{a:'abc', b:'7.8'}
+    页面请求: //www.jd.com/abc.7.8.html
+
+    http: 匹配示例;
+    app.get("/:a.html", callback); //得到{a:'abc.7.8'}
+    app.get("/:a.:b"); //得到{a:'abc', b:'7.8.html'}
+    app.get("/:a.:b.html"); //得到{a:'abc', b:'7.8'}
     ```
 
 - `request.params`属性集合了所有占位符存储的==路由参数==，没有占位符，`params`返回值为空
 
 ### ==响应==设置
 
-- 兼容http模块方法
-- express响应设置可以==链式==调用。例：`res.status(500).set('aaa','123').send(xxx)`
-- `res.status(500)`：设置==状态码==。等同于http模块的`res.status = 500`
-- `res.set('aaa','123')`：设置==响应头==。等于http模块`res.setHeader`
-- `res.send('中文xxx')`：设置==响应体==。等同于http模块`res.end`
-  - **但是**send方法会自动添加`text/html;charset=utf-8`响应头，因此不需要设置响应头也可正常显示中文
+- 兼容 http 模块方法
+- express 响应设置可以==链式==调用。例：`res.status(500).set('aaa','123').send(xxx)`
+- `res.status(500)`：设置==状态码==。等同于 http 模块的`res.status = 500`
+- `res.set('aaa','123')`：设置==响应头==。等于 http 模块`res.setHeader`
+- `res.send('中文xxx')`：设置==响应体==。等同于 http 模块`res.end`，会==覆盖页面==
+  - **但是**send 方法会自动添加`text/html;charset=utf-8`响应头，因此不需要设置响应头也可正常显示中文
   - 同`res.end`一样，只能有一个
   - `send`后不能写`res.download`等方法
+  - 同 http 模块的`res.end`，会继续执行后续代码
 - `res.redirect(url,状态码)`：==重定向==
-  - 将==**当前**请求==转向新的url，并不会修改当前页面
-  - `url`可以是`./path`、`/path`，也可以是完整的url`http...`
+  - 将==**当前**请求==转向新的 url，并不会修改当前页面
+  - `url`可以是`./path`、`/path`，也可以是完整的 url`http...`
   - **只能**有一个`redirect`，同`res.end`一样
+  - 会继续执行后续代码
 - `res.download(path,重命名,失败回调)`：==下载==响应。后面两个参数可以省略
-  - `path`只能是本地/服务器资源路径，==不能是url==！
+  - `path`只能是本地/服务器资源路径，==不能是 url==！
   - 和`res.send`放在一起执行会==失效==，因为`res.download`执行完会断开请求连接
-  - 只有新开页签发送的==get请求才会触发下载==，如果是页面内元素、事件触发则不会自动下载
-- `res.json(任何类型数据)`：==JSON==响应
+  - 只有新开页签发送的==get 请求才会触发下载==，如果是页面内元素、事件触发则不会自动下载
+- ※`res.json(任何类型数据)`
+  - ==接口==响应，返回 JSON 数据，不覆盖原页面，由==发起请求==的回调接收响应结果
   - 同样执行完会断开连接
   - 会自动设置==响应头==类型为`application/json`
-  - 如果传读取的文件内容，依然是Buffer类型数据，即使`toString`转换成字符串，也会有`\n`等字符，因此不适合传文件
+  - 如果传读取的文件内容，依然是 Buffer 类型数据，即使`toString`转换成字符串，也会有`\n`等字符，因此不适合传文件
+  - 会继续执行后续代码
 - `res.sendFile(绝对路径)`：响应==文件==内容
   - 只能是**绝对**路径！因此需要用[path.resolve]()或者`__dirname + '/path'`
-  - 响应的文件内容是==原格式==，如果在地址栏发送请求，响应HTML文件会==直接运行==！
+  - 响应的文件内容是==原格式==，如果在地址栏发送请求，响应 HTML 文件会==直接运行==！
   - 响应的文件视浏览器是否支持在线预览，不同的浏览器可能会直接打开或者跳转下载
     - 因为浏览器默认自动解析添加`Content-Disposition:video/mp4`等响应头，识别不了的会添加`Content-Disposition:attachment`，从而进行下载
     - **但**如果手动添加响应头`res.set('Content-Disposition','attachment')`，则**所有**响应文件均会**下载**
@@ -536,7 +639,7 @@ server.listen(端口号,()=>{ 回调函数在 服务启动成功 后被调用
   - 当访问`http(s)://ip:port`时
     - 一种是可以`res.redirect('./index.html')`==重定向==，让`app.use(express.static(__diranme))`静态资源获取服务器上的首页
     - 另一种是`res.sendFile(__dirname + '/index.html')`直接==返回==首页==文件==
-    - 如果首页文件名为`index.html`，则可以省略上述方法，因为没有path路径时默认访问`http(s)://ip:port/index.html`，静态资源中间件会直接返回文件
+    - 如果首页文件名为`index.html`，则可以省略上述方法，因为没有 path 路径时默认访问`http(s)://ip:port/index.html`，静态资源中间件会直接返回文件
 
 ### ==中间件==函数
 
@@ -555,9 +658,9 @@ function middleware(req,res,next){
   - **并且**将`app.use`写到路由后也不会执行！除非`app.use`前的路由一个都没匹配上才会执行==中间件函数==
   - `app.use(中间件函数)`：专门解析中间件函数的方法
     - `use`方法设置的是==**全局**==中间件
-    - 会将http请求交给中间件
+    - 会将 http 请求交给中间件
     - 可以传两个参数`app.use('前缀', 路由对象)`，第一个参数是路由匹配规则前缀，第二个是路由对象
-  
+
 - ==路由==中间件：在路由匹配规则触发后执行，并先于`callback`回调前执行
 
   - 使用方法`app.<method>(path, 中间件函数, callback)`
@@ -574,7 +677,7 @@ function middleware(req,res,next){
       if(pathname === '/xxx'){
           ...
       } else if(pathname === 'path'){
-          
+
       } else {
           需要一大串ifelse解析路由和静态资源读取
           fs.readFile(`.${pathname}`,(err,data)=>{
@@ -586,7 +689,7 @@ function middleware(req,res,next){
           })
       }
   })
-  
+
   express框架读取静态资源
   const express = require('express')
   const app = express()
@@ -594,7 +697,7 @@ function middleware(req,res,next){
   app.<method>('path',callback)
   ```
 
-  - 不过一般而言HTML页面上的静态资源都是相对路径，以当前html文件所在文件夹为==__dirname==，路径一般为`./img/xxx.png`等，因此请求url为`http://127.0.0.1:port/img/xxx.png`，这种情况下静态资源路径应写为`express.static(__dirname)`即可，因为静态资源路径写为`express.static(__dirname+'/img')`，请求url必须为`http://127.0.0.1:port/xxx.png`，不能加`/img`，相当于[express.static]()方法已经帮你把存放静态资源的文件夹路径拼上了
+  - 不过一般而言 HTML 页面上的静态资源都是相对路径，以当前 html 文件所在文件夹为==**dirname==，路径一般为`./img/xxx.png`等，因此请求 url 为`http://127.0.0.1:port/img/xxx.png`，这种情况下静态资源路径应写为`express.static(**dirname)`即可，因为静态资源路径写为`express.static(\_\_dirname+'/img')`，请求url必须为`http://127.0.0.1:port/xxx.png`，不能加`/img`，相当于[express.static]()方法已经帮你把存放静态资源的文件夹路径拼上了
   - [use]()方法都是==全局中间件==，因此要写在路由前
   - `express.static`方法会自动为静态资源加上对应响应头类型和字符集
   - Tips
@@ -603,6 +706,7 @@ function middleware(req,res,next){
 ### 获取==请求体==数据
 
 - `express`自身也有解析请求体的方法
+
   - `app.use(express.json()/urlencoded()/text()/raw())`：同`body-parser`一样有四钟方法解析请求体
   - `app.use(express.urlencoded({ extended:false }))`：必写方法。同`body-parser`一样必须要有这个配置项才能解析请求体
 
@@ -629,24 +733,24 @@ function middleware(req,res,next){
   - 形参`files`是对象，存储着文件的详细信息，因为上传的文件会重新命名，所以有`newFilename`和`oldFilename`属性
 
   ```js
-  const formidable = require('formidable')
-  app.post('/test', (req,res)=>{
-      // 创建formidable对象
-      let form = formidable({
-          mutiples:true,
-          uploadDir:__dirname+'/src', //配置项 上传文件保存目录
-          keepExtensions:true, //配置项 是否保留文件后缀
-      })
-      form.parse(req, (err,fields,files)=>{
-          // fields对象内存储着 除了文件之外 字段
-          // files对象内存储着 文件数据 没传文件则为 空对象
-          if(err){
-              next(err)
-              return
-          }
-      })
-  })
-  
+  const formidable = require("formidable");
+  app.post("/test", (req, res) => {
+  	// 创建formidable对象
+  	let form = formidable({
+  		mutiples: true,
+  		uploadDir: __dirname + "/src", //配置项 上传文件保存目录
+  		keepExtensions: true, //配置项 是否保留文件后缀
+  	});
+  	form.parse(req, (err, fields, files) => {
+  		// fields对象内存储着 除了文件之外 字段
+  		// files对象内存储着 文件数据 没传文件则为 空对象
+  		if (err) {
+  			next(err);
+  			return;
+  		}
+  	});
+  });
+  ```
 
 ### 防盗链
 
@@ -656,7 +760,7 @@ function middleware(req,res,next){
 
   ```js
   app.use((req, res, next) => {
-  	let url = req.get('referer');
+  	let url = req.get("referer");
   	if (url) {
   		// 第一种方法 正则
   		let reg = /^https?:\/\/(?<a>[0-9\.a-zA-Z]+)(:[0-9]+)?\//g;
@@ -664,15 +768,15 @@ function middleware(req,res,next){
   		// 第二种方法 URL API
   		let obj = new URL(url);
   		req.cus_params = obj.hostname;
-  		if (req.cus_params !== '127.0.0.1') {
-  			res.status(404).send('<h1>404 NOT FOUND</h1>');
+  		if (req.cus_params !== "127.0.0.1") {
+  			res.status(404).send("<h1>404 NOT FOUND</h1>");
   			return;
   		}
   	}
   	next();
   });
   app.use(express.static(__dirname));
-  app.post('/login', (req, res) => {
+  app.post("/login", (req, res) => {
   	res.send(req.cus_params);
   });
   ```
@@ -682,7 +786,7 @@ function middleware(req,res,next){
 - 使用前需创建==路由对象==，`const router = express.Router()`
 - ==路由==对象跟==应用==对象`app`一样，使用同样的方法，**只不过**需要模块化暴露出去，并在其他地方==导入==`app.use(router)`使用
 
-- `app.use('/user',router)`use可以设置==路由前缀==，即引用的路由都会加上`/user`等前缀，在路由文件的匹配规则中就不用写`/user`了
+- `app.use('/user',router)`use 可以设置==路由前缀==，即引用的路由都会加上`/user`等前缀，在路由文件的匹配规则中就不用写`/user`了
 
 - 示例
 
@@ -692,7 +796,7 @@ function middleware(req,res,next){
   const router = express.Router()
   router.get('/home',(req,res)=>{...}) // 因为有前缀 相当于匹配get('/excel/home',callback)
   module.exports = router
-                             
+
   模块2.js
   const express = require('express')
   const router = express.Router()
@@ -703,61 +807,62 @@ function middleware(req,res,next){
   module.exports = router
   ```
 
-### express中使用ejs模板
+### express 中使用 ejs 模板
 
-- 使用ejs模块渲染html结构有两种方式
+- 使用 ejs 模块渲染 html 结构有两种方式
 
-  - 读取`.html`文件生成字符串，放入ejs函数渲染
+  - 读取`.html`文件生成字符串，放入 ejs 函数渲染
 
     ```js
-    const express = require('express')
-    const app = express()
-    const ejs = require('ejs')
-    let content = '内容'
-    let title = '标题'
-    const fs = require('fs')
-    let fileString = fs.readFileSync("./index.html").toString()
-    let result = ejs(fileString, {title, content})
-    app.get('/', (req,res)=>{
-        res.send(result) // 注意 此处用的是express的send
-    })
-    app.listen('80', ()=>{})
+    const express = require("express");
+    const app = express();
+    const ejs = require("ejs");
+    let content = "内容";
+    let title = "标题";
+    const fs = require("fs");
+    let fileString = fs.readFileSync("./index.html").toString();
+    let result = ejs(fileString, { title, content });
+    app.get("/", (req, res) => {
+    	res.send(result); // 注意 此处用的是express的send
+    });
+    app.listen("80", () => {});
     ```
 
-  - 在`.ejs`文件内写html结构，并用ejs在响应设置添加的方法渲染
+  - 在`.ejs`文件内写 html 结构，并用 ejs 在响应设置添加的方法渲染
 
     ```js
-    const express = require('express')
-    const app = express()
-    const ejs = require('ejs')
-    app.set('view engine', 'ejs')
-    app.set('views', __dirname)
-    app.get('/', (req,res)=>{
-       let text = 'hahah'
-       res.render('ejsPageName', { title: text })//注意,此处使用render,且不需要写文件后缀
-    })
+    const express = require("express");
+    const app = express();
+    const ejs = require("ejs");
+    app.set("view engine", "ejs");
+    app.set("views", __dirname);
+    app.get("/", (req, res) => {
+    	let text = "hahah";
+    	res.render("ejsPageName", { title: text }); //注意,此处使用render,且不需要写文件后缀
+    });
+    ```
 
-- `app.set(key,value)`：express==应用对象==的set方法，用于设置==系统配置==
+- `app.set(key,value)`：express==应用对象==的 set 方法，用于设置==系统配置==
 
   - `app.set('view engine', 'ejs')`，`view engine`和`views`是固定写法
   - `app.set('views', path模块.resolve(__dirname, '/HTML模板存储文件夹'))`：指定`res.render()`渲染页面文件存放位置
 
 - 用例
 
-  - js页面
+  - js 页面
 
     ```js
-    const express = require('express')
-    const app = express()
-    app.set('view engine', 'ejs')
-    app.set('views', `${__dirname}`)
-    app.get('/', (req,res)=>{
-        let text = 'hahahah'
-        res.render('ejsPageName', {title:text})
-    })
+    const express = require("express");
+    const app = express();
+    app.set("view engine", "ejs");
+    app.set("views", `${__dirname}`);
+    app.get("/", (req, res) => {
+    	let text = "hahahah";
+    	res.render("ejsPageName", { title: text });
+    });
     ```
 
-  - ejsPageName.ejs页面
+  - ejsPageName.ejs 页面
 
     ```ejs
     <!-- html结构 -->
@@ -776,28 +881,27 @@ function middleware(req,res,next){
     <% }) %>
     ```
 
-  - 模板中可以写js语句，如：`<%= title || 'title为false' %>`
+  - 模板中可以写 js 语句，如：`<%= title || 'title为false' %>`
 
 ## Mongodb
 
 - 三个重要概念
   - ==数据库(database)==：数据仓库，数据库==服务==下可以创建多个数据库，用以存放多个==集合==
     - 一个项目使用一个数据库
-    - 一台电脑安装一个mongodb，这台电脑就是一个==节点==
+    - 一台电脑安装一个 mongodb，这台电脑就是一个==节点==
   - ==集合(collection)==：类似==数组==，集合中存放多个==文档==
     - 一个集合存储==同一类型==的数据
   - ==文档(document)==：文档是数据库中最小单位，类似==对象==。文档中的属性称之为==字段==
-
 - 安装数据库注意事项
 
-  - 在安装或解压目录下的`bin`目录打开cmd，执行`mongod --dbpath=..\data\test`指定数据库路径为`..\data\test`(以bin文件目录为起点同级的data下的test)目录，并启动==mongodb服务==，注意不是==HTTP服务==，在浏览器端无法直接访问，因为是HTTP==协议==向mongodb服务发起请求
-    - 为了能连接Mongodb==服务==，还需要启动Mongodb==客户端==，以客户端连接服务
+  - 在安装或解压目录下的`bin`目录打开 cmd，执行`mongod --dbpath=..\data\test`指定数据库路径为`..\data\test`(以 bin 文件目录为起点同级的 data 下的 test)目录，并启动==mongodb 服务==，注意不是==HTTP 服务==，在浏览器端无法直接访问，因为是 HTTP==协议==向 mongodb 服务发起请求
+    - 为了能连接 Mongodb==服务==，还需要启动 Mongodb==客户端==，以客户端连接服务
       - 客户端启动命令`mongo`，**注意**不是`mongod`，有两个`.exe`文件
     - ==服务==开启后**不能**关闭，否则==客户端==访问不到
-    - Mongodb默认存放数据位置`C:\data\db`，如果用默认目录可以执行`mongod`直接启动服务，但使用自定义目录，就需要每次执行`mongod --dbpath=..\data\test`来启动服务
+    - Mongodb 默认存放数据位置`C:\data\db`，如果用默认目录可以执行`mongod`直接启动服务，但使用自定义目录，就需要每次执行`mongod --dbpath=..\data\test`来启动服务
   - 命令行`mongod`指令其实是执行`bin`目录下的`mongod.exe`，可能会提示缺少`xxx.dll`文件，下载后放在`c:\Windows\System32`下即可
   - 配置环境变量，便于命令启动
-    - 复制mongodb的bin文件夹目录，在系统——高级系统设置——环境变量——Path中新建粘贴文件夹目录
+    - 复制 mongodb 的 bin 文件夹目录，在系统——高级系统设置——环境变量——Path 中新建粘贴文件夹目录
     - 以后启动客户端就可以直接`mongo`，无需在`bin`目录下
       - 但是因为是自定义数据存放目录，因此启动服务还需要在`bin`目录下执行
   - **不要**在服务窗口选中文本，会导致服务暂停，客户端操作无法返回结果
@@ -825,11 +929,12 @@ function middleware(req,res,next){
 
     - 插入文档：`db.集合名.insert(文档对象)`
     - 查询文档：`db.集合名.find(查询条件)`
-      - `_id`是mongodb自动生成的唯一编号，用来唯一标识文档
+      - `_id`是 mongodb 自动生成的唯一编号，用来唯一标识文档
       - 查询条件可以是文档中某一字段，但**必须**是对象的形式，如`db.test1.find({age:20})`
         - 字段必须完全匹配，不支持模糊搜索
         - 可以多字段同时查询
     - 更新文档：
+
       - 用新内容全部替换：`db.集合名.update(查询条件， 新的文档)`
       - 修改对应字段：`db.集合名.update({name:'xxx'}, {$set:{age:19}})`
       - 当有多个查询结果符合条件时，修改更新失败
@@ -841,26 +946,26 @@ function middleware(req,res,next){
 
   - 与`MySQL`的区别
     - `Mongodb`属于==非关系型==数据库，`MySQL`属于==关系型==数据库
-      - ==关系型==数据库特点是以**行**和**列**的方式存储数据，类似Excel，一系列行和列组成**表**，一组**表**组成**数据库**，每一列的==字段名==都是==固定==的
-      - ==非关系型==数据库的特点是类JSON，没有行和列，以文档为最小单元，每个文档中==字段名==可以==不固定==
+      - ==关系型==数据库特点是以**行**和**列**的方式存储数据，类似 Excel，一系列行和列组成**表**，一组**表**组成**数据库**，每一列的==字段名==都是==固定==的
+      - ==非关系型==数据库的特点是类 JSON，没有行和列，以文档为最小单元，每个文档中==字段名==可以==不固定==
       - ==关系型==数据库中**表**对应==非关系型==数据库中**集合**，**一组**表或集合组成一个数据库
-    - `MySQL`必须用==SQL语句==操作，而`Mongodb`不只用SQL语句，还可以用其他语言操作
+    - `MySQL`必须用==SQL 语句==操作，而`Mongodb`不只用 SQL 语句，还可以用其他语言操作
     - `MySQL`适合**读写**操作==密集==的场景，`Mongodb`适合灵活更改==数据类型==场景
 
 ## Mongoose
 
-- 是一个工具包使用`npm i mongoose`安装，作用是便于用==代码操作==Mongodb数据库
+- 是一个工具包使用`npm i mongoose`安装，作用是便于用==代码操作==Mongodb 数据库
 
   - 绕过`mongo`客户端命令行操作数据库，而是通过`mongoose`直连`mongodb`服务用代码进行操作
 
-- 导入mongoose：`const mongoose = require('mongoose')`
+- 导入 mongoose：`const mongoose = require('mongoose')`
 
-- 连接mongodb服务：`mongoose.connect('协议名://IP地址:端口号/数据库名')`
+- 连接 mongodb 服务：`mongoose.connect('协议名://IP地址:端口号/数据库名')`
 
   - 协议名`mongodb`
   - 端口号默认`27017`
   - 数据库名不存在会自动创建
-  - **注意**本地连接时，IP地址不能用`localhost`只能用`127.0.0.1`
+  - **注意**本地连接时，IP 地址不能用`localhost`只能用`127.0.0.1`
 
 - 设置事件回调
 
@@ -874,66 +979,77 @@ function middleware(req,res,next){
 - 连接数据库后在集合中==添加==文档
 
   ```js
-  const mongoose = require('mongoose')
-  
+  const mongoose = require("mongoose");
+
   // 连接Mongodb服务中指定数据库
-  mongoose.connect('mongodb://127.0.0.1:27017/customdb')
-  
-  mongoose.connection.once('open',()=>{
-      // 首先创建文档结构对象 其实就是定义数据类型
-      let dataType = new mongoose.Schema({
-          name: String,
+  mongoose.connect("mongodb://127.0.0.1:27017/customdb");
+
+  mongoose.connection.once("open", () => {
+  	// 首先创建文档结构对象 其实就是定义数据类型
+  	let dataType = new mongoose.Schema({
+  		name: String,
   		price: String,
   		num: Number,
-      })
-      
-      // 然后创建对象模型 其实就是所连接数据库下指定要操作哪个集合，并限制文档字段数据类型
-      // 没有对应集合则会新建
-      let obj = mongoose.model('集合名', dataType)
-      
-      // ※注意Mongoose@6.0以后的版本不支持create中传入回调函数 而是返回一个Promise对象
-      obj.create({
-          name:'菠萝',
-          price:'30',
-          num:2
-      }).then( data =>{
-          console.log('创建成功' + data)
-      }, err =>{
-          console.log('创建失败' + err)
-      })
-  })
-  mongoose.connection.on('error', () => {
-  	console.log('连接失败');
+  	});
+
+  	// 然后创建对象模型 其实就是所连接数据库下指定要操作哪个集合，并限制文档字段数据类型
+  	// ※没有对应集合则会新建
+  	let obj = mongoose.model("集合名", dataType);
+
+  	// ※注意Mongoose@6.0以后的版本不支持create中传入回调函数 而是返回一个Promise对象
+  	obj
+  		.create({
+  			name: "菠萝",
+  			price: "30",
+  			num: 2,
+  		})
+  		.then(
+  			(data) => {
+  				console.log("创建成功" + data);
+  			},
+  			(err) => {
+  				console.log("创建失败" + err);
+  			}
+  		);
   });
-  mongoose.connection.on('close', () => {
-  	console.log('连接关闭');
+  mongoose.connection.on("error", () => {
+  	console.log("连接失败");
+  });
+  mongoose.connection.on("close", () => {
+  	console.log("连接关闭");
   });
   ```
 
 - ==删除==文档
 
   ```js
-  mongoose.connection.once('open',()=>{
-      let dataType = new mongoose.Schema({
-          name: String,
+  mongoose.connection.once("open", () => {
+  	let dataType = new mongoose.Schema({
+  		name: String,
   		price: String,
   		num: Number,
-      })
-      let obj = mongoose.model('集合名', dataType)
-      // ※注意Mongoose@6.0以后的版本不支持delete中传入回调函数 而是返回一个Promise对象
-      // 删除一条 可以有多个符合查询条件的 但只会删除第一条匹配到的
-      obj.deleteOne({name:'菠萝'}).then( data =>{
-          console.log('删除成功' + data)
-      }, err =>{
-          console.log('删除失败' + err)
-      })
-      // 删除多条
-      obj.deleteMany({price:'30'}).then( data =>{
-          console.log('删除成功' + data)
-      }, err =>{
-          console.log('删除失败' + err)
-      })
-  })
+  	});
+  	let obj = mongoose.model("集合名", dataType);
+  	// ※注意Mongoose@6.0以后的版本不支持delete中传入回调函数 而是返回一个Promise对象
+  	// 删除一条 可以有多个符合查询条件的 但只会删除第一条匹配到的
+  	obj.deleteOne({ name: "菠萝" }).then(
+  		(data) => {
+  			console.log("删除成功" + data);
+  		},
+  		(err) => {
+  			console.log("删除失败" + err);
+  		}
+  	);
+  	// 删除多条
+  	obj.deleteMany({ price: "30" }).then(
+  		(data) => {
+  			console.log("删除成功" + data);
+  		},
+  		(err) => {
+  			console.log("删除失败" + err);
+  		}
+  	);
+  });
   ```
 
 - ==更新==文档
@@ -964,41 +1080,72 @@ function middleware(req,res,next){
 
 - ==读取==文档
 
+  - 注意：读取结果都是==数组==
+
   ```js
-  mg.connection.once('open', () => {
+  mg.connection.once("open", () => {
   	let datatype = new mg.Schema({
   		name: String,
   		price: String,
   		num: Number,
   	});
-  	let obj = mg.model('test2', datatype);
-  	// 读取不到也不会读取失败 只会返回null
+  	let obj = mg.model("test2", datatype);
+  	// ※读取不到也不会读取失败 只会返回空数组[] 旧版本返回null
   	// 读取单条
-  	obj.findOne({ name: '茄子2' }).then(
+  	obj.findOne({ name: "茄子2" }).then(
   		(data) => {
   			mg.disconnect();
-  			console.log('读取成功', data);
+  			console.log("读取成功", data);
   		},
   		(err) => {
   			mg.disconnect();
-  			console.log('读取失败');
+  			console.log("读取失败");
   		}
   	);
   	// 通过id读取
-  	obj.findById('646dddcc94cf30cef7076975').then((data) => {
+  	obj.findById("646dddcc94cf30cef7076975").then((data) => {
   		mg.disconnect();
-  		console.log('读取成功' + data);
+  		console.log("读取成功" + data);
   	});
   	// 批量查询
-  	obj.find({ name: 'test2' }).then((data) => {
+  	obj.find({ name: "test2" }).then((data) => {
   		mg.disconnect();
-  		console.log('读取成功' + data);
+  		console.log("读取成功" + data);
   	});
-      // 读取所有
+  	// 读取所有
   	obj.find().then((data) => {
   		mg.disconnect();
-  		console.log('读取成功' + data);
+  		console.log("读取成功" + data);
   	});
+  	// 读取筛选 读取到符合条件的记录只显示需要的字段内容
+  	// select 接收对象作为参数 对象内要读取的字段值为1
+  	// 省略或值设置为0 表示不显示
+  	obj
+  		.find()
+  		.select({ price: 1, name: 1 })
+  		.then((data) => {
+  			console.log("旧版本需要exec执行回调，将find里的回调方法放到exec中执行，新版返回的是Promise对象，因此不需要回调");
+  		});
+  	// 读取数据排序
+  	// select等方法可以链式调用
+  	obj
+  		.find()
+  		.select({ price: 1 })
+  		.sort({ price: 1 })
+  		.then((data) => {
+  			console.log("升序1 降序-1");
+  		});
+  	// 数据截取
+  	// skip跳过num条 limit取前num条 数据
+  	obj
+  		.find()
+  		.sort({ price: -1 })
+  		.skip(3)
+  		.limit(3)
+  		.then((data) => {
+  			console.log("price从降序排列，取4~6位置(skip跳过3条，limit只取前3条)的记录");
+  			console.log("常用于分页");
+  		});
   });
   ```
 
@@ -1010,32 +1157,42 @@ function middleware(req,res,next){
     - `>=`用`$gte`
     - `<=`用`$lte`
     - `!==`用`$ne`
-    - 使用示例：`db.test.find({ price: { $gt: 10 } })`，表示价格比10大的记录
+    - 使用示例：`db.test.find({ price: { $gt: 10 } })`，表示价格比 10 大的记录
   - 逻辑运算
     - 逻辑==或==：`$or`
-      - 示例：`db.test.find({ $or:[{price:10}, {price:30}] })`，价格10或30的
+      - 示例：`db.test.find({ $or:[{price:10}, {price:30}] })`，价格 10 或 30 的
     - 逻辑==与==：`$and`
-      - 示例：`db.test.find({ $and:[{price:{$gt:10}, {price:{$lt:30}}] })`，价格==大于==10==小于==30的
+      - 示例：`db.test.find({ $and:[{price:{$gt:10}, {price:{$lt:30}}] })`，价格==大于==10==小于==30 的
   - 正则匹配
     - 示例：`db.test.find({name:/[A-Z0-9]+/})`
 
 - ==文档==结构可选字段类型
 
   - 字符串：`String`
+
   - 数字：`Number`
+
   - 布尔值：`Boolean`
+
   - 数组：`Array`，也可以用`[]`
+
   - 日期：`Date`
-  - Buffer对象：`Buffer`
+
+  - Buffer 对象：`Buffer`
+
   - 任意类型：`mongoose.Schema.Types.Mixed`
-  - 对象ID：`mongoose.Schema.Types.ObjectId`
+
+  - 对象 ID：`mongoose.Schema.Types.ObjectId`
+
     - 主要用于==关联表==，也就是==外键==，通过文档中这个字段来==查找其他表==，以联合搜索内容
+
   - 高精度数字：`mongoose.Schema.Types.Decimal128`
+
   - Tips
     - 写入文档的字段名和文档结构中==不符==，则会==忽视==
     - 写入文档==字段类型==与文档结构==不符==，则会==报错==
 
-- ==字段值==验证，mongoose内置功能
+- ==字段值==验证，mongoose 内置功能
 
   ```json
   name:{
@@ -1058,3 +1215,229 @@ function middleware(req,res,next){
       // 注意 要使用此项必须一开始就用 不能在旧集合中使用此项 会失效
       unique: true,
   }
+  ```
+
+- ==条件==控制
+
+  - mongodb 不能使用`<>=!=`等运算符，需要使用符号代替
+  - 运算符：例`{price:{$gt:10}}`price 大于 10 的记录
+    - `>`：`$gt`
+    - `<`：`$lt`
+    - `>=`：`$gte`
+    - `<=`：`$lte`
+    - `!==`：`$ne`
+  - 逻辑运算
+    - `$or`逻辑或：`{$or:[{price:{$lt:10}}, {price:{$gt:30}}]}`price 小于 10**或大**于 30 的记录
+    - `$and`逻辑与：`{$and:[{price:{$gt:10}}, {price:{$lt:30}}]}`price 大于 10**且**小于 30 的记录
+  - 正则匹配：`{price:/[1-3]{1}[0-9]{1}/}`
+
+- Tips
+  - mongoose 除了`_id`字段会自动往文档里添加`id`字段
+
+## 接口
+
+- [RESTful API]()
+
+  - 一种特殊风格的接口
+
+  - URL 的路径表示==资源==，路径中不能有==动词==，例如`create`，`delete`，`update`等这些都不能有
+
+  - 操作资源要与`HTTP 请求方法`对应
+
+  - 操作结果要与`HTTP 响应状态码`对应
+
+  - 请求类型
+
+    - 其实是语义化的规范，里面逻辑还是自己写
+
+    | 请求类型 | 返回                                       |
+    | -------- | ------------------------------------------ |
+    | GET      | 资源信息                                   |
+    | POST     | 新增并返回新的资源信息                     |
+    | PUT      | 更新并返回新的资源信息(完整更新替换)       |
+    | DELETE   | 删除资源返回空文档                         |
+    | PATCH    | 更新并返回新的资源信息(局部更新同名属性值) |
+
+- [json-server]()工具包
+
+  - 用于快速搭建`RESTful API`服务
+  - 安装：`npm i -g json-server`
+
+- 接口测试工具[apipost](https://www.apipost.cn/)
+
+  - `none`表示没有请求体
+  - `form-data`表示表单形式的数据
+  - `x-www-form-urlencoded`表示`query`查询字符串
+  - `raw`表示`json`等格式的原生请求体
+  - 放入同一文件夹的接口可以设置通用`header`等
+
+## 日期对象
+
+- 存到数据库里的==时间==得是==日期对象==，因为后端内部调用接口时处理字符串形式的日期很麻烦，因此存成一个对象使用更方便
+- 有两种方式
+  - 一种`new Date()`传入日期时间字符串
+  - 另一种使用[moment](http://momentjs.cn/)工具包转换成`Date`对象
+    - `moment('2023-10-1').toDate()`
+
+## 权限控制(用户身份识别)
+
+- HTTP 协议无法区分请求来自哪里，即==无法区分用户==
+
+- 常见的权限(会话)控制技术
+
+  - cookie
+
+    - HTTP 服务器发送到==浏览器保存==的一小块数据
+    - 按==域名==划分保存
+    - `key=value;`形式的键值对
+    - 特性
+
+      - 浏览器向服务器发送请求时，会==自动==将==当前域名下==可用的 cookie 设置在==请求头==中，发送给==服务器==，再由服务器发送`set-cookie: name=xxx;password=111`响应头，浏览器识别到这一响应头会自动将 cookie 存储到当前域名下
+      - 没有 cookie 不会有`cookie: name=xxx`请求头
+      - 当前域名指同一==IP==、==端口号==，都会携带 cookie
+      - 对于没有设置生命时长的 cookie，==浏览器==关闭时会自动清除；设置了时长的，时间一到也会自动清除
+      - 注意：==响应报文==中的`Max-Age=120`单位是==秒==
+
+    - 应用
+
+      ```js
+      // express文件
+      app.get("/login", (req, res) => {
+      	// 设置cookie
+      	res.cookie("name", "xxx");
+
+      	// 设置生命时长 单位毫秒
+      	res.cookie("name", "xxx", { maxAge: 2 * 60 * 1000 }); // 2分钟
+
+      	// 清除cookie
+      	// 只能一条条删
+      	res.clearCookie("name");
+      });
+      // 读取cookie
+      // 需要安装cookie-parser工具包
+      let cookieparser = require("cookie-parser");
+      app.use(cookieparser());
+      app.get("/read", (req, res) => {
+      	res.json(req.cookies);
+      });
+      ```
+
+  - session
+
+    - 保存在==服务器端==的数据
+
+    - 运行流程
+
+      1. 填写身份验证信息，校验通过后创建==session 对象==，将`session_id`的值通过`set-cookie`返回给浏览器
+      2. 浏览器下次请求就会携带`cookie`，服务器通过`cookie`中的`session_id`确定身份
+
+    - 应用
+
+      ```js
+      // 需要安装express-session、connect-mongo工具包
+      const session = require("express-session");
+      const cm = require("connect-mongo");
+
+      const app = express();
+      // 设置session中间件 传入配置对象 返回一个函数
+      app.use(
+      	session({
+      		name: "sid", //设置cookie的name，默认值：connect.sid
+      		secret: "key", //参与加密的字符串(签名/密钥)
+      		saveUninitialized: false, //是否每次请求设置一个cookie存储session的id，为true则不用session也会创建空对象
+      		resave: true, //是否每次请求重新保存session(延续生命周期)，如20分钟过期，只要操作间隔不大于20分钟就一直不会过期
+      		store: cm.create({
+      			mongoUrl: "mongodb://127.0.0.1:27017/customdb", //数据库连接配置
+      		}),
+      		cookie: {
+      			httpOnly: true, //前端是否可通过JS操作cookie
+      			maxAge: 60 * 1000, //控制 sessionID 的过期时间(包括浏览器cookie、数据库session过期时间)
+      		},
+      	})
+      );
+      // 路由
+      app.get("/login", (req, res) => {
+      	if (req.query.name === "admin" && req.query.password === "admin") {
+      		// 设置 session 信息
+      		req.session.username = "admin";
+      		req.session.password = "admin";
+
+      		res.send("登陆成功");
+      	} else {
+      		res.send("登陆失败");
+      	}
+      });
+      // 读取 session
+      app.get("/home", (req, res) => {
+      	// 中间件已经根据浏览器请求中携带的cookie获取session id
+      	// 并在数据库中查询将查询结果放入req对象中
+      	if (req.session.username) {
+      		res.send(`欢迎 ${req.session.username} 登录`);
+      	} else {
+      		res.send("你还没有登录");
+      	}
+      });
+      // 销毁 session
+      app.get("/loginout", (req, res) => {
+      	req.session.destroy(() => {
+      		res.send("退出登录");
+      	});
+      });
+      ```
+
+  - token
+
+    - 由==服务端==返回给客户端的加密字符串，保存着==用户信息==
+
+    - 与`cookie`不同的是，`token`是由客户端发送请求时手动添加到请求报文中，一般放在请求头
+
+    - 特点
+
+      - 数据存储在客户端，服务端压力更小
+      - 更安全，数据加密避免伪造请求攻击
+        - 即使`token`泄露，但==服务端==掌握的==加密字符串(钥匙)==不会泄露，就无法解析`token`获得加密信息
+      - 拓展性强，可服务间共享、增加服务节点更简单
+
+    - 应用
+
+      ```js
+      // 需要安装 jsonwebtoken 工具包
+      const jwt = require("jsonwebtoken");
+
+      // 创建 token
+      // jwt.sign(数据, 加密字符串, 配置项)
+      let token = jwt.sign(
+      	{
+      		username: "xxx",
+      	},
+      	"secretkey",
+      	{
+      		expiresIn: 60, //单位 秒
+      	}
+      );
+
+      // 解析 token
+      jwt.verify(token, "secretkey", (err, data) => {
+      	if (err) {
+      		// 使用加密字符串解析token不正确时触发
+      		console.log(err);
+      		return;
+      	}
+      	//解析得到得数据 {username:'xxx', iat: 注册时间戳, exp: 过期时间戳}
+      	console.log(data);
+      });
+      ```
+
+- `session`和`cookie`的区别
+
+  - 存储位置
+    - `cookie`：浏览器端
+    - `session`：服务器端
+  - 安全性
+    - `cookie`是明文，安全性较低
+    - `session`数据存于服务器相对安全，即时暴露也只有 cookie 中的`session_id`
+  - 网络传输量
+    - `cookie`设置内容过多会影响传输效率
+    - `session`存在服务器，只通过`cookie`传`id`，不影响效率
+  - 存储限制
+    - 浏览器限制单个 cookie 保存数据不能超过==4K==，且==同域名==下存储条数也有限制

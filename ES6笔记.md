@@ -152,6 +152,9 @@
 
 - 除了then里传入两个函数，还可以用[promise对象.catch(函数)]()接收失败回调方法
 
+  - ※`.catch(callback)`后不会再执行后续`.then`！
+
+
   ```js
   //第一种 then里传入两个函数 用来接收 成功和失败的值
   new Promise().then(successDate => successDate, errMsg => errMsg)
@@ -159,14 +162,58 @@
   //第二种 then只传入一个函数 用来接收成功值 用.catch函数接收失败值
   new Promise().then(successDate => successDate).catch(errMsg => errMsg)
   
-  //第三种 then只传入一个函数也没有catch 只能接收成功值
+  //※第三种 then只传入一个函数也没有catch 只能接收成功值
+  // then默认接收 成功回调 这点是解决 回调地狱 的关键
   new Promise().then(successDate => successDate)
+  ```
 
 - ※`then()`**返回值**还是==Promise对象==
 
   - **但是**then里的函数如果没有`return`，`then()`返回的是==值为undefined的Promise对象==
 
   - 如果`then( res => { return res } )`有return，则返回==值为res的Promise对象==
+
+  - ==中断==`.then()`的链式调用
+
+    - 在上一个`.then()`中`return new Promise(()=>{})`，这样返回的Promise对象状态就是`pending`，就不会继续链式执行
+
+    - 任何一步`.then()`返回的Promise对象状态为==失败==，都会中断后续`.then()`的链式调用，直接进到末尾的失败回调
+
+    - Tips：Promise对象状态失败或抛出异常时，没有`.catch(()=>{})`处理会导致程序报错
+
+  - Promise==异常穿透==
+
+    - 当使用`.then()`链式调用，在链式调用末尾指定失败的回调。前面的`.then()`出现任何异常都会传到末尾的失败回调中处理
+
+      ```js
+      // 用.catch处理                  //用.then中的第二个失败回调处理 上一步 .then的异常
+      promiseObj.then(res=>{               promiseObj.then(res=>{
+          if(!res){                           if(!res){
+             throw new Error('err')              throw new Error('err')
+          }                                   }
+      }).then(()=>{                         }).then(()=>{
+          return promiseObj2                   return promiseObj2
+      }).then(res=>{                        },err=>{
+          console.log(res)                     console.log(err)
+      }).catch(err=>{                       }).then(res=>{
+          console.log(err)                     console.log(res)
+      })                                    })
+
+- promise对象的==状态==是==成功==或是==失败==，由==return==后的值决定
+
+  ```js
+  function fn(){
+      return 基本数据类型、对象等	返回结果状态成功
+      return new Promise((success,reject)=>{
+          success(内容)			  返回结果状态成功
+      })
+      return new Promise((success,reject)=>{
+          reject(内容)			  返回结果状态失败
+      })
+      throw new Error('xxx')		返回结果状态失败
+  }
+  let result = fn()
+  result.then(value => {},reason => {})
 
 - Promise对象里的值，**只能**通过`p.then( res => {获取res} )`才能获取Promise对象里存的值
 
@@ -224,10 +271,10 @@
     let a = [1,2,3,4,5,4,3,2,1]
     let a2 = [4,5,5,6,5]
     let result = [...new Set(a)].filter(item => return new Set(a2).has(item)) 输出[4,5]
-    ```
-
+  ```
+  
   - 并集：`let t = new Set([...a,...a2])`
-
+  
   - 差集(双方集合中独有的元素)：`let t = [...new Set(a)].filter(item= > return !(new Set(a2).has(item)) )`
 
 ## Map
@@ -510,23 +557,6 @@
           console.log(await child()) // 输出 '123'
       }
 
-  - promise对象的==状态==是==成功==或是==失败==，由==return==后的值决定
-
-    ```js
-    async function fn(){
-        return 基本数据类型、对象等	返回结果状态成功
-        return new Promise((success,reject)=>{
-            success(内容)			  返回结果状态成功
-        })
-        return new Promise((success,reject)=>{
-            reject(内容)			  返回结果状态失败
-        })
-        throw new Error('xxx')		返回结果状态失败
-    }
-    let result = fn()
-    result.then(value => {},reason => {})
-    ```
-
   - 在对象中声明的函数可以省略function，在函数前加async
 
     ```js
@@ -547,7 +577,7 @@
     request(async ()=>{}) // 箭头函数也可使用async关键字
     request(async function(){}) // 匿名函数
     request(async )
-
+  
 - await==表达式==
 
   - ==必须==写在async函数**里**
@@ -638,9 +668,12 @@
 
   - `func(...实参)`时，实参不能是==对象==！因为==属性==必须用`{}`包裹，不可能`( aa:1, bb:2, cc:3 )`像这样展开。**但是**可以像`func({...对象})`这样传入一个对象进去
   - 只有一个==形参==来接收传入的实参时，**只能**使用[arguments]()关键词
+  - 当展开==对象==时，想要修改对象中某属性值，可以`console.log({...对象, 对象.key:新值})`
+    - 注意==新值==必须放扩展对象**后**，才能覆盖！`{obj.key:newValue, ...obj}`不能修改
 
+  
   应用：
-
+  
   - ==数组合并==：ES6之前使用[concat]()合并，新方法：`let new = [...array1,...array2,...]`
   - ==展开对象==：`let t = {a:1,b:'qwe} let t2 = {...t} fn({...t})`，**注意**展开对象一定要用=={ }==包裹
   - ==对象合并==：`let t = {a:1} let t2 = {b:'qwe'} let t3 = {...t,...t2}`，会将展开的对象属性取出，实行一层==浅拷贝==

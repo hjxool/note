@@ -223,6 +223,9 @@
     - 背景色：修改`.el-table--enable-row-hover .el-table__body tr:hover>td`
   - 边框
     - 修改`<el-table>`的边框样式，以及==单元格==`.el-table td`和`.el-table th`里的`border-right border-bottom`属性
+- Tips
+  - `v-show`无法控制`<el-table-column>`显示，只有`v-if`可以
+
 
 ## Tabs标签页
 
