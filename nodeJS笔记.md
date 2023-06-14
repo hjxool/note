@@ -197,7 +197,7 @@
 
 ```js
 const http = require('http')
-
+// createServer接收一个函数作为参数 所以可以使用express()返回的函数对象作为参数
 const server = http.createServer((request, response)=>{ 回调函数 在 *每次*收到请求后都会调用
     第一个参数 request => 浏览器发来的 请求报文 对象，包括 请求行、请求头、请求体
     第二个参数 response => 服务器的 响应报文 对象，可以设置 返回结果
@@ -267,6 +267,39 @@ server.listen(端口号,()=>{ 回调函数在 服务启动成功 后被调用
   - 第一个参数是请求行的 url，可以是完整形式`http:...`，也可以是端口号后内容`request.url`
   - 第二个参数是==是否将 query 属性解析为对象==，可选 true/false
     - 解析后的结果`{ name:'xxx',password:'123' }`
+
+## util模块
+
+- 用于将回调函数风格的方法转变成Promise形式
+
+- **只能**传入==错误优先==风格的回调函数，即`fn(params1, params2, ..., (err,data)=>{})`
+
+- 应用
+
+  ```js
+  const fs = require('fs')
+  const util = require('util')
+  // 封装成新的函数方法
+  let newFsRead = util.promisify(fs.readFile)
+  newFsRead('./src/text.txt').then(data=>{})
+  ```
+
+- 内部实现逻辑
+
+  ```js
+  // 传入一个函数作为参数 返回一个函数
+  function promisify(fn) {
+      // 返回的函数可接收多个参数
+      return (...params) => {
+          return new Promise((success, fail) => {
+              // 将参数数组展开
+              fn(...params, (err, data) => {
+                  if (err) fail()
+                  success()
+              })
+          })
+      }
+  }
 
 ## URL API
 
@@ -341,12 +374,12 @@ server.listen(端口号,()=>{ 回调函数在 服务启动成功 后被调用
         console.log('hhhh')
     }
     module.exports = fn
-  
+    
     第二种方式——用对象整体暴露
     function fn(){}
     let a = '123'
     module.exports = {fn,a} 简写形式 等同于 {fn:fn,a:a}
-  
+    
     第三种方式——exports.name
     function fn(){}
     let a = '455'
@@ -513,7 +546,7 @@ server.listen(端口号,()=>{ 回调函数在 服务启动成功 后被调用
 
 - 也是一个==工具包==，封装了多个功能，便于开发 HTTP 服务
 
-  - 导入的工具包是**函数**，使用前需创建==应用对象==，`const app = express()`
+  - 导入的工具包是**函数**，使用前需创建==函数对象==，`const app = express()`，`app`其实是一个函数，所以可以传入`http或https.createServer`
 
 - 与 node 原生 http 模块区别
 
@@ -551,6 +584,9 @@ server.listen(端口号,()=>{ 回调函数在 服务启动成功 后被调用
   app.post("/login", (req, res) => {
   	res.send("收到数据" + req.body + "对象");
   });
+  
+  // http模块也可以使用express创建的应用对象
+  const server = http.createServer(app)
   ```
 
 ### express==路由==
@@ -593,7 +629,7 @@ server.listen(端口号,()=>{ 回调函数在 服务启动成功 后被调用
 
     ```js
     页面请求: //www.jd.com/abc.7.8.html
-  
+    
     http: 匹配示例;
     app.get("/:a.html", callback); //得到{a:'abc.7.8'}
     app.get("/:a.:b"); //得到{a:'abc', b:'7.8.html'}
@@ -893,19 +929,23 @@ function middleware(req,res,next){
     - 一个集合存储==同一类型==的数据
   - ==文档(document)==：文档是数据库中最小单位，类似==对象==。文档中的属性称之为==字段==
 - 安装数据库注意事项
+  - 通过安装程序安装的`mongodb`不需要命令行启动服务，而是在window系统下的`服务`功能中启动
+  - 以下展示`.zip`压缩包形式启动服务
+    - 在安装或解压目录下的`bin`目录打开 cmd，执行`mongod --dbpath=..\data\test`指定数据库路径为`..\data\test`(以 bin 文件目录为起点同级的 data 下的 test)目录，并启动==mongodb 服务==，注意不是==HTTP 服务==，在浏览器端无法直接访问，因为是 HTTP==协议==向 mongodb 服务发起请求
+      - 为了能连接 Mongodb==服务==，还需要启动 Mongodb==客户端==，以客户端连接服务
+        - 客户端启动命令`mongo`，**注意**不是`mongod`，有两个`.exe`文件
 
-  - 在安装或解压目录下的`bin`目录打开 cmd，执行`mongod --dbpath=..\data\test`指定数据库路径为`..\data\test`(以 bin 文件目录为起点同级的 data 下的 test)目录，并启动==mongodb 服务==，注意不是==HTTP 服务==，在浏览器端无法直接访问，因为是 HTTP==协议==向 mongodb 服务发起请求
-    - 为了能连接 Mongodb==服务==，还需要启动 Mongodb==客户端==，以客户端连接服务
-      - 客户端启动命令`mongo`，**注意**不是`mongod`，有两个`.exe`文件
-    - ==服务==开启后**不能**关闭，否则==客户端==访问不到
-    - Mongodb 默认存放数据位置`C:\data\db`，如果用默认目录可以执行`mongod`直接启动服务，但使用自定义目录，就需要每次执行`mongod --dbpath=..\data\test`来启动服务
-  - 命令行`mongod`指令其实是执行`bin`目录下的`mongod.exe`，可能会提示缺少`xxx.dll`文件，下载后放在`c:\Windows\System32`下即可
-  - 配置环境变量，便于命令启动
-    - 复制 mongodb 的 bin 文件夹目录，在系统——高级系统设置——环境变量——Path 中新建粘贴文件夹目录
-    - 以后启动客户端就可以直接`mongo`，无需在`bin`目录下
-      - 但是因为是自定义数据存放目录，因此启动服务还需要在`bin`目录下执行
-  - **不要**在服务窗口选中文本，会导致服务暂停，客户端操作无法返回结果
-    - 解决方法：服务端窗口按下回车
+      - ==服务==开启后**不能**关闭，否则==客户端==访问不到
+      - Mongodb 默认存放数据位置`C:\data\db`，如果用默认目录可以执行`mongod`直接启动服务，但使用自定义目录，就需要每次执行`mongod --dbpath=..\data\test`来启动服务
+
+    - 命令行`mongod`指令其实是执行`bin`目录下的`mongod.exe`，可能会提示缺少`xxx.dll`文件，下载后放在`c:\Windows\System32`下即可
+    - 配置环境变量，便于命令启动
+      - 复制 mongodb 的 bin 文件夹目录，在系统——高级系统设置——环境变量——Path 中新建粘贴文件夹目录
+      - 以后启动客户端就可以直接`mongo`，无需在`bin`目录下
+        - 但是因为是自定义数据存放目录，因此启动服务还需要在`bin`目录下执行
+
+    - **不要**在服务窗口选中文本，会导致服务暂停，客户端操作无法返回结果
+      - 解决方法：服务端窗口按下回车
 
 - 命令行交互
 
@@ -1305,10 +1345,10 @@ function middleware(req,res,next){
       app.get("/login", (req, res) => {
       	// 设置cookie
       	res.cookie("name", "xxx");
-    
+      
       	// 设置生命时长 单位毫秒
       	res.cookie("name", "xxx", { maxAge: 2 * 60 * 1000 }); // 2分钟
-    
+      
       	// 清除cookie
       	// 只能一条条删
       	res.clearCookie("name");
@@ -1337,7 +1377,7 @@ function middleware(req,res,next){
       // 需要安装express-session、connect-mongo工具包
       const session = require("express-session");
       const cm = require("connect-mongo");
-    
+      
       const app = express();
       // 设置session中间件 传入配置对象 返回一个函数
       app.use(
@@ -1361,7 +1401,7 @@ function middleware(req,res,next){
       		// 设置 session 信息
       		req.session.username = "admin";
       		req.session.password = "admin";
-    
+      
       		res.send("登陆成功");
       	} else {
       		res.send("登陆失败");
@@ -1465,3 +1505,71 @@ function middleware(req,res,next){
     - `session`存在服务器，只通过`cookie`传`id`，不影响效率
   - 存储限制
     - 浏览器限制单个 cookie 保存数据不能超过==4K==，且==同域名==下存储条数也有限制
+
+## 服务器部署运行(项目上线)
+
+- 环境配置
+
+  - 首先在服务器中安装`nodeJS`、`Mongodb`、`git`环境
+  - 然后`npm i`安装`package.json`下的依赖包
+  - 最后在命令行使用`node ./path/server.js`启动服务
+
+- 在==云服务器本地==访问服务使用`127.0.0.1:port/page`访问页面，而==外网==使用`云服务器公网IP:port/page`访问页面
+
+- 域名注册(以阿里云为例)
+
+  - 选`产品`中的`域名注册`，搜索像注册使用的域名看是否可以购买
+  - 进入`域名`-`控制台`，如果是国内使用，需要在`ICP备案`按流程登记等待审核
+  - ==审核过==的域名点击`解析`，将域名和==云服务器公网IP==做一个映射
+    - tips：像`www.baidu.com`这类都是域名，不是IP地址，浏览器其实不知道把请求发给谁，所以会去`DNS服务器`去查询当前域名对应的`IP地址`
+  - 点击`添加记录`，`记录类型`选择`指向一个IPV4地址`，`主机记录`设置`www`等前缀，`记录值`填写`服务器公网IP`
+
+- 配置HTTPS证书
+
+  - 只能在==服务器==端操作，本地服务无法操作
+
+  - https可以==加密HTTP报文==，响应报文由客户端解码，请求报文由服务器解码
+
+  - [工具官网](https://certbot.eff.org/)
+
+  - 操作流程
+
+    1. [下载工具](https://dl.eff.org/certbot-beta-installer-win_amd64.exe)安装
+
+    2. 管理员运行命令`certbot certonly --standalone`
+
+       - 证书获取会占用`80`端口，注意不要跟服务器启的服务冲突
+       - 获取证书需要输入邮箱、==域名==
+         - 域名**必须**是==指向当前服务器IP==的
+       - 证书会存储在本地
+
+    3. 导入并使用`https`模块**创建服务**
+
+       ```js
+       const https = require('https')
+       const fs = require('fs')
+       // 导入express
+       const express = require('express')
+       const app = express()
+       // 创建https服务 应用express对象
+       https.createServer({
+           // 证书存放路径 注意因为是反斜线需要转义\
+           key: fs.readFileSync('C:\\Certbot\\live\\www.custom.com\\privkey.pem','utf8'),
+           cert: fs.readFileSync('C:\\Certbot\\live\\www.custom.com\\cert.pem','utf8'),
+           ca: fs.readFileSync('C:\\Certbot\\live\\www.custom.com\\chain.pem','utf8'),
+       },app).listen(443,()=>{
+           // https默认端口号443
+           console.log('443端口监听中')
+       })
+       // 设置路由规则
+       app.use(中间件)
+       const router = require('./api/router.js')
+       app.use('/api',router)
+       app.get('/', callback)
+       ```
+    
+    4. 证书更新
+    
+       - 有效期==三个月==
+       - 一般更新：`certbot renew`
+       - 强制更新：`certbot --force-renewal`

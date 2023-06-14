@@ -146,14 +146,11 @@
   }
   ```
 
-- Promise传入的两个函数，是[异步]()执行，函数前后的代码都会执行，**但是**==成功==或==失败==函数执行后，另一个函数就不会执行
+- Promise传入的两个函数，是[异步]()执行，函数前后的代码都会执行，==状态==**只能**改变**一次**
 
   - 即时成功函数先执行，依然会走完后续==主线程步骤==再结束`await`
 
 - 除了then里传入两个函数，还可以用[promise对象.catch(函数)]()接收失败回调方法
-
-  - ※`.catch(callback)`后不会再执行后续`.then`！
-
 
   ```js
   //第一种 then里传入两个函数 用来接收 成功和失败的值
@@ -165,7 +162,7 @@
   //※第三种 then只传入一个函数也没有catch 只能接收成功值
   // then默认接收 成功回调 这点是解决 回调地狱 的关键
   new Promise().then(successDate => successDate)
-  ```
+  
 
 - ※`then()`**返回值**还是==Promise对象==
 
@@ -179,7 +176,7 @@
 
     - 任何一步`.then()`返回的Promise对象状态为==失败==，都会中断后续`.then()`的链式调用，直接进到末尾的失败回调
 
-    - Tips：Promise对象状态失败或抛出异常时，没有`.catch(()=>{})`处理会导致程序报错
+    - Tips：Promise对象==状态失败==或抛出异常时，没有对应处理失败的回调函数会导致程序报错！
 
   - Promise==异常穿透==
 
@@ -201,8 +198,12 @@
 
 - promise对象的==状态==是==成功==或是==失败==，由==return==后的值决定
 
+  - 其实是promise对象实例当中的一个属性值`PromiseState`
+
+
   ```js
-  function fn(){
+  // async函数默认返回promise对象
+  async function fn(){
       return 基本数据类型、对象等	返回结果状态成功
       return new Promise((success,reject)=>{
           success(内容)			  返回结果状态成功
@@ -215,12 +216,37 @@
   let result = fn()
   result.then(value => {},reason => {})
 
-- Promise对象里的值，**只能**通过`p.then( res => {获取res} )`才能获取Promise对象里存的值
+- Promise对象里的值，**只能**通过`p.then( res => {获取res} )`或`let res = await p`才能获取Promise对象里存的值
+
+- Promise构造函数(实例身上没有)方法
+
+  - `Promise.resolve(value)`
+    - 参数：任意值，包括基本数据类型、Promise对象
+    - 返回值
+      - 返回一个状态成功/失败的promise对象
+      - 参数为基本数据类型、成功的promise对象状态都是成功。失败的promise也会导致`resolve`结果失败
+
+  - `Promise.reject(value)`
+    - 参数：任意值
+    - 返回值：返回一个状态失败的promise对象
+
+  - `Promise.all(promiseObjArray)`
+    - 参数：==多个==promise对象组成的==数组==
+    - 返回值
+      - 返回一个新的promise对象，==状态==由参数中==所有==promise状态决定，所有promise状态都==成功==才成功，**只要有一个**==失败==就==直接(意味着不会执行后续promise)==失败
+
+      - 状态成功：值由参数中==所有promise**成功**的结果==组成的==数组==
+
+      - 状态失败：值为参数中==失败==的promise的结果(**不是数组**)
+
+  - `Promise.race(promiseObjArray)`
+    - 参数：同`all`方法
+    - 返回值：返回一个新的promise对象，值为==**第一个**==完成的promise的==结果==及==状态==
 
 - 对比普通回调和Promise.then的区别
 
   ```js
-  普通回调
+  // 普通回调
   function fn1(a) {
       fn2(a, 'b')
   }
@@ -231,7 +257,8 @@
       console.log(p[0] + p[1] + p[2])	输出'abc'
   }
   fn1('a')
-  Promise回调——then方法*返回*的结果还是*Promise对象*，所以可以接着用.then执行后续回调
+  
+  // Promise回调——then方法*返回*的结果还是*Promise对象*，所以可以接着用.then执行后续回调
   let p = new Promise((a, b) => {
       a('a')
   })
@@ -247,6 +274,7 @@
   }).then((v) => {
       console.log(v[0] + v[1] + v[2])	输出'abc'
   })
+  ```
 
 ## Set集合
 
@@ -544,10 +572,12 @@
 
   - 可以使用`await`关键字
 
+  - ※`async`函数默认返回一个promise对象，即使没写return也会返回值为undefined的promise对象
+
   - **返回值**会自动加工成==Promise对象==！哪怕返回的是基本类型数据，得到的返回值也是Promise对象
 
     - **但**如果async函数返回给==父级==函数(父级函数也是async)，父级函数用`await`关键字可以把==状态成功==的Promise对象值取出来，即==原数据类型==
-
+  
       ```js
       async child(){
           return '123'
@@ -558,7 +588,7 @@
       }
 
   - 在对象中声明的函数可以省略function，在函数前加async
-
+  
     ```js
     // 普通用法
     async function fn(){}
