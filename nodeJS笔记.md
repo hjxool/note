@@ -289,17 +289,39 @@ server.listen(端口号,()=>{ 回调函数在 服务启动成功 后被调用
   ```js
   // 传入一个函数作为参数 返回一个函数
   function promisify(fn) {
-      // 返回的函数可接收多个参数
+      // 返回的函数可接收多个参数 params是数组
       return (...params) => {
           return new Promise((success, fail) => {
-              // 将参数数组展开
+              // 将参数数组展开 补全最后一个回调函数参数
               fn(...params, (err, data) => {
-                  if (err) fail()
-                  success()
+                  if (err) fail(err)
+                  success('ok')
               })
           })
       }
   }
+  // 实验函数
+  function testFn(params1, params2, callback1, callback2) {
+      console.log(params1)
+      console.log(params2)
+      // 关键点 如果有多个回调函数作为参数 必须 携带最后一个回调函数作为参数传入
+      callback1(params1 + params2, callback2)
+  }
+  // 加工旧方法 返回一个新的函数
+  let newTestFn = promisify(testFn)
+  // 新方法传参 只传最后一个回调函数之前的
+  newTestFn(5, 2, (result, callback) => {
+      let t = null
+      if (result > 5) {
+          t = 'error'
+      }
+      // 关键点 执行最后一个回调函数 并按错误在前 数据在后顺序传入参数
+      callback(t, result)
+  }).then(res => {
+      console.log(res)
+  }).catch( res => {
+      console.log(res)
+  })
 
 ## URL API
 

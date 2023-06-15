@@ -199,11 +199,10 @@
 - promise对象的==状态==是==成功==或是==失败==，由==return==后的值决定
 
   - 其实是promise对象实例当中的一个属性值`PromiseState`
-
-
-  ```js
-  // async函数默认返回promise对象
-  async function fn(){
+  
+  - ```js
+    // async函数默认返回promise对象
+    async function fn(){
       return 基本数据类型、对象等	返回结果状态成功
       return new Promise((success,reject)=>{
           success(内容)			  返回结果状态成功
@@ -212,9 +211,10 @@
           reject(内容)			  返回结果状态失败
       })
       throw new Error('xxx')		返回结果状态失败
-  }
-  let result = fn()
-  result.then(value => {},reason => {})
+    }
+    let result = fn()
+    result.then(value => {},reason => {})
+
 
 - Promise对象里的值，**只能**通过`p.then( res => {获取res} )`或`let res = await p`才能获取Promise对象里存的值
 
@@ -299,11 +299,11 @@
     let a = [1,2,3,4,5,4,3,2,1]
     let a2 = [4,5,5,6,5]
     let result = [...new Set(a)].filter(item => return new Set(a2).has(item)) 输出[4,5]
-  ```
-  
-  - 并集：`let t = new Set([...a,...a2])`
-  
-  - 差集(双方集合中独有的元素)：`let t = [...new Set(a)].filter(item= > return !(new Set(a2).has(item)) )`
+    ```
+
+- 并集：`let t = new Set([...a,...a2])`
+
+- 差集(双方集合中独有的元素)：`let t = [...new Set(a)].filter(item= > return !(new Set(a2).has(item)) )`
 
 ## Map
 
@@ -612,41 +612,40 @@
 
   - ==必须==写在async函数**里**
 
-  - await后可以跟==Promise对象==，及任意数据类型
+  - await后可以跟==Promise对象==，及==任意==数据类型
 
     - 但是跟==Promise对象==，会自动帮你把Promise对象中的==值==取出来返回
 
-      - 除了状态==成功==的Promise对象，其余状态不会进行操作，也==不会继续往下执行代码！==且==没有返回值==
-
-        ```js
-        async fn(){
-            await new Promise((success,fail)=>{}) // 状态为待处理，不会执行后续代码
-            await new Promise((success,fail)=>{fail('err')})// 状态为失败，不会执行后续代码
-            console.log('后续')
-        }
+      ```js
+      async fn(){
+          await new Promise((success,fail)=>{}) // 状态为待处理，不会执行后续代码
+          // 状态为失败都也会结束await继续往后执行 状态失败必须要有错误处理回调！不然会抛异常
+          await new Promise((success,fail)=>{fail('err')}).catch(()=>{})
+          // 状态成功 继续往后执行 不需要 成功处理回调！
+          await new Promise((success,fail)=>{success('ok')})
+          console.log('后续')
+      }
+      ```
 
     - 当需要promise返回值时，不能`await let data = new Promise().then(res=>res)`
 
       - 而是`let data = await new Promise().then(res=>res)`
 
-  - [await]()==返回值==是==promise对象==状态==成功==的**值**，即`.then(success=>data,err=>err)`then成功回调方法==返回的值==data
-
-  - ==await后==跟异步方法返回的==promise对象！==会等该异步方法==执行返回==成功或失败结果后==才会继续==执行后续的代码
-
-  - 要搭配==try...catch==，因为promise对象状态==失败会抛出异常==，影响后续执行
+  - [await]()==返回值==是==promise对象==状态==成功/失败==的**值**
 
     ```js
-    let r = new Promise((success,reject)=>{
-        success('xxx')
-    })
     async function fn(){
-        try{
-            let result = await r	注意，必须要跟promise对象 后跟 普通函数 没有作用
-        }catch(err){
-            console.log(err)
-        }
+        let result = await new Promise((resolve, reject)=>{
+            resolve('ok')
+        })
+        console.log(result) // 'ok'
+        let result2 = await new Promise((resolve, reject)=>{
+            reject('err')
+        })
+        console.log(result2) // 'err'
     }
-    ```
+
+  - ==await后==跟异步方法返回的==promise对象！==会等该异步方法==执行返回==成功或失败结果后==才会继续==执行后续的代码
 
 - Tips
 
