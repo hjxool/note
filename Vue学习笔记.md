@@ -394,8 +394,8 @@ created:function(){
 
 - beforeUpdate：数据变化但是没传递到虚拟DOM
 - updated：虚拟DOM和html上的都已经更新
-- beforeDestory：监听、子组件和事件未被销毁前
-- destoryed：销毁完成
+- beforeDestroy：监听、子组件和事件未被销毁前
+- destroyed：销毁完成
 - 通过`let vm = new Vue()`接收创建的实例对象，**不能**在==beforeUpdate之前的生命周期中获取到！==
   - 因为beforeUpdate之前的生命周期都是在==初始化==，初始化没完成之前，==new Vue还没有返回值！==
   - **但是**==不论在哪个生命周期==，==this==都能取到vue实例，因为钩子函数也是函数，this指向它的调用者，也就是内部正在运作的vue实例，但是new Vue还没有返回这个实例
@@ -517,15 +517,15 @@ methods中方法互相调用：通过this.$options.methods.方法名查找method
 
   ```html
   组件内
-  <slot></slot>                      <slot></slot>                        同左
-                                     <slot></slot>
-  HTML页面上                                                               匿名插槽 用 v-slot绑定名称是default
-  <h2>匿名</h2>                      同左                                  <template v-slot:default>
+  <slot></slot>             <slot></slot>             同左
+                            <slot></slot>
+  HTML页面上                                           匿名插槽 用 v-slot绑定名称是default
+  <h2>匿名</h2>               同左                     <template v-slot:default>
   <p>匿名2</p>                                                                 <p>xxx</p>
-  <div>xxx</div>                                                          </template>
+  <div>xxx</div>                                      </template>
   
   页面效果
-  匿名 匿名2 xxx                     匿名 匿名2 xxx 匿名 匿名2 xxx
+  匿名 匿名2 xxx          匿名 匿名2 xxx 匿名 匿名2 xxx
   ```
 
 - ==具名插槽==
@@ -547,14 +547,14 @@ methods中方法互相调用：通过this.$options.methods.方法名查找method
   - 接收到的都是对象
 
   ```html
-  匿名插槽                                              具名插槽
-  <slot :存值名="组件内响应式变量"></slot>             <slot name="t-t" :存值名="组件内响应式变量"></slot>
+  匿名插槽                                    具名插槽
+  <slot :存值名="组件内响应式变量"></slot>      <slot name="t-t" :存值名="组件内响应式变量"></slot>
   
   HTML页面
-  <template v-slot:default="接收数据名">                <template v-slot:t-t="接收数据名">
-  	<p v-show="接收数据名.存值名">...</p>                  <p>{{接收数据名.存值名}}</p>
+  <template v-slot:default="接收数据名">        <template v-slot:t-t="接收数据名">
+  	<p v-show="接收数据名.存值名">...</p>          <p>{{接收数据名.存值名}}</p>
       <p v-show="!接收数据名.存值名">...</p>
-  </template>                                          </template>
+  </template>                                  </template>
 
 ## 子组件给父组件传值：
 
@@ -590,7 +590,8 @@ methods中方法互相调用：通过this.$options.methods.方法名查找method
     Tips：
   
     - `$on('事件名',callback)`第二个参数是监听的事件函数，默认参数是`$emit('事件名',值)`传递过来的值
-    - 注意！当`v-if`销毁组件时一定要清除组件监听事件！！不然触发会广播到所有未销毁的事件，组件销毁不会销毁监听事件！
+    - 全局事件总线是==全局==变量，因此`this.$bus.$on`监听事件==不会==随组件==销毁==，因此**必须**在组件生命周期中手动清除`this.$bus`身上的监听事件
+      - 注：销毁监听事件使用`this.$bus.$off('eventName')`，该方法同时会销毁所有同名事件，未销毁的组件中监听事件也不会触发了
 
 ## $refs对象
 

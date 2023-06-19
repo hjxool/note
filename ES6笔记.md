@@ -167,39 +167,40 @@
 - ※`then()`**返回值**还是==Promise对象==
 
   - **但是**then里的函数如果没有`return`，`then()`返回的是==值为undefined的Promise对象==
-
   - 如果`then( res => { return res } )`有return，则返回==值为res的Promise对象==
+  - 如果`then(res=>{ return new Promise() })`，则返回==值为新Promise对象的值==，而**不是**promise对象的值为新promise
+  - 如果抛出异常`throw new Error('err')`，则返回==值为错误信息==
 
-  - ==中断==`.then()`的链式调用
+- ==中断==`.then()`的链式调用
 
-    - 在上一个`.then()`中`return new Promise(()=>{})`，这样返回的Promise对象状态就是`pending`，就不会继续链式执行
+  - `.then()`中`return new Promise(()=>{})`，这样返回的Promise对象状态就是`pending`，就不会继续链式执行
 
-    - 任何一步`.then()`返回的Promise对象状态为==失败==，都会中断后续`.then()`的链式调用，直接进到末尾的失败回调
+  - 任何一步`.then()`返回的Promise对象状态为==失败==，都会中断后续`.then()`的链式调用，直接进到末尾的失败回调
 
-    - Tips：Promise对象==状态失败==或抛出异常时，没有对应处理失败的回调函数会导致程序报错！
+  - Tips：Promise对象==状态失败==或抛出异常时，没有对应处理失败的回调函数会导致程序报错！
 
-  - Promise==异常穿透==
+- Promise==异常穿透==
 
-    - 当使用`.then()`链式调用，在链式调用末尾指定失败的回调。前面的`.then()`出现任何异常都会传到末尾的失败回调中处理
+  - 当使用`.then()`链式调用，在链式调用末尾指定失败的回调。前面的`.then()`出现任何异常都会传到末尾的失败回调中处理
 
-      ```js
-      // 用.catch处理                  //用.then中的第二个失败回调处理 上一步 .then的异常
-      promiseObj.then(res=>{               promiseObj.then(res=>{
-          if(!res){                           if(!res){
-             throw new Error('err')              throw new Error('err')
-          }                                   }
-      }).then(()=>{                         }).then(()=>{
-          return promiseObj2                   return promiseObj2
-      }).then(res=>{                        },err=>{
-          console.log(res)                     console.log(err)
-      }).catch(err=>{                       }).then(res=>{
-          console.log(err)                     console.log(res)
-      })                                    })
+    ```js
+    // 用catch处理                  //用then中的第二个失败回调处理 之前 then的异常
+    promiseObj.then(res=>{               promiseObj.then(res=>{
+        if(!res){                           if(!res){
+           throw new Error('err')              throw new Error('err')
+        }                                   }
+    }).then(()=>{                         }).then(res =>{
+        return promiseObj2                   return 'success'
+    }).then(res=>{                        }).then(res =>{
+        console.log(res)                     console.log(res)
+    }).catch(err=>{                       },err =>{
+        console.log(err)                     console.log(err) // 'err'
+    })                                    })
 
 - promise对象的==状态==是==成功==或是==失败==，由==return==后的值决定
 
   - 其实是promise对象实例当中的一个属性值`PromiseState`
-  
+
   - ```js
     // async函数默认返回promise对象
     async function fn(){
