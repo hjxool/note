@@ -128,6 +128,10 @@
 
 - 本质是==构造函数==，用以处理==异步操作失败或成功的结果==
 
+- 链式调用思路
+
+  - 将平铺开的回调方法相互关联，比如`fn1`中执行回调`fn2`，`fn2`中执行`fn3`，就可以通过构造对象，`fn1`返回的对象身上记录`fn2`，`fn2`返回对象身上记录`fn3`，从而避免回调地狱，使用函数返回对象的形式平铺需要嵌套的回调方法
+
 - ```js
   let p = new Promise(fn1)	Promise接收 函数 作为参数
   function fn1(p1, p2) {		Promise执行时 会往函数中传入两个 函数 作为参数
@@ -183,6 +187,8 @@
 
   - 当使用`.then()`链式调用，在链式调用末尾指定失败的回调。前面的`.then()`出现任何异常都会传到末尾的失败回调中处理
 
+  - 思路：`then`中虽然没传失败的回调，但是内部其实设置的默认回调，并通过一层层返回状态失败的Promise对象将错误信息传递到`catch`，`catch`内其实又调用一次`then(undefined,onfail)`方法来处理失败的结果
+
     ```js
     // 用catch处理                  //用then中的第二个失败回调处理 之前 then的异常
     promiseObj.then(res=>{               promiseObj.then(res=>{
@@ -201,20 +207,30 @@
 
   - 其实是promise对象实例当中的一个属性值`PromiseState`
 
+  - `catch`或==最后一个==`then`中处理失败回调不能再返回失败的Promise对象或抛出异常！因为`catch`和`then`中处理失败回调是兜底的，再抛出异常程序都无法继续进行。所以`catch`和`then(null,err=>{})`返回的都是状态成功的Promise对象
+
   - ```js
     // async函数默认返回promise对象
     async function fn(){
-      return 基本数据类型、对象等	返回结果状态成功
+      return 基本数据类型、对象等	 // 返回结果 状态成功
       return new Promise((success,reject)=>{
-          success(内容)			  返回结果状态成功
+          success(内容)		  // 返回结果 状态成功
       })
       return new Promise((success,reject)=>{
-          reject(内容)			  返回结果状态失败
+          reject(内容)		 // 返回结果 状态失败
       })
-      throw new Error('xxx')		返回结果状态失败
+      throw new Error('xxx')  // 返回结果 状态失败
     }
     let result = fn()
-    result.then(value => {},reason => {})
+    result.then(value => {
+        throw 'error'         // 返回结果 状态失败
+    }).then(value=>{
+        return new Promise((a,b)=>{
+            b('error')        // 返回结果 状态失败
+        })
+    }).catch(reason => {
+        return true           // 返回结果 状态成功
+    })
 
 
 - Promise对象里的值，**只能**通过`p.then( res => {获取res} )`或`let res = await p`才能获取Promise对象里存的值
@@ -632,7 +648,7 @@
 
       - 而是`let data = await new Promise().then(res=>res)`
 
-  - [await]()==返回值==是==promise对象==状态==成功/失败==的**值**
+  - [await]()==返回值==是==promise对象==状态==成功==的**值**
 
     ```js
     async function fn(){
@@ -646,7 +662,7 @@
         console.log(result2) // 'err'
     }
 
-  - ==await后==跟异步方法返回的==promise对象！==会等该异步方法==执行返回==成功或失败结果后==才会继续==执行后续的代码
+  - ==await后==跟异步方法返回的==promise对象！==会等该异步方法执行返回Promise对象状态成功后==才会继续==执行后续的代码
 
 - Tips
 
