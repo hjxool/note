@@ -358,26 +358,28 @@
 - class是function构造函数的==语法糖==，只是为了结构语法更清晰
 
   ```js
-  function构造函数
+  // function构造函数
   function Person(name){
       this.name = name
   }
   Person.prototype.age = function(){
       console.log(18)
   }
-  let hj = new Person('hj')	得到的对象身上有name属性 以及原型身上的age方法
-  class类
-  class Person2{	注意不能用函数形式
-      constructor(name){	构造方法 名字不能修改
+  let hj = new Person('hj') // 得到的对象身上有name属性 以及原型身上的age方法
+  
+  // class类
+  class Person2{	// 注意不能用函数形式
+      constructor(name){	// 构造方法 名字不能修改
           this.name = name
       }
-      age(){	注意!只能用这种形式 不能用ES5的对象形式
+      age(){	// 注意!只能用这种形式 不能用ES5的对象形式
           console.log(22)
       }
-      static bbb = 'bbb'	Person2的实例对象身上是看不到 static关键字声明的静态属性和方法的
-                			等同于Person函数对象身上添加属性方法 其实例对象看不到
+      // 不想让实例使用的属性、方法 用static关键字 只有类才能看到、使用这些属性方法
+      // 等同 Person2.fn = ()=>{}添加属性方法 其实例对象看不到
+      static bbb = 'bbb'
   }
-  let zh = new Person2('zh')	同function构造函数得到的对象一样 但是简化了原型身上添加属性方法
+  let zh = new Person2('zh') // 同function构造函数得到的对象一样 但是简化了原型身上添加属性方法
   ```
 
 - ==继承==
@@ -392,11 +394,14 @@
         console.log('打电话')
     }
     function SmartPhone(price,color){
-        Phone.call(this,price)	此处非常聪明的用call重新矫正this的指向 用当前构造函数的this 相当于在自己实例对象身上
-        this.color = color		添加其他构造函数的属性 达到复用的目的
+        // 关键 用call重新矫正this的指向
+        // 用当前构造函数的this 相当于在自己实例对象身上 添加其他构造函数的属性 达到复用的目的
+        Phone.call(this,price)
+        this.color = color
     }
-    SmartPhone.prototype = new Phone()	重新定向原型
-    SmartPhone.prototype.constructor = SmartPhone 因为原型是实例对象 所以没有constructor 这里要弄一个同名的来替代
+    SmartPhone.prototype = new Phone() // 重新定向原型
+    // 因为原型是实例对象 所以没有constructor 这里要弄一个同名的来替代
+    SmartPhone.prototype.constructor = SmartPhone
     ```
 
   - Class继承
@@ -409,33 +414,37 @@
         console.log('打电话')
     }
     Phone.prototype.bbb2 = 123
-    class SmartPhone extends fn{	必须要用extends关键字
+    class SmartPhone extends fn{ // 必须要用extends关键字
         constructor(price,color){
-            super(price) 或 super.fn()	super表示父类的constructor 直接传参表示继承使用父类的属性
-            this.color = color			也可以直接.父类方法调用
+            // super表示父类的constructor 直接传参表示继承使用父类的属性
+            super(price) // constructor内才能用super(参数)
+            this.color = color
         }
-        fn2(){	此处可以用super调父类方法 但是！不能用super(参数)
-            console.log(222)
+        // constructor外可以用.父类方法调用 但 不能用super(参数)
+        fn2(){
+            super.fn()
         }
     }
-    let t = new SmartPhone('xiaomi','red')	子类身上就有父类的属性方法了 并且！不用重新定向原型和constructor
+    // 子类身上就有父类的属性方法了 并且！不用重新定向原型和constructor
+    let t = new SmartPhone('xiaomi','red')
     ```
 
-- 父类方法的重写：即在子类上声明跟父类同名的方法
+- 父类方法的==重写==：即在子类上声明跟父类同名的方法
 
 - class的==getter==和==setter==
 
   ```js
   class tt{
-      constructor(aa){	constructor不是必须有的 有get和set同样可以读取、设置属性
+      // constructor不是必须的 有get和set同样可以读取、设置属性
+      constructor(aa){
           this.aa = aa
       }
       get aa(){
           console.log('读取')
-          return 'aaa'	不能写return this.aa 因为会读取aa然后再触发get方法然后无限循环
+          return 'aaa' // 不能写return this.aa 因为会读取aa然后再触发get方法然后无限循环
       }
       set aa(newVal){
-          console.log('设置')	同样不能在此处写this.aa=newVal 会无限循环
+          console.log('设置') // 同样不能在此处写this.aa=newVal 会无限循环
       }
   }
 
