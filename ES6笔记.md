@@ -256,9 +256,12 @@
 
       - 状态失败：值为参数中==失败==的promise的结果(**不是数组**)
 
+      - 因为返回值是Promise对象，且状态有可能失败，因此必须`Promise.all(...).catch()`
+    
   - `Promise.race(promiseObjArray)`
     - 参数：同`all`方法
     - 返回值：返回一个新的promise对象，值为==**第一个**==完成的promise的==结果==及==状态==
+    - 同样需要用`.catch`方法
 
 - 对比普通回调和Promise.then的区别
 
