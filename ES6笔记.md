@@ -615,7 +615,10 @@
           console.log(child()) // 输出 [object promise]{...}
           console.log(await child()) // 输出 '123'
       }
-
+      ```
+  
+    - 如果返回的是一个Promise对象，则==返回值==状态由Promise对象状态决定，且==值==是Promise对象的值(值传递)
+  
   - 在对象中声明的函数可以省略function，在函数前加async
   
     ```js
