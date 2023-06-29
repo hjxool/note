@@ -525,10 +525,12 @@ server.listen(端口号,()=>{ 回调函数在 服务启动成功 后被调用
     - 没找到则，往==上级目录==下的`node_modules`中寻找，直到磁盘==根目录==
 - 生产环境和开发环境
   - 开发依赖：只在==开发阶段==使用的依赖包
-    - 命令：`npm -D 包名`
+    - 命令：`npm i 包名 -D`
+      - `D`必须大写！
     - 包信息存在`package.json`中==devDependencies==属性
   - 生产依赖：==开发阶段==和最终==上线==都用得到的依赖包
-    - 命令：`npm -S 包名`
+    - 命令：`npm i 包名 -S`
+      - `S`必须大写！
     - `-S`是默认选项
     - 包信息存在`package.json`中==dependencies==属性
   - 普通(==局部==)安装
@@ -560,6 +562,10 @@ server.listen(端口号,()=>{ 回调函数在 服务启动成功 后被调用
     - 安装最新版本：`nvm install latest`
     - ==删除==某版本：`nvm uninstall 16.11.12`
     - ==**切换**==版本：`nvm use 16.11.12`
+- `npx`
+  - 将`node_modules`下的`.bin`==临时==添加为环境变量，即==无需引入直接在命令行中使用==
+  - `npx webpack ./main.js --mode=development`
+
 - Tips
   - ==nodemon==工具的使用，用`nodemon ./xx.js`代替`node ./xx.js`
   - 开发环境中的`node_modules`文件夹，是不会上传服务器的，主要是为了去除冗余的安装包文件。所以协同开发时，都是下载`package.json`和`package-lock.json`文件，根据里面的`dependence`属性重新在本地安装依赖包，而`npm i`命令可以快捷安装 json 里所有依赖
