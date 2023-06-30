@@ -24,14 +24,17 @@
 - 输出`output`
 
   - 指示webpack打包完的文件输出到何处，如何命名等
+  - `path`表示==所有==文件的输出路径
+  - `filename`可以是路径`filename: 'work/main.js'`，生成的`main.js`文件会放在`path/work`目录下，而图片等其他资源则放在`path`目录下
 
 - 加载器`loader`
 
   - webpack自身不能处理的资源借助`loader`、`Webpack`进行解析
+  - 如果不写`eslint`、`babel`等`loader`的配置文件，则在`rules`对象中添加`options`对象写配置项
 
 - 插件`plugins`
 
-  - 扩展`Webpack`的功能
+  - 扩展`Webpack`的功能。如`Eslint`
 
 - 模式`mode`
 
@@ -51,7 +54,9 @@
           // 文件的输出路径 必须用 绝对路径
           path: path.resolve(__dirname,'dist'),
           // 文件名
-          filename: 'main.js'
+          filename: 'main.js', // 也可以指定目录
+          // 清空上一次打包生成的内容
+          clean: true,
       },
       // 加载器
       module: {
@@ -66,10 +71,63 @@
 
 ## 处理样式资源
 
+- 不要使用`loader: 'css-loader'`，因为`loader`配置项只能使用一个加载器
+
 - `.css`文件
 
   - 安装依赖：`npm i css-loader style-loader -D`
+
   - 想要打包资源，必须引入该资源
+
+    ```js
+    module.exports = {
+        ...
+        module: {
+    		rules: [
+    			{
+    				test: /\.css/i, // 只检测.css(忽略大小写)文件
+    				use: [ // use执行顺序从数组末尾到开头
+              			'style-loader', // 将编译后的css模块以<style>形式加入到HTML文件中
+              			'css-loader' // 将css资源编译成nodeJS模块导入到js中
+            		],
+    			},
+    		],
+    	},
+    }
+
+- `.less`文件
+
+  - 安装依赖：`npm i less-loader -D`
+
+    ```js
+    module.exports = {
+        ...
+        module: {
+    		rules: [
+    			{
+    				test: /\.less/i,
+    				use: [
+              			'style-loader',
+              			'css-loader',
+                        'less-loader'
+            		],
+    			},
+    		],
+    	},
+    }
+
+## 处理静态资源
+
+- 通用资源类型(asset)
+
+  - webpack自身就可以处理，不需要加载器
+  - 打包后会将相对路径引入`./img/xx.aa`的资源变成==url请求路径==
+  - 文件命名`[hash]`可以添加规则，比如`[hash:10]`表示取哈希值前10位
+  - 资源模块类型`type`
+    - `asset/resource`发送一个单独的文件并导出 URL。之前通过使用 `file-loader` 实现
+    - `asset/inline` 导出一个资源的 data URI。之前通过使用 `url-loader` 实现
+    - `asset/source` 导出资源的源代码。之前通过使用 `raw-loader` 实现
+    - `asset` 在导出一个 data URI 和发送一个单独的文件之间自动选择。之前通过使用 `url-loader`，并且配置资源体积限制实现
 
   ```js
   module.exports = {
@@ -77,15 +135,141 @@
       module: {
   		rules: [
   			{
-  				test: /\.css/i, // 只检测.css(忽略大小写)文件
-  				use: [ // use执行顺序从数组末尾到开头
-            			'style-loader', // 将编译后的css模块以<style>形式加入到HTML文件中
-            			'css-loader' // 将css资源编译成nodeJS模块导入到js中
-          		],
+  				test: /\.(png|jpe?g|gif|webp|svg)$/,
+                  type: 'asset',
+  				parser: {
+                      // 将小于4kb的文件处理成base64格式
+                      dataUrlCondition: {
+                          maxSize: 4 * 1024 // 4KB
+                      }
+                  },
+                  generator: {
+                      // 既指定文件名命名规则，也指定文件分类存放路径
+                      // hash表示哈希值为了文件不重名的唯一标识
+                      // ext表示文件拓展名
+                      // query表示如果静态资源地址是url且携带query查询参数则携带上
+                      filename: 'img/[hash][ext][query]'
+                  }
   			},
   		],
   	},
   }
   ```
 
-- `.less`文件
+## Eslint
+
+- 为了规范代码格式，便于后续`Babel`做代码兼容性处理，再由`webpack`压缩代码
+
+- 配置文件的写法：`.eslintrc`、`.eslintrc.js`、`.eslintrc.json`
+
+- 配置
+
+  ```js
+  module.exports = {
+      // 解析选项
+      parserOptions: {
+          ecmaVersion: 6, // ES语法版本
+          sourceType: 'module', // ES模块化
+          ecmaFeatures: { // ES其他特性
+              jsx: true, // 如果是React项目，就需要开启jsx特性
+          }
+      },
+      // 具体检查规则
+      // off或0表示 关闭规则
+      // warn或1表示 开启规则 且只提示warn
+      // error或2表示 开启规则 且抛出异常error
+      rules: {
+          semi: 'error', // 是否禁止使用分号
+          'array-callback-return': 'warn', // 数组方法的回调函数中有return语句
+          // 一条规则有多个条件使用数组形式
+          'default-case': [
+              'warn', // switch语句中有default分支
+              {commentPattern: '^no default$'} // 允许在最后注释no default就不执行规则
+          ],
+          eqeqeq: [
+              'warn', // 是否强制使用===和!==
+              'smart', // 除了少数情况不执行规则
+          ]
+      },
+      // 继承其他规则
+      // Eslint官方规则 eslint:recommended
+      // Vue Cli官方规则 plugin:vue/essential
+      // React Cli官方规则 react-app
+      extends: ['plugin:vue/essential'],
+      // 环境
+      env: {
+          node: true, // 启用node全局变量
+          browser:true, // 启用浏览器中全局变量
+      }
+  }
+  ```
+
+- 使用
+
+  - 安装：`npm i eslint-webpack-plugin eslint -D`
+
+  - 在`webpack.config.js`中引入：`const eslint = require('eslint-webpack-plugin')`
+
+    ```js
+    module.exports = {
+        ...
+        plugins: [
+            new eslint({
+                // 需要检查的文件存放目录
+                context: path.resolve(__dirname, 'js')
+            })
+        ]
+    }
+    ```
+
+  - 创建`.eslintrc.js`文件，写入配置
+
+  - 运行`npx webpack`就会检查并打包代码
+
+  - 如果安装了`ESlint`插件，需要创建`.eslintignore`文件屏蔽`webpack`打包输出的目录
+
+## Babel
+
+- 用于将ES6语法编写的代码转换成向后兼容的JS语法，以便在旧版本浏览器上运行
+
+- 配置文件的写法：`.babelrc`、`.babelrc.js`、`.babelrc.json`
+
+- 配置
+
+  ```js
+  module.exports = {
+      // 预设 一组babel插件拓展功能
+      presets: [
+          '@babel/preset', // 智能预设，允许使用最新的JS
+          '@babel/preset-react', // 编译React jsx语法
+          '@babel/preset-typescript', // 编译TS语法
+      ]
+  }
+  ```
+
+- 使用
+
+  - 安装：`npm i babel-loader @babel/core @babel/preset-env -D`
+
+  - 在`webpack.config.js`中使用
+
+    - 排除指定==文件夹==下的文件`exclude: /正则/`
+
+    ```js
+    module.exports = {
+        ...
+        module: {
+    		rules: [
+                {
+                    test: /\.js$/,
+                    exclude: /node_modules/, // node_modules下的文件不需要打包编译
+                    loader: 'babel-loader',
+                }
+    		],
+    	},
+    }
+    ```
+
+  - 创建`.babelrc.js`文件，写入配置
+
+  - 运行`npx webpack`就会检查并打包代码
