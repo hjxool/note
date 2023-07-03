@@ -273,3 +273,49 @@
   - 创建`.babelrc.js`文件，写入配置
 
   - 运行`npx webpack`就会检查并打包代码
+
+## 处理HTML资源
+
+- 手动引入资源打包会比较繁琐，有的文件还涉及依赖关系就会比较麻烦，因此使用`plugin 插件`来自动化导入
+
+- 使用
+
+  - 安装：`npm i html-webpack-plugin -D`
+
+  - 在`webpack.config.js`中引入：`const html = require('html-webpack-plugin')`
+
+    ```js
+    module.exports = {
+        ...
+        plugins: [
+            new html({
+                // 以index.html文件创建新的html文件 不然打包后html结构丢失
+                template: path.resolve(__dirname, '/index.html')
+            })
+        ]
+    }
+    ```
+
+## 自动化打包
+
+- 使用
+
+  - 安装：`npm i webpack-dev-server -D`
+
+  - 在`webpack.config.js`中配置
+
+    - 注：不会输出打包文件，是在内存中编译打包的
+  
+    ```js
+    module.exports = {
+        ...
+        // 开发服务器
+        devServer: {
+            host: 'localhost', // 启动服务器域名
+            port: '30', // 启动服务器端口号
+            open: true, // 是否自动打开浏览器
+        }
+    }
+    ```
+  
+  - 运行：`npx webpack serve`

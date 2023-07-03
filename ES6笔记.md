@@ -101,7 +101,7 @@
       }
       function * gen(){
           let t = yield oneStep()
-          console.log(t) 第二个next中传入的参数作为第一个**yield整体的返回值** 此处输出'第1步'
+          console.log(t) 第二个next中传入的参数作为第一个 yield整体的返回值 此处输出'第1步'
           let t2 = yield twoStep()
           console.log(t2) 输出'第2步'
           let t3 = yield threeStep()
@@ -606,7 +606,7 @@
   - **返回值**会自动加工成==Promise对象==！哪怕返回的是基本类型数据，得到的返回值也是Promise对象
 
     - **但**如果async函数返回给==父级==函数(父级函数也是async)，父级函数用`await`关键字可以把==状态成功==的Promise对象值取出来，即==原数据类型==
-  
+
       ```js
       async child(){
           return '123'
@@ -616,11 +616,11 @@
           console.log(await child()) // 输出 '123'
       }
       ```
-  
+
     - 如果返回的是一个Promise对象，则==返回值==状态由Promise对象状态决定，且==值==是Promise对象的值(值传递)
-  
+
   - 在对象中声明的函数可以省略function，在函数前加async
-  
+
     ```js
     // 普通用法
     async function fn(){}
@@ -639,7 +639,7 @@
     request(async ()=>{}) // 箭头函数也可使用async关键字
     request(async function(){}) // 匿名函数
     request(async )
-  
+
 - await==表达式==
 
   - ==必须==写在async函数**里**
@@ -681,21 +681,24 @@
 
 - Tips
 
-  ```js
-  asycn child(){
-      // 这样无法等待异步执行完后再返回
-      // 因为return 是立即执行的 而这时await还未返回值 相当于 return 空
-      // 但因为child是async函数 因此返回的空值也被包装成Promise对象
-      return await new Promise((success,fail)=>{
-        // 异步操作
-        setTimeout(()=>{
-            success('yes')
-        },2000)
-      })
-  }
-  function parent(){
-      console.log(child())// 输出 状态为“待处理”的Promise对象
-  }
+  - ```js
+    asycn child(){
+        // 这样无法等待异步执行完后再返回
+        // 因为return 是立即执行的 而这时await还未返回值 相当于 return 空
+        // 但因为child是async函数 因此返回的空值也被包装成Promise对象
+        return await new Promise((success,fail)=>{
+          // 异步操作
+          setTimeout(()=>{
+              success('yes')
+          },2000)
+        })
+    }
+    function parent(){
+        console.log(child())// 输出 状态为“待处理”的Promise对象
+    }
+
+  - `async`、`await`其实是`生成器函数`的语法糖，本质是将`async`声明的函数体放入生成器函数，`await`的位置相当于`yield`，将`await`前后内容分隔，再在`await`后的Promise对象追加一个`.then(()=>{ genObj.next() })`，从而得到`await`后Promise对象状态成功后才会==往后执行==的现象
+
 
 ## 扩展运算符和rest参数
 
