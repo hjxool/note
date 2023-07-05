@@ -1603,3 +1603,150 @@ function middleware(req,res,next){
        - 有效期==三个月==
        - 一般更新：`certbot renew`
        - 强制更新：`certbot --force-renewal`
+
+## 微服务
+
+- 演化过程
+
+  1. 单体架构
+
+     ![image-20230705105430692](C:/Users/admin/AppData/Roaming/Typora/typora-user-images/image-20230705105430692.png)
+
+     <center>启1个服务，所有应用接口都集中在一起，共同操作维护一个数据库</center>
+
+  2. 负载均衡
+
+     ![image-20230705105653521](C:/Users/admin/AppData/Roaming/Typora/typora-user-images/image-20230705105653521.png)
+
+     <center>同一套应用接口部署在多台设备上，由nginx转发请求到不同设备，共同操作维护一个数据库</center>
+
+  3. 负载均衡+主从数据库
+
+     ![image-20230705105944798](C:/Users/admin/AppData/Roaming/Typora/typora-user-images/image-20230705105944798.png)
+
+     <center>在负载均衡基础上，每台设备维护单独的数据库，数据库之间同步数据</center>
+
+  4. 微服务
+
+     ![image-20230705110218612](C:/Users/admin/AppData/Roaming/Typora/typora-user-images/image-20230705110218612.png)
+
+     <center>将单个服务的应用接口拆成分散的服务搭载独立的接口部署在多台服务器</center>
+
+- GRPC
+
+  - 概念：通过远程调用其他服务上的接口称为`RPC`，基于`RPC`技术思想开发的微服务框架有谷歌的GRPC框架、阿里的dubbo框架、Facebook的Thrift、腾讯的Tars等。可以跨语言调用接口方法，如Java中写了个微服务，在NodeJS中可以调用
+
+  - 通俗理解微服务
+
+    - 一整个服务被拆分成多个小服务，每个小服务单独维护自己的接口路由和数据库，那每个被拆分的服务怎么知道其他服务中有哪些接口可以调用呢？答案就是在上层用一个统一的协议记录每个服务的接口信息。而前端在请求接口时则是先经过==微服务网关==，通过微服务网关分发到各个小服务器下。其中微服务网关到微服务的请求方式依据用的框架而定，前端到微服务网关的请求则是前端自己的请求方式
+
+  - 示例
+
+    - 所在项目如果没有`package.json`，需要`npm init`生成
+
+    - 安装==生产==依赖：`cnpm i @grpc/grpc-js @grpc/proto-loader`
+  
+      - `npm`没有这个包，必须安装`cnpm`
+  
+    - 配置`.proto`文件
+  
+      ```js
+      // proto文件 语句结尾需要加;号
+      syntax = 'proto3'; // 1.设置proto版本
+      
+      package test1; // 包名
+      
+      // 2.定义服务
+      service Greeter{
+        // 3.定义远程调用方法 rpc、returns是固定写法
+        rpc fn1(fn1Req) returns (fn1Res) {}
+      }
+      
+      // 4.定义形参和返回值数据结构
+      // message在不同语言中生成不同的结果 在js中得到的是对象 在go语言中得到的是结构体 诸如此类
+      message fn1Req{
+        // 定义对象中接收的参数类型 int32、bool、double、string
+        // 类型后的字段表示 形参名
+        // 参数后的数字表示 传参顺序
+        string name = 1;
+        int64 age = 2;
+        string sex = 3;
+        bool flag = 4;
+      }
+      message fn1Res{
+        int32 code = 1;
+        string message = 2;
+        string result = 3;
+      }
+      ```
+  
+    - 配置微服务文件`server.js`
+  
+      ```js
+      // 1.引入proto文件
+      let grpc = require('@grpc/grpc-js');
+      let protoloader = require('@grpc/proto-loader');
+      const path = require('path');
+      let proto_path = path.resolve(__dirname + '/protos/greeter.proto');
+      
+      // 2.解析proto文件 固定写法
+      let package_definition = protoloader.loadSync(proto_path, {
+      	keepCase: true,
+      	longs: String,
+      	enums: String,
+      	defaults: true,
+      	oneofs: true,
+      });
+      // test1是在.proto文件中定义的包名
+      let proto_obj = grpc.loadPackageDefinition(package_definition).test1;
+      
+      // 3.定义远程调用方法 函数名必须跟.proto文件中 rpc定义的方法名 统一
+      function fn1(req, res) {
+      	console.log(req);
+      	res(null, { code: 200, message: '测试成功', result: 'test server' });
+      }
+      
+      // 4.启动服务
+      // 创建实例对象
+      let server = new grpc.Server();
+      // 注册服务 service是固定写法 第二个参数是调用方法 可以传入多个
+      server.addService(proto_obj.Greeter.service, { fn1 });
+      // 监听端口
+      // 参数：地址及端口 通信凭证 回调函数
+      // 地址可以填'0.0.0.0'表示任意地址
+      server.bindAsync('127.0.0.1:3001', grpc.ServerCredentials.createInsecure(), () => {
+      	server.start();
+      	console.log('监听3001端口...');
+      });
+      ```
+  
+    - 配置客户端文件`client.js`
+  
+      ```js
+      // 1.引入proto文件
+      let grpc = require('@grpc/grpc-js');
+      let protoloader = require('@grpc/proto-loader');
+      const path = require('path');
+      let proto_path = path.resolve(__dirname + '/protos/greeter.proto');
+      
+      // 2.解析proto文件 固定写法
+      let package_definition = protoloader.loadSync(proto_path, {
+      	keepCase: true,
+      	longs: String,
+      	enums: String,
+      	defaults: true,
+      	oneofs: true,
+      });
+      // test1是在.proto文件中定义的包名
+      let proto_obj = grpc.loadPackageDefinition(package_definition).test1;
+      
+      // 3.建立连接
+      // 参数：地址及端口 通信凭证
+      // 注：通信凭证与服务端不同
+      let client = new proto_obj.Greeter('127.0.0.1:3001', grpc.credentials.createInsecure());
+      // 调用方法 参数必须对应.proto的message生成结果 对象中属性可以不写 但不能写错 会接收不到
+      // 参数：错误信息 响应体数据
+      client.fn1({ name: '张三', age: 22, sex: '男', flag: true }, (err, res) => {
+      	console.log(res);
+      });
+  

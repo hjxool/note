@@ -451,9 +451,11 @@
     ```js
     module.exports = {
         ...
-        plugins: [
-            new cssMini()
-        ]
+        optimization: {
+            minimizer: [
+                new cssMini()
+            ]
+        }
     }
 
 ## SourceMap源代码映射
@@ -559,7 +561,51 @@
   - 每次打包，JS文件都会经过`Eslint`、`Babel`编译，速度较慢。使用`cache`缓存之前的检查编译结果，只对修改的文件重新检查，再次打包速度就会更快
   - 用法见`Babel`、`Eslint`章节
 - `Thead`
+  
   - 多==进程==打包==JS代码==
     - 注：仅适用特别耗时的操作，因为每个进程都有启动时间，大约`600ms`
   - 使用
-    - 安装：`npm i `
+    - 安装：`npm i thread-loader-D`
+    
+    - 在`webpack.config.js`中
+    
+      ```js
+      const os = require('os') // 引入nodeJS核心模块
+      const threads = os.cpus().length // cpu核数
+      const terser = require('terser-webpack-plugin')// Thead插件
+      module.exports = {
+          ...
+          module: {
+      		rules: [
+      			{
+                      test: /\.js$/,
+                      exclude: /node_modules/,
+                      use: [
+                          {
+                            loader: 'thread-loader',
+                            options:{
+                                works: threads,// 指定工作进程数
+                            }
+                          },
+                          'babel-loader',
+                      ]
+                  },
+      		],
+      	},
+          plugins: [
+              new eslint({
+                  context: path.resolve(__dirname, 'js'),
+                  exclude: /node_modules/,
+                  threads, // 开启多线程并设置进程数
+              }),
+          ],
+          optimization: {
+              // 放置压缩的操作
+              minimizer: [
+                  new cssMini(),// 压缩css
+                  new terser({ // 压缩js
+                      parallel: threads,// 开启多线程和设置进程数量
+                  })
+              ]
+          }
+      }
