@@ -37,7 +37,7 @@
     - 开发时不需要打包输出，`path`可以为`undefined`
   - `filename`可以是路径`filename: 'work/main.js'`，生成的`main.js`文件会放在`path/work`目录下，而图片等其他资源则放在`path`目录下
 
-- 加载器`loader`
+- 加载器`module`
 
   - webpack自身不能处理的资源借助`loader`、`Webpack`进行解析
   - 如果不写`eslint`、`babel`等`loader`的配置文件，则在`rules`对象中添加`options`对象写配置项
@@ -52,6 +52,14 @@
 
   - 开发者模式：`development`
   - 生产模式：`production`
+
+- 优化`optimization`
+
+  - 压缩`minimizer`、代码分割`splitChunks`的配置
+
+- ==开发==服务器(自动打包)`devServer`
+
+  - 方便开发时保存自动打包，且是在内存中编译，读写速度快
 
 - 在==项目根目录==下创建`webpack.config.js`文件
 
@@ -82,16 +90,36 @@
               {  // use写法1
                  use: ['xxx1','xxx2'],
                  // use写法2——内嵌配置项时
-                 use: ['xxx1',{ loader: 'xxx2',options:{} }]
+                 use: ['xxx1',{ loader: 'xxx2',options:{} }],
                  // use写法3——多个重复内容复用
-                 use: fn(params)
+                 use: fn(params),
               }
           ],
   	},
       // 插件 数组
-      plugins: [],
+      plugins: [
+          new html({
+              template: path.resolve(__dirname, '/index.html'),
+              filename: 'html/index.html'
+          })
+      ],
       // 模式
-      mode: 'development'
+      mode: 'development',
+      // 优化配置
+      optimization: { 
+          minimizer: [// 压缩
+              new cssMini()
+          ],
+          splitChunks: {// 代码分割
+              chunks: 'all',
+          }
+      },
+      // 开发服务器
+      devServer: {
+          host: 'localhost', // 启动服务器域名
+          port: '30', // 启动服务器端口号
+          open: true, // 是否自动打开浏览器
+      }
   }
 
 ## 动态插入样式
@@ -312,6 +340,7 @@
       // 开启缓存
       cache: true,
       cacheLocation: path.resolve(__dirname, './node_modules') // 指定缓存文件路径
+      plugins: ['import'],// 不同版本eslint有可能不支持动态导入import函数
   }
   ```
 
@@ -408,7 +437,7 @@
         plugins: [
             new html({
                 // 以index.html文件创建新的html文件 不然打包后html结构丢失
-                template: path.resolve(__dirname, '/index.html').
+                template: path.resolve(__dirname, '/index.html'),
                 // 指定目录及文件名
                 filename: 'html/index.html'
             })
@@ -561,14 +590,14 @@
   - 每次打包，JS文件都会经过`Eslint`、`Babel`编译，速度较慢。使用`cache`缓存之前的检查编译结果，只对修改的文件重新检查，再次打包速度就会更快
   - 用法见`Babel`、`Eslint`章节
 - `Thead`
-  
+
   - 多==进程==打包==JS代码==
     - 注：仅适用特别耗时的操作，因为每个进程都有启动时间，大约`600ms`
   - 使用
-    - 安装：`npm i thread-loader-D`
-    
+    - 安装：`npm i thread-loader -D`
+
     - 在`webpack.config.js`中
-    
+
       ```js
       const os = require('os') // 引入nodeJS核心模块
       const threads = os.cpus().length // cpu核数
@@ -609,3 +638,139 @@
               ]
           }
       }
+      ```
+
+- `Tree Shaking`
+
+  - ==术语==，移除JS中没有用上的代码
+  - Webpack已经默认开启，无需配置
+    - 注：依赖`ES Module`，否则无法应用
+
+- `Babel`
+
+  - Babel为编译的每个文件都插入了辅助代码`_extend`，会增加代码体积，可以使用`@babel/plugin-transform-runtime`将辅助代码作为独立模块，避免重复引入
+
+  - `@babel/plugin-transform-runtime`
+
+    - 禁用Babel自动对每个文件的runtime注入，而是引入，并使所有辅助代码从这里引入
+
+  - 使用
+
+    - 安装：`npm i @babel/plugin-transform-runtime -D`
+
+    - 在`babel.config.js`中配置
+
+      ```js
+      module.exports = {
+         ...
+         plugins: ['@babel/plugin-transform-runtime']
+      }
+      ```
+
+- `Image Minimizer`
+
+  - 仅对本地静态图片进行压缩，如果是在线链接就不需要
+
+  - 使用
+
+    - 安装：`npm i image-minimizer-webpack-plugin imagemin -D`
+    - 模式
+      - 无损压缩：`npm i imagemin-gifsicle imagemin-jpegtran imagemin-optipng imagemin-svgo -D`
+      - 有损压缩：`npm i imagemin-gifsicle imagemin-mozjpeg imagemin-pngquant imagemin-svgo -D`
+
+    - 在`webpack.config.js`中配置
+
+      ```js
+      // 引入插件
+      const mini_img = require('image-minimizer-webpack-plugin')
+      // 详见webpack官方文档配置案例 较长且固定写法 不在此展示
+
+- `Code Split`(重要)
+
+  - 打包时会将所有JS打包到一个文件中，对于渲染单个页面有很多不需要加载的部分
+  - `Code Split`功能
+    - 分割文件：将打包生成的文件进行分割，生成多个JS文件
+    - 按需加载：需要哪个就加载哪个
+
+  1. 多入口方式
+
+     - `webpack.config.js`配置
+
+       ```js
+       const html_plugin = require('html-webpack-plugin')
+       module.exports = {
+           // 多入口要用对象形式
+           entry: {
+               app: './src/app.js',
+               main: './main.js'
+           },
+           output: {
+               path: path.resolve(__dirname, 'bundle'),
+               // 因为入口有多个，会输出多个文件，如果 filename:main.js 
+               // 会生成多个main.js，导致发生覆盖最终只有一个main.js
+               filename: '[name].js',// webpack命名方式，以entry属性名命名输出文件
+           },
+           pligins: [
+               new html_plugin({
+                   template: path.resolve(__dirname, '/src/index.html')
+               })
+           ],
+           ...
+       }
+       ```
+
+     - 会遇到的问题
+
+       - 如果有个公共模块被多个入口文件引用，那么打包时就会将==公共模块==生成多个，这时需要将==复用模块==单独打包，让输出文件调用
+
+         ```js
+         module.exports = {
+             ...
+             optimization: {
+                 // 代码分割配置
+                 splitChunks: {
+                     chunks: 'all',// 对所有模块进行分割
+                 }
+             }
+         }
+         ```
+
+       - 使用`import(path)`按需加载，动态导入，代码分割时会将动态导入的文件代码拆分成单独的模块，在需要时自动加载(页面加载时不会发起请求，触发事件时发请求获取文件)
+
+         ```js
+         // 使用import导入模块 替代 require('path')
+         document.getElementById('btn').onclick = ()=>{
+             // import返回值是Promise对象
+             import('./modules1.js').then(res => {
+                 // 加载成功
+                 res.default.fn(2,1)
+             }).catch(err => {
+                 // 加载失败
+             })
+         }
+         ```
+
+  2. 单入口方式
+
+     - `webpack.config.js`配置
+
+       ```js
+       const html_plugin = require('html-webpack-plugin')
+       module.exports = {
+           entry: './main.js',
+           output: {
+               path: path.resolve(__dirname, 'bundle'),
+               filename: 'js/[name].js',
+           },
+           pligins: [
+               new html_plugin({
+                   template: path.resolve(__dirname, '/src/index.html')
+               })
+           ],
+           optimization: {
+               splitChunks: {
+                   chunks: 'all',
+               }
+           }
+           ...
+       }

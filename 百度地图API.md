@@ -4,4 +4,4 @@
 
 [MapVGL动画](https://www.jianshu.com/p/9f29c862c084)
 
-webpack24
+webpack46

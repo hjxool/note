@@ -586,7 +586,7 @@
 
   - 动态引入`.then`内执行的实际上是`import * as 形参名`，所以`export default`时，需要`形参.default`才能取到里面的属性方法
 
-- 要引入**css文件**，直接使用`**import 路径**`
+- 要引入**css文件**，直接使用`import 路径`
 
 - ==引入Npm包==：`import 别名 from '包的名称'`即可使用，例：`import $ from 'jquery'`=>`$(body).css('color','red')`
 
