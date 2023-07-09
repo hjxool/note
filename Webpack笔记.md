@@ -747,20 +747,34 @@
              }).catch(err => {
                  // 加载失败
              })
+             // 动态导入同时设置打包文件名 还需要在webpack.config.js文件中配置
+             // /* webpackChunkName: 'modules2' */是webpack特殊命名规则 固定写法
+             import(/* webpackChunkName: 'modules2' */'./modules2.js').then(({fn2})=>{})
+         }
+         
+         // webpack.config.js
+         module.exports = {
+             output: {
+                 filename: 'js/main.js',
+                 // 给打包输出的其他文件命名 如：代码分割的文件
+                 chunkFilename: 'js/[name].js',
+                 ...
+             },
+             ...
          }
          ```
-
+  
   2. 单入口方式
-
+  
      - `webpack.config.js`配置
-
+  
        ```js
        const html_plugin = require('html-webpack-plugin')
        module.exports = {
            entry: './main.js',
            output: {
                path: path.resolve(__dirname, 'bundle'),
-               filename: 'js/[name].js',
+               filename: 'js/main.js',
            },
            pligins: [
                new html_plugin({
