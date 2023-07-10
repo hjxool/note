@@ -101,6 +101,11 @@
 
     ![img](https://upload-images.jianshu.io/upload_images/6322775-98fc500bb756ae16.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
 
+- 使用外部组件库
+  1. 创建实例对象`const app = Vue.CreateApp(...)`
+  2. 注册组件`app.use(xxx)`
+  3. 挂载页面`app.mount('#app')`
+
 ## 创建根实例对象
 
 - vue3方法创建的实例对象，不能直接使用，只有在 `mount()` 挂载后所赋值的变量，才能取到里面的值，等同于Vue2中的`let vm = new Vue`

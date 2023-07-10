@@ -467,10 +467,10 @@ methods中方法互相调用：通过this.$options.methods.方法名查找method
   - component是“**全局注册！**”，而extend是`let 对象名 = Vue.extend({})`的形式注册的`局部组件`
   - component('组件名'，extend对象名)
   - extend使用时：`new Vue({ components:{ **组件名：extend赋值对象** } })`
-  
+
 - 在根实例对象使用组件是==平级的==，但是组件中可以用`components：{}`包裹其他组件，并在`template`中调用
 
-- 组件之所以能`**同名且维护不同的对象**`，就是因为`**extend**`中返回的是`**新创建的function Vuecomponent()**`，就是每次调用都创建一个新的函数
+- 组件之所以能`同名且维护不同的对象`，就是因为`extend`中返回的是`新创建的function Vuecomponent()`，就是每次调用都创建一个新的函数
 
 - ※组件是在==挂载==时就已经==执行完==身上立即执行的方法了！
 
@@ -495,13 +495,17 @@ methods中方法互相调用：通过this.$options.methods.方法名查找method
       components:{component} 同上
   })
   ```
-  
+
 - 不管是==全局==组件还是==局部==组件，[mixins]()==混入==对象**必须**==声明在组件**之前**！==
 
 - [mixins: [ 变量1,变量2, ... ] ]()：将外部文件/变量混入当前组件/根实例
 
   - 组件是独立作用域，所以每个组件都要混入才能使用外部声明的变量和方法
   - 混入==优先==于组件==子身的同名==方法和变量。例如，混入文件里有mounted/data配置项，它的执行优先于组件内写的mounted/data
+
+- 使用外部组件库
+
+  - `Vue.use(xxx)`即可
 
 ## 插槽
 
