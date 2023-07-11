@@ -70,7 +70,7 @@
 
 - `function`
 
-  - 用**类似**箭头函数的**语法**，声明函数==结构==、==类型==
+  - 函数结构的类型声明：用**类似**箭头函数的**语法**，声明函数==结构==、==类型==
 
     ```ts
     let a: (p1: number, p2: number) => number
@@ -78,8 +78,18 @@
         return a + b
     }
     a = (e: string, b): string =>{} // 报错 赋值时不能更改类型
+    a = (a) =>{} // 不报错 可以少传参数
+    a = (a, b, c) =>{} // 报错 不可以多传参数
 
 - `array`
+
+  - 声明语法：`类型[]`，数组中==不能==出现==声明类型之外==的元素
+
+    ```ts
+    let a: string[] // 声明字符串数组
+    // 声明语法2
+    let a: Array<number> // 声明数字类型的数组
+
 
 #### TS特有
 
@@ -142,6 +152,40 @@
     function fn(): never{
         throw new Error('err')
     }
+    ```
+
+- 元组`tuple`
+
+  - ==固定长度==的数组。语法：`[类型, ...]`
+
+    ```ts
+    let a: [string, string]
+    a = ['a', 'b']
+    a = [1, 'v'] // 报错 元素类型不符
+    a = ['a'] // 报错 数组长度不符
+    a = ['a', 'b', 'c'] // 报错 数组长度不符
+    ```
+
+- 枚举`enum`
+
+  - 用变量存储值，用的时候只需要对比变量，和用变量表示类型，编译时会自动转换成对应值
+
+    - 语法：`enum 枚举对象名{ 枚举项 = 对应值, ...}`
+
+    ```ts
+    enum Gender{
+        male = 1,
+        female = 0
+    }
+    let a: {name: string, gender: Gender}
+    a = {
+        name: '柯洁',
+        gender: Gender.male // 直观的表示0、1含义
+    }
+    console.log(a.gender == Gender.male) // 用于判断
+    // 对比联合类型声明方式
+    let a: {name: string, gender: 0|1} // 表示只能取0或1 但是0和1代表的意思不够直观
+
 
 
 #### 联合类型
@@ -161,3 +205,78 @@
   b = a as string;
   // 语法2: <类型>变量
   b = <string>a
+  ```
+
+#### 类型别名
+
+- 对于自定义类型用别名来代替，方便复用
+
+  ```ts
+  type type1 = 1 | 2 | 3 | 4
+  let a: type1
+  ```
+
+## 配置
+
+- 命令行
+
+  - 文件保存修改自动编译：`tsc xxx.ts -w`
+    - `-w`表示`watch`
+  - 根目录下有配置文件，在命令行使用`tsc`指令一键编译目录下所有ts文件
+    - 同样可以`tsc -w`监视所有ts文件变更
+
+- 配置文件`tsconfig.json`
+
+  ```json
+  {
+      // 指定哪些文件需要被编译
+      "include": [
+          // 路径 **表示任意目录 *表示任意文件
+          "./ts/**/*"
+      ],
+      // 指定哪些文件不需要被编译
+      "exclude": [],
+      // 指定从哪个文件下继承配置
+      "extends": "./configs/base",
+      // 指定被编译文件列表 
+      "files": ["xx.ts"],
+      // 编译器选项
+      "compilerOptions": {
+          // 指定ts被编译的版本 默认ES3
+          "target": "es6", // esnext表示最新版本
+          // 指定要使用的模块化规范
+          "module": "es6",
+          // 指定项目中要使用的库 默认在浏览器环境运行不需要设置
+          "lib": ["dom"],
+          // 编译后的文件输出目录
+          "outDir": "./js",
+          // 编译后代码合并为一个文件
+          // 仅支持"module":"amd"或"system"
+          // 合并同名的全局变量会报错
+          "outFile": "./js/main.js",
+          // 是否对JS文件进行编译 默认false
+          "allowJs": false,
+          // 是否对JS文件检查语法规范 默认false
+          "checkJs": false,
+          // 是否移除注释 默认false
+          "removeComments": false,
+          // 不生成编译后的文件 默认false 一般用于检查代码
+          "noEmit": false,
+          // 编译有错误时不生成文件 默认false
+          "noEmitOnError": true,
+          // 严格检查全开或全关
+          "strict": true,
+          // 编译后文件是否使用严格模式 默认false
+          "alwaysStrict": false,
+          // 不允许隐式的any类型 如let a;或(a)=>{} 默认false
+          "noImplicitAny": true,
+          // 不允许不明确类型的this 如(this: Window)=>{return this} 默认false
+          "noImplicitThis": false,
+          // 严格检查空值 默认false
+          // 如获取页面元素有可能是空 用if判断或者obj?.key的形式
+          "strictNullChecks": true,
+      }
+  }
+  ```
+  
+  
