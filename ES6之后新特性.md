@@ -356,7 +356,7 @@
     }
 
 
-## Class
+## Class类
 
 - class是function构造函数的==语法糖==，只是为了结构语法更清晰
 
@@ -376,11 +376,13 @@
           this.name = name
       }
       age(){	// 注意!只能用这种形式 不能用ES5的对象形式
-          console.log(22)
+          // 类中定义的方法可以访问到自身属性
+          console.log(this.name)
       }
       // 不想让实例使用的属性、方法 用static关键字 只有类才能看到、使用这些属性方法
       // 等同 Person2.fn = ()=>{}添加属性方法 其实例对象看不到
       static bbb = 'bbb'
+      static fn(){}
   }
   let zh = new Person2('zh') // 同function构造函数得到的对象一样 但是简化了原型身上添加属性方法
   ```
@@ -417,13 +419,17 @@
         console.log('打电话')
     }
     Phone.prototype.bbb2 = 123
-    class SmartPhone extends fn{ // 必须要用extends关键字
+    // 必须要用extends关键字
+    class SmartPhone extends fn{
+        // 没写constructor时,extends会自动调用父类构造函数并传递赋值
+        // 写了constructor时,必须 写super()调用父类构造函数并传参
         constructor(price,color){
             // super表示父类的constructor 直接传参表示继承使用父类的属性
             super(price) // constructor内才能用super(参数)
             this.color = color
         }
-        // constructor外可以用.父类方法调用 但 不能用super(参数)
+        // 可以在类 方法 中用 super.父类方法 调用 但 不能用super(参数)
+        // super就表示父类 注:父类指继承链上当前类之前所有继承的类
         fn2(){
             super.fn()
         }
@@ -432,7 +438,11 @@
     let t = new SmartPhone('xiaomi','red')
     ```
 
-- 父类方法的==重写==：即在子类上声明跟父类同名的方法
+- 父类方法的==重写==
+
+  - 即在子类上声明跟父类同名的方法。当子类中有方法和父类方法同名，则子类会覆盖父类同名方法
+
+  - 所以子类中一旦写了`constructor()`，其实就是==重写==了父类的构造函数，父类的构造函数丢失，因此**必须**用`super()`调用父类构造函数
 
 - class的==getter==和==setter==
 
@@ -450,6 +460,24 @@
           console.log('设置') // 同样不能在此处写this.aa=newVal 会无限循环
       }
   }
+  ```
+
+- 基类/抽象类
+
+  - 不能被用作创建实例的类，只能用来继承。如`Phone`等
+
+  - 构造函数中用`new.target`可以==指向当前类==，从而避免抽象类创建实例
+
+    ```js
+    class Phone{
+        constructor(params){
+            if (new.target === Phone){
+                throw new Error('Cannot create an instance of an abstract class')
+            }
+            this.name = params
+        }
+    }
+
 
 ## Symbol
 

@@ -898,7 +898,14 @@
 
 - 只要是==函数==，加==（）==就可以执行，哪怕是==变量==形式
 
-- 区分==对象==和==数组==：`xxx.constructor === Array/Object`或者`xxx instanceof Array/Object`或者`Array.isArray(xxx) //true或false`
+- 区分==对象==和==数组==
+
+  - `xxx.constructor === Array/Object`
+
+  - ``xxx instanceof Array/Object`
+
+  - `Array.isArray(xxx) //true或false`
+
 
   Tips：
 

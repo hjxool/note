@@ -278,5 +278,104 @@
       }
   }
   ```
+
+
+## class类
+
+- 与ES6不同点
+
+  - TS在class最外层定义属性，在`constructor(){}`构造函数中赋值。而ES是在`constructor`中定义并赋值
+
+    ```ts
+    class Person{
+        name: string;
+        constructor(a: string){
+            this.name = a
+        }
+    }
+    ```
   
+  - 声明静态属性。ES6中没有类型声明
   
+    ```ts
+    class Person{
+        static name: string;
+    }
+    ```
+  
+  - TS中特有==只读属性==关键字`readonly`。生成对象后只读，不能修改属性
+  
+    ```ts
+    class Person{
+        readonly name: string;
+    }
+    ```
+  
+  - 关键字可以叠加使用
+  
+    ```ts
+    class Person{
+        static readonly name: string;
+    }
+    ```
+  
+  - TS中特有==基类==关键字`abstract`。声明为==抽象类/基类==的类**不能**用来创建对象，专门用来继承
+  
+    - ==抽象类==中**才可以**声明==抽象方法==，即没有内容的函数，执行内容**必须**由派生类决定，派生类**必须**对抽象方法进行==重写==
+  
+      ```ts
+      abstract class Phone{
+          name: string;
+          constructor(name: string){
+              this.name = name;
+          }
+          // 定义抽象方法 用 abstract 关键字
+          abstract callSomeOne(): void;
+      }
+      class SmartPhone extends Phone{
+          color: string;
+         	constructor(name: string, color: string){
+              super(name);
+              this.color = color;
+          }
+          callSomeOne(): void{
+              console.log('重写')
+          }
+      }
+      let p = new Phone('诺基亚') // 报错 基类无法创建实例
+      ```
+  
+  - TS特有==接口==关键字`interface`
+  
+    - 定义一个类的结构，包括有哪些属性和方法
+  
+      ```ts
+      interface customClass{
+          name: string;
+          age: number;
+      }
+      ```
+  
+    - 可以作为类型声明使用。与==类型别名==一样
+  
+      ```ts
+      let obj: customClass = {
+          name: 'xxx',
+          age: 11,
+      }
+      ```
+  
+    - 同名接口可以重复定义，使用时按全部同名接口结构叠加。==类型别名==不能重复定义
+  
+      ```ts
+      interface customClass{
+          key1: unknown;
+          key2: boolean;
+      }
+      // 必须是全部同名接口累加结构 否则会报错
+      let obj: customClass = {
+          name: 'xxx',
+          age: 11,
+          key1: 'asda',
+          key2: false,
+      }
