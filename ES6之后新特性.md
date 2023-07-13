@@ -444,20 +444,21 @@
 
   - 所以子类中一旦写了`constructor()`，其实就是==重写==了父类的构造函数，父类的构造函数丢失，因此**必须**用`super()`调用父类构造函数
 
-- class的==getter==和==setter==
+- ==存取器==，class的==getter==和==setter==
 
   ```js
   class tt{
       // constructor不是必须的 有get和set同样可以读取、设置属性
       constructor(aa){
-          this.aa = aa
+          this._aa = aa // 设置私有属性来中转数据 否则存取器读写同一属性会无限循环
       }
       get aa(){
           console.log('读取')
-          return 'aaa' // 不能写return this.aa 因为会读取aa然后再触发get方法然后无限循环
+          return this._aa
       }
       set aa(newVal){
-          console.log('设置') // 同样不能在此处写this.aa=newVal 会无限循环
+          console.log('设置')
+          this._aa = newVal
       }
   }
   ```

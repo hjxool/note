@@ -294,35 +294,35 @@
         }
     }
     ```
-  
+
   - 声明静态属性。ES6中没有类型声明
-  
+
     ```ts
     class Person{
         static name: string;
     }
     ```
-  
+
   - TS中特有==只读属性==关键字`readonly`。生成对象后只读，不能修改属性
-  
+
     ```ts
     class Person{
         readonly name: string;
     }
     ```
-  
+
   - 关键字可以叠加使用
-  
+
     ```ts
     class Person{
         static readonly name: string;
     }
     ```
-  
+
   - TS中特有==基类==关键字`abstract`。声明为==抽象类/基类==的类**不能**用来创建对象，专门用来继承
-  
+
     - ==抽象类==中**才可以**声明==抽象方法==，即没有内容的函数，执行内容**必须**由派生类决定，派生类**必须**对抽象方法进行==重写==
-  
+
       ```ts
       abstract class Phone{
           name: string;
@@ -344,29 +344,43 @@
       }
       let p = new Phone('诺基亚') // 报错 基类无法创建实例
       ```
-  
+
   - TS特有==接口==关键字`interface`
-  
-    - 定义一个类的结构，包括有哪些属性和方法
-  
+
+    - 定义一个类的==标准结构==，包括有哪些==属性==和==方法==。所有属性、方法都不能有==实际的值==。类似抽象类
+
       ```ts
+      // 接口
       interface customClass{
           name: string;
-          age: number;
+          fn(): void;
+      }
+      // 定义类实现接口 implements关键字
+      // 可以增加自定义属性方法 但必须满足接口属性方法
+      class Person implements customClass{
+          name: string;
+        	age: number;
+        	constructor(a: string, b: number) {
+          	this.name = a
+          	this.age = b
+        	}
+        	fn(): void {
+          	console.log(111)
+        	}
       }
       ```
-  
+
     - 可以作为类型声明使用。与==类型别名==一样
-  
+
       ```ts
       let obj: customClass = {
           name: 'xxx',
           age: 11,
       }
       ```
-  
+
     - 同名接口可以重复定义，使用时按全部同名接口结构叠加。==类型别名==不能重复定义
-  
+
       ```ts
       interface customClass{
           key1: unknown;
@@ -378,4 +392,113 @@
           age: 11,
           key1: 'asda',
           key2: false,
+      }
+      ```
+
+  - TS特有==修饰符==
+
+    - `public`
+
+      - 公共属性，可以在任意位置访问(包括子类)修改，定义属性时的默认值。如`class xx{name: string}`等于`class xx{public name: string}`
+
+    - `private`
+
+      - 私有属性，只能在==当前类内部==进行访问修改。但是可以通过定义方法暴露==属性值==的方式**访问**
+
+        ```ts
+        class Person{
+            private _name: string;
+            private _age: number;
+            constructor(a: string, b: number) {
+                this._name = a;
+                this._age = b;
+            }
+            // ES class关键字get、set存取器
+            get name() {
+                return this._name
+            }
+            set name(value: string) {
+            	this._name = value
+          	}
+        }
+        let a = new Person('aaa', 111)
+        a.name = 'bbb'
+        console.log(a.name)
+        ```
+
+    - `protected`
+
+      - 受保护属性，只能在**当前类**和**子类**==内部==访问修改
+
+        ```ts
+        class A{
+            protected key: string;
+            constructor(a: string) {
+                this.key = a;
+            }
+        }
+        class B extends A{
+            fn() {
+                return this.key; // 子类中可以访问
+            }
+        }
+        let a = new A('a')
+        a.key // 报错 不能访问
+        let b = new B('b')
+        b.key // 报错 同样不能访问
+        ```
+
+  - TS class语法糖
+
+    - 注：使用语法糖`public`不能省略
+
+      ```ts
+      class Person{
+          constructor(public _name: string, private _age: number) {}
+      }
+      // 等价于
+      class Person{
+          private _name: string;
+          private _age: number;
+          constructor(a: string, b: number) {
+              this._name = a;
+              this._age = b;
+          }
+      }
+
+  - TS特有==泛型==
+
+    - 定义==函数==或==类==时，遇到类型不明确的可以使用泛型
+
+      ```ts
+      // <>内xxx就是泛型名称 声明类型也是xxx
+      function fn<xxx>(params: xxx): xxx{
+          return params
+      }
+      fn(10) // 不指定泛型,ts可以自动判断类型
+      fn<string>('text') // 指定泛型类型,传入值类型必须与指定泛型相同
+      ```
+
+    - 可以同时指定多个泛型
+
+      ```ts
+      function fn<aa,bb>(p1: bb, p2: aa): aa{
+          return p1
+      }
+      fn(1, '2') // 同样可以自动判断类型
+      fn<string, number>('1', 2) // 指定多个泛型
+      ```
+
+    - 泛型可以通过继承==类==或==接口==指定范围
+
+      ```ts
+      class A{
+          constructor(public length: number){}
+      }
+      interface A{
+          length: number;
+      }
+      // extends是固定写法,即使实现接口也不能用implements
+      function fn<T extends A>(p: T): number{
+          return p.length;
       }
