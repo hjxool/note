@@ -255,7 +255,7 @@
           // 合并同名的全局变量会报错
           "outFile": "./js/main.js",
           // 是否对JS文件进行编译 默认false
-          "allowJs": false,
+          "allowJs": true,
           // 是否对JS文件检查语法规范 默认false
           "checkJs": false,
           // 是否移除注释 默认false
@@ -278,6 +278,12 @@
       }
   }
   ```
+
+- 配置文件遇到的问题
+
+  - webpack打包时，入口是ts文件，却提示没有找到输入，且`tsconfig.json`文件报错
+    - 原因：没有配置`"allowJs": true`
+
 
 
 ## class类

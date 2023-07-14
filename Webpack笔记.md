@@ -1,11 +1,18 @@
 ## 基本使用
 
 - ==静态资源==打包工具
+
+- 想要打包资源，**必须**引入该资源
+
 - Webpack本身功能只有：编译及压缩JS中的`ES Module`语法
+
 - 以一个或多个文件作为打包入口，将项目所有文件编译==合成==一个或多个文件输出
+
 - 浏览器不能识别ES6模块化语法，除非`<script type="module" src="./main.js">`，为了能够更方便的使用`<script src="./main.js">`，就需要Webpack打包工具
+
 - 安装：`npm i webpack webpack-cli -D`
   - 因为项目上线后不需要开发阶段的工具包，只需要项目能够正常运行的依赖包即可
+
 - 打包：`npx webpack ./main.js --mode=development(开发)或production(生产)`
   - 开发环境
     - **仅**会对`import`、`export`进行编译
@@ -13,6 +20,7 @@
     - 除了对ES6模块化语法进行编译，还会对ES6箭头函数等方法进行编译，将整体代码进行==压缩==
   - 基本功能下只能处理`js`资源
   - 有了`webpack.config.js`配置文件后，在`webpack.config.js`所在层级使用命令行`npx webpack`运行即可
+
 - 有了配置文件后
   - 打包：`npx webpack`
   - 开发时不打包只在内存中编译：`npx webpack serve`
@@ -22,6 +30,30 @@
 
 - 在`package.json`文件中，配置项`scripts`下像`dev`等运行指令`webpack --config ./webpack.dev.js`不需要`npx`，因为这里`webpack `等指令都是全局的
   - 可以理解为`scripts`下的配置`'xxx': 'webpack'`，在命令行运行`npm run xxx`等同于`npx webpack`
+
+- 如果用`loader`就可以把`options`写同级
+
+  ```js
+  module: {
+      rules: [
+        {
+          loader: 'xxx-loader'，
+  　　　　　options: {...}
+        },
+        // 如果用use options就只能写到use里
+        {
+            use: [{
+                loader: 'xxx-loader',
+                options: {...}
+            }, 'xxx2-loader']
+        }
+      ]  
+  }
+  ```
+
+- (不确定)入口`entry`路径不能是`../`开头，可以用`path.resolve(__dirname, '../src/xxx.js')`
+
+- `[name]`是以entry属性名命名所有带`[name]`的文件
 
 
 ## 配置
@@ -122,6 +154,101 @@
       }
   }
 
+## 开发/生产配置文件
+
+- 生产和开发流程略有不同，如开发打包时不需要生成文件来减少打包速度
+
+- 开发模式
+
+  - 配置文件`xx\configs\webpack.dev.js`
+
+    ```js
+    // 引入插件相同 略过
+    module.exports = {
+    	mode: 'development',
+    	entry: path.resolve(__dirname, '../src/main.ts'),
+    	// output不能少
+    	output: {
+    		path: undefined, // 没有路径 因为是在内存编译
+    		filename: 'js/[name].js', // 文件名还是需要指定
+    	},
+    	// 其他配置相同
+        devtool: 'cheap-module-source-map',
+        devServer: {
+            host: 'localhost', // 启动服务器域名
+            port: '30', // 启动服务器端口号
+            open: true, // 是否自动打开浏览器
+        }
+    };
+    ```
+
+  - 修改配置文件`根目录\package.json`
+
+    ```json
+    {
+        "scripts": {
+    		"server": "webpack serve --config ./xx/configs/webpack.dev.js",
+            ...
+    	},
+    }
+
+- 生产模式
+
+  - 配置文件`xx\configs\webpack.pro.js`
+
+    ```js
+    const path = require('path');
+    const css = require('mini-css-extract-plugin');
+    const html = require('html-webpack-plugin');
+    
+    module.exports = {
+    	mode: 'production',
+    	entry: path.resolve(__dirname, '../src/main.ts'), //入口是ts
+    	output: {
+    		path: path.resolve(__dirname, '../bundle'),
+    		filename: 'js/[name].js', //生成浏览器可识别的js文件
+    		clean: true,
+    	},
+    	module: {
+    		rules: [
+    			{
+    				oneOf: [
+    					{
+    						test: /\.css$/,
+    						use: [css.loader, 'css-loader'],
+    						include: path.resolve(__dirname, '../src'),
+    					},
+    					{
+    						test: /\.ts$/,
+    						use: ['ts-loader'],
+    						include: path.resolve(__dirname, '../src'),
+    					},
+    				],
+    			},
+    		],
+    	},
+    	plugins: [
+    		new css({
+    			filename: 'css/index.css',
+    		}),
+    		new html({
+    			template: path.resolve(__dirname, '../src/index.html'),
+    			filename: 'html/index.html',
+    		}),
+    	],
+    	devtool: 'source-map',
+    };
+
+  - 修改配置文件`根目录\package.json`
+
+    ```json
+    {
+        "scripts": {
+    		"build": "webpack --config ./xx/configs/webpack.pro.js",
+            ...
+    	},
+    }
+
 ## 动态插入样式
 
 - 不要使用`loader: 'css-loader'`，因为`loader`配置项只能使用一个加载器
@@ -131,8 +258,6 @@
   - 安装依赖：`npm i css-loader style-loader -D`
 
     - `style-loader`会动态创建`<style>`标签
-
-  - 想要打包资源，必须引入该资源
 
     ```js
     module.exports = {
@@ -149,7 +274,7 @@
     		],
     	},
     }
-
+  
 - `.less`文件
 
   - 安装依赖：`npm i less-loader -D`
@@ -448,7 +573,7 @@
     }
     ```
 
-## 自动化打包
+## 自动打包(开发服务器)
 
 - 使用
 
@@ -715,7 +840,7 @@
           path: path.resolve(__dirname, 'bundle'),
           // 因为入口有多个，会输出多个文件，如果 filename:main.js 
           // 会生成多个main.js，导致发生覆盖最终只有一个main.js
-          filename: '[name].js',// webpack命名方式，以entry属性名命名输出文件
+          filename: '[name].js',// webpack命名方式，以entry属性名命名所有[name]的文件
       },
       pligins: [
           new html_plugin({
@@ -842,7 +967,13 @@
                     oneOf:[
                         {
                             test: /\.ts$/,
-                            use: ['ts-loader'],
+                            use: [{
+                                loader: 'ts-loader',
+                                options:{
+                                    // 必须要指定tsconfig.json文件路径
+                                    configFile: path.resolve(...)
+                                },
+                            }],
                             exclude: /node_modules/,
                         }
                     ]

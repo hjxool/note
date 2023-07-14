@@ -13,6 +13,10 @@
   - 但是这样就无法使用`require(path)`方法，会报错
   - 并且没有`__dirname`全局变量了，需要根据控制台==当前==目录，使用`import.meta.url`作为替代
 
+- 配置文件`package.json`中的`"scripts"`配置的运行指令是以`package.json`文件为**根目录**！
+
+  - 所以如果是多项目共用`package.json`，运行指令的==路径==一定是`./项目/文件夹/文件`的形式
+
 - > 流程
   >
   > <center>express开启服务、设置路由规则。决定如何返回静/动态资源、如何处理请求</center>
@@ -186,6 +190,7 @@
   path.resolve(__dirname,'./index.js') => D:\node\index.js
   path.resolve(__dirname,'index.js','index2.js') => D:\node\index.js\index2.js
   path.resolve(__dirname,'/index.js') => D:\index.js 注意此处是从根目录开始
+  path.resolve(__dirname, '../xxx/index.js') => D:\xxx\index.js 返回上一级下的xxx目录
   ```
 
 - ==地址拼接==
@@ -1749,4 +1754,3 @@ function middleware(req,res,next){
       client.fn1({ name: '张三', age: 22, sex: '男', flag: true }, (err, res) => {
       	console.log(res);
       });
-  

@@ -181,13 +181,22 @@
 ## reactive
 
 - 加工==对象类型==的数据，使用==reactive函数==，加工成==proxy对象==
-  - 使用方法：
 
-    - 使用前`import {reactive} from 'vaue'`
+- reactive**不能**处理==基础数据类型==
 
-    - `let obj = reactive({ xxx:'李白'，age：18 })`
+- 使用方法：
 
-    - reactive**不能**处理==基础数据类型==
+  ```js
+  import {reactive, createApp} from 'vue'
+  createApp({
+      setup(){
+          let obj = reactive({ xxx:'李白'，age：18 })
+          return {obj}
+      }
+  }).mount('#app')
+  ```
+
+- 用==扩展运算符==展开`reactive`加工的对象，其属性不再具有==响应式==！
 
 
 ## toRef/toRefs
@@ -198,9 +207,14 @@
   - 只能处理单个
   - 当需要暴露一个对象中个别属性时可用
 
-- `toRefs(对象)`
+- `toRefs(对象)`(重要)
   - 返回值是==对象==`{key1:..., key2:...}`
-  - 在`setup()`返回值中`return {...toRefs(对象)}`，在HTML模板中用`{{对象中第一层的基础类型数据}}`，直接取用，而不需要`object.key`这样来使用，但是里层的属性依然需要`{{key1.key2...}}`
+  - 在`setup()`返回值中`return {...toRefs(对象)}`，在HTML模板中用`{{对象中第一层的基础类型数据}}`，直接取用，而不需要`object.key`这样来使用，但是里层的属性依然需要`{{ key1.key2... }}`
+
+- `toRefs`与`reactive`区别
+  - `reactive`加工的对象使用==扩展运算符==展开后不具有响应式
+  - `toRefs`专门批量生产响应式变量，加工后的对象展开后，属性依然具有响应式
+
 
 
 ## computed计算属性
