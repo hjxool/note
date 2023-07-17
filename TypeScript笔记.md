@@ -275,6 +275,10 @@
           // 严格检查空值 默认false
           // 如获取页面元素有可能是空 用if判断或者obj?.key的形式
           "strictNullChecks": true,
+          // 指定TS如何从 import xx from 模块 中查找文件 默认classic
+          // 默认根据相对路径从js文件中找模块 像"npm i vue" "import xx from 'vue'"就无法解析
+          // 所以最好设置为Node
+          "moduleResolution": "Node"
       }
   }
   ```
