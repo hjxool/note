@@ -4,6 +4,7 @@
 2. 安装TS工具：`npm i -g typescript`
 3. 创建`.ts`文件
 4. 使用`tsc xxx.ts`对TS文件进行编译，输出JS文件
+   - 编译==单个文件==的指令，**都**==不会应用==`tsconfig.json`中的配置
 
 ## 基本类型
 
@@ -67,6 +68,21 @@
     // 其他属性，属性名类型为string，值类型未知
     // 可以添加满足条件的任意属性
     let a: {name: string, [key: string]: unknown}
+    ```
+
+  - 类存取器声明的属性符合`object`结构类型。即只有`public`、`get xx`声明的属性才能用作`object`结构类型
+
+    ```ts
+    class A {
+      // 声明类型并赋初值
+      private _a: string = 'asd'
+      get aa() {
+        return this._a
+      }
+    }
+    let t: { _a: string } = new A()// 报错 实例不符合{_a:string}结构类型
+    let t: { aaa: string } = new A()// 报错 实例不符合{aaa:string}结构类型
+    let t: { aa: string } = new A()// 正确 实例符合{aa:string}结构类型
 
 - `function`
 
@@ -186,7 +202,8 @@
     // 对比联合类型声明方式
     let a: {name: string, gender: 0|1} // 表示只能取0或1 但是0和1代表的意思不够直观
 
-
+- HTML元素`HTMLElement`
+  - 值类型为HTML元素
 
 #### 联合类型
 
@@ -287,8 +304,6 @@
 
   - webpack打包时，入口是ts文件，却提示没有找到输入，且`tsconfig.json`文件报错
     - 原因：没有配置`"allowJs": true`
-
-
 
 ## class类
 

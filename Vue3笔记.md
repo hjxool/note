@@ -2,7 +2,7 @@
 
 - vue3中`<template>`下不再需要==根元素==
 
-- vue3中不再需要data、methods等函数，而是在一个全新的`setup(){}`函数中像传统js语句那样去声明；
+- vue3中data、methods配置项，可以声明在`setup(){}`函数中
   - `setup(){}`必须有==返回值==，可以写成两种形式，==对象形式==、==渲染函数==
     - 对象形式：`return { name，function }`。对象形式中包含的属性和方法均可直接使用，比如`{{name}}`、`@click="function"`
     - 渲染函数：`return () => {return h('元素', 内容)}`，想要使用还需要`import {h} from 'vue'`
@@ -43,8 +43,6 @@
       let n = ref(123)
       fn(){...}
   </script>
-
-
 
 ## 组件
 
@@ -317,3 +315,28 @@
       	<h3>加载中。。。</h3>
       </template>
   </Suspense>
+
+## 生命周期
+
+- ```ts
+  <script>
+  import { ref } from 'vue'
+  
+  export default {
+    setup() {
+      const count = ref(0)
+      // 返回值会暴露给模板和其他的选项式 API 钩子
+      return {
+        count
+      }
+    },
+  
+    mounted() {
+      console.log(this.count) // 0
+    }
+  }
+  </script>
+  
+  <template>
+    <button @click="count++">{{ count }}</button>
+  </template>
