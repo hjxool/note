@@ -589,6 +589,9 @@
 
 - 在一个**js文件**中想==暴露==和==引入===一些方法和属性，有几种对应形式：
 
+  - 注！`default`暴露时，`import xx from path`会帮你把default层里面的值取出来，但用解构赋值`import {key} from path`的方式去取默认暴露的值是不行的
+
+
   ```js
   1、通常形式 分别暴露 和 集中暴露
   export let t = 111			 let t = 111
@@ -603,8 +606,8 @@
       fn(){default对象内可以取到父级作用域的变量}
   }
   import 别名 from 'path'
-  import * as 别名 from 'path'	注意！这种方式导入的模块会多一层default，即 别名.default.t
-  import {default as 别名} from 'path'	default不能直接使用必须用别名
+  import * as 别名 from 'path'// 注！这种方式导入的模块会多一层default，即 别名.default.t
+  import {default as 别名} from 'path'// default不能直接使用必须用别名
   ```
 
 - ==动态引入==：

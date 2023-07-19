@@ -320,6 +320,37 @@
     }
     ```
 
+  - TS在class外层定义属性时，可以用**变量声明方式**设置初始值，然后根据值类型自动进行类型限制
+
+    ```ts
+    class A{
+        aaa = 'aaa'
+        bbb = 222
+    }
+    let a = new A()// 实例属性等于初始值
+    ```
+
+  - JS中class可以在==构造函数==中给参数设默认值，但TS不行
+
+    ```ts
+    // JS中可以
+    class A {
+      constructor(a = 10) {
+        this.a = a
+      }
+    }
+    let a = new A()
+    // TS中不行
+    class A {
+      // 或是 constructor(a = 10)也不行
+      constructor(a: number = 10) {
+        this.a = a
+      }
+    }
+    let a = new A()
+    // TS中普通函数可以设置默认值
+    function fn(a: string = 'aaa'){return a}
+
   - 声明静态属性。ES6中没有类型声明
 
     ```ts
@@ -527,3 +558,44 @@
       function fn<T extends A>(p: T): number{
           return p.length;
       }
+
+- 存取器`set`不能声明返回值类型
+
+  ```ts
+  class A{
+      // 报错 set不能声明返回值类型
+      set key(val: number): void{...}
+  }
+
+- 类可以当作类型声明
+
+  ```ts
+  class A{
+      xxx: string
+  }
+  let a: A = {xxx:'asd'}
+  ```
+
+  - 但是有`private`等属性时==不能用==这种方式
+
+    ```ts
+    class A{
+        protected xxx: string
+        private xxx2: string
+    }
+    // 不写属性会报错缺少类中声明的属性 写了会报错私有属性不能在类外使用
+    // 所以有私有、被保护属性时，写不写都有问题
+    let a: A = {
+        xxx: 'aaa',
+        xxx2: 'bbb'
+    }
+    ```
+
+  - 静态属性`static`可以用这种方式
+
+    ```ts
+    class A {
+        static xxx: string = 'sss'
+        xxx2: string
+    }
+    let a: A = {xxx2: 'qqq'}

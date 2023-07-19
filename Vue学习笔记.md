@@ -507,6 +507,11 @@ methods中方法互相调用：通过this.$options.methods.方法名查找method
 
   - `Vue.use(xxx)`即可
 
+- Tips
+
+  - 注册使用组件`components:{xxx:component1}`的位置**必须**在==组件声明之后==！
+
+
 ## 插槽
 
 - 组件**不接收HTML**页面上的值，除非在`<template>`中使用`<slot>`标签（除了class，写在标签上是可以识别的）

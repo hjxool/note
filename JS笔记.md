@@ -1389,7 +1389,10 @@ offsetTop/Left是相对父级（注：滚动显示容器里，里面的每一个
 
   - 仅能找到符合条件的==第一个==元素
   - 同样可以用于某一元素下去搜索子、孙元素
-  - [querySelectorAll]()：查找==所有==符合条件的元素。返回的==始终==是一个==数组==
+  - [querySelectorAll]()：查找==所有==符合条件的元素
+    - 返回的==始终==是一个==数组==
+    - `querySelectorAll`其实不如`getElementsByClassName`等方法好用，因为`querySelectorAll`返回的是==固定长度==数组，而`getElementsByTagName`等返回的数组会随着==DOM节点数量改变而改变==
+    - `querySelectorAll`节点属性会动态改变，只是返回的数组长度不变
 
 - [createElement]()：创建完元素以后==并不能==查找到节点，因为还在内存中，并没有放入页面，得[appendChild]()放入页面后才能查到
 
