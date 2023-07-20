@@ -411,6 +411,8 @@
 
   - Class继承
 
+    - `static`静态属性不会继承到后代类中
+    
     ```js
     function Phone(price){
         this.price = price
@@ -437,6 +439,7 @@
     // 子类身上就有父类的属性方法了 并且！不用重新定向原型和constructor
     let t = new SmartPhone('xiaomi','red')
     ```
+    
 
 - 父类方法的==重写==
 
