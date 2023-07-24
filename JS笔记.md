@@ -1193,17 +1193,23 @@ offsetTop/Left是相对父级（注：滚动显示容器里，里面的每一个
 - [object.defineProperty(对象名，'键'，{ 配置项 })]()
 
   - ```js
-    let obj = {}
-    let name = ''
-    Object.defineProperty(obj,'key',{
-        get(){
-            return name
-        },
-        set(value){
-            obj['key'] = value 注意 这里不是修改代理的值 所有的修改/读取操作均发生在原始数据身上 
-            				    代理对象本身只是一个空壳 映射 到原始对象
-        }
-    })
+    let source = {
+        name: 'xxx',
+        age: 18
+    }
+    let proxy = {}
+    for(let key in source){
+        Object.defineProperty(proxy, key, {
+            get(){
+                // 代理对象本身只是一个空壳 映射 到原始对象
+                return source[key]
+            },
+            set(value){
+                // 所有修改/读取操作均发生在原始数据身上
+                source[key] = value
+            }
+        })
+    }
 
 ![img](https://upload-images.jianshu.io/upload_images/6322775-b5e3b3b6e236d059.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
 
@@ -1597,3 +1603,12 @@ offsetTop/Left是相对父级（注：滚动显示容器里，里面的每一个
 - 需要注意的地方
   - 将真实DOM树中的节点添加到虚拟DOM中，真实DOM中的节点会==消失==
   - 将==虚拟==DOM添加到真实DOM树中后，会留下一个==空的==`DocumentFragment`
+
+## 事件流
+
+1. 捕获
+   - 从外向内，找到最内层子元素事件
+   - 捕获过程中遇到的事件都==不会触发==
+2. 执行目标元素身上的事件
+3. 冒泡
+   - 从内向外，依次触发父级元素身上的事件
