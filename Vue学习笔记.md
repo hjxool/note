@@ -640,8 +640,6 @@ Tips：
 
 - 在多层for循环中 使用$nextTick会在所有层级的for循环执行完在调用，因此无法一次循环执行完渲染一些节点
 
-------
-
 ### 原型链：
 
 ![img](https://upload-images.jianshu.io/upload_images/6322775-eb2867b76670dcda.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
@@ -649,8 +647,6 @@ Tips：
 ```
 构造函数`和`实例对象`在原型上的上一级都是`**原型对象**`，而原型对象的上一级则是`object原型对象`，**但是**vue特别的将组件原型指向改变为`**vue原型对象**
 ```
-
-------
 
 ### Vue动画：
 
