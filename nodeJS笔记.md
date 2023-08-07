@@ -254,6 +254,54 @@ server.listen(端口号,()=>{ 回调函数在 服务启动成功 后被调用
 
   - ==80==是==http 协议==默认端口号，==https 协议==默认端口号是==443==，默认端口号不会在地址栏显示
 
+- 发送==请求==调用其他接口
+
+  ```js
+  const http = require('http')
+  // 或者https 与http方式相同
+  const https = require('https')
+  const options = {
+      host: 'www.example.com',
+      port: 80,
+      path: '/api/getdata',
+      method: 'GET',
+      headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer xxx'
+      }
+  }
+  const req = http.request(options, res => {
+      console.log('响应结果')
+      res.on('data', chunk => {})
+      res.on('end', () => {})
+  })
+  req.on('error', err => {
+      console.log('请求遇到问题')
+  })
+  // 发送post请求时 设置请求体
+  req.write('{name:'xx', password:'111'}')
+  req.end() // 发送请求
+  ```
+
+## 发送请求调用其他接口
+
+- 有的服务、接口之间互相有数据关联，这就需要发送http请求从其他接口获取数据
+
+- 使用
+
+  - 安装：`npm i axios`
+
+  - 引入
+
+    ```js
+    const axios = require('axios')
+    // 使用方式详见网络请求笔记
+    axios({
+    	method:'post',
+    	url:'',
+        data:{}
+    }).then(res=>{})
+
 ## url 模块(旧版)
 
 - 用于解析地址栏 url，一般用于提取、解析==query==参数
