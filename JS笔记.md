@@ -1613,3 +1613,25 @@ offsetTop/Left是相对父级（注：滚动显示容器里，里面的每一个
 2. 执行目标元素身上的事件
 3. 冒泡
    - 从内向外，依次触发父级元素身上的事件
+
+## try catch finally
+
+- ```js
+  try{
+      // 操作流程
+  }catch(err){
+      // 操作流程中抛出异常时进入catch
+  }finally{
+      // try正常执行完后执行
+      // catch异常处理完后依然会执行
+      // catch中处理异常时抛出异常会先进入finally 然后再抛出catch中操作异常
+      // try中有return后执行
+  }
+
+- 总结
+  - 无return且未出现异常`try-->finally`
+  - 出现异常`try-->catch-->finally`
+  - try或catch中有`return`
+    - 返回值为==基本类型==，finally执行完不会改变返回值
+    - 返回值为==对象==，finally执行完会改变返回值
+    - finally中有`return`会改变try、catch的返回值

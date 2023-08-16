@@ -1065,6 +1065,42 @@ function middleware(req,res,next){
     - 删除文档：`db.集合名.remove(查询条件)`
       - 当有多个查询结果符合条件，一起删除
 
+- 事务
+
+  - 操作要么全部成功，要么全部失败。例如转账，银行从A扣钱，B加钱，有一环异常都会回滚操作
+  
+  - 基本操作
+  
+    - 开始事务：调用`startTransaction()`开启一个事务
+  
+    - 执行操作：事务中需要执行的操作，例如插入、删除文档
+  
+    - 提交事务：调用`commitTransaction()`提交事务，这会将执行操作持久化到磁盘(数据库)
+  
+    - 回滚事务：如果事务执行失败，调用`abortTransaction()`来回滚操作
+  
+  - 示例
+  
+    ```js
+    const client = await MongoClient.connect(url, {useNewUrlParser: true})
+    // 创建事务示例
+    const session = client.startSession()
+    
+    try{
+        session.startTransaction()
+        // 执行操作 中间有一步出错直接抛出异常
+        await 修改文档
+        await 更新文档
+        
+        await session.commitTransaction()
+    }catch(err){
+        // 捕获异常后回滚操作
+        await session.nabortTransaction()
+    }finally{
+        // 全部操作执行完毕并提交事务后 释放内存
+        session.endSession()
+    }
+  
 - Tips
 
   - 与`MySQL`的区别
