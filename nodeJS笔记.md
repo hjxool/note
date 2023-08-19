@@ -1337,6 +1337,11 @@ function middleware(req,res,next){
 
   - 日期：`Date`
 
+    - 存储在数据库中是以==时间戳==的形式，毫秒为单位。但是在可视化工具上看是`Thu Aug 17 2023 20:08:45 GMT+0800 (中国标准时间)`形式
+
+      ```js
+      mongooseModel.create({time:new Date()})
+
   - Buffer 对象：`Buffer`
 
   - 任意类型：`mongoose.Schema.Types.Mixed`
