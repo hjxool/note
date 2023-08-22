@@ -1139,10 +1139,10 @@ function middleware(req,res,next){
 
   ```js
   const mongoose = require("mongoose");
-
+  
   // 连接Mongodb服务中指定数据库
   mongoose.connect("mongodb://127.0.0.1:27017/customdb");
-
+  
   mongoose.connection.once("open", () => {
   	// 首先创建文档结构对象 其实就是定义数据类型
   	let dataType = new mongoose.Schema({
@@ -1150,11 +1150,11 @@ function middleware(req,res,next){
   		price: String,
   		num: Number,
   	});
-
+  
   	// 然后创建对象模型 其实就是所连接数据库下指定要操作哪个集合，并限制文档字段数据类型
   	// ※没有对应集合则会新建
   	let obj = mongoose.model("集合名", dataType);
-
+  
   	// ※注意Mongoose@6.0以后的版本不支持create中传入回调函数 而是返回一个Promise对象
   	obj
   		.create({
@@ -1170,6 +1170,10 @@ function middleware(req,res,next){
   				console.log("创建失败" + err);
   			}
   		);
+      
+      obj.create({
+          name: '可以只传入部分字段，创建出来的文档就只有name'
+      }).then(data => {}, err => {})
   });
   mongoose.connection.on("error", () => {
   	console.log("连接失败");
@@ -1236,6 +1240,11 @@ function middleware(req,res,next){
       })
   })
   ```
+
+  - 文档中有数组的情况，使用`$push`、`$shift`等操作
+
+    ```js
+    obj.updateOne({name:'test'}, {$push: {list: 'value'}}).then(...)
 
 - ==读取==文档
 
@@ -1335,6 +1344,40 @@ function middleware(req,res,next){
 
   - 数组：`Array`，也可以用`[]`
 
+    ```js
+    const mongoose = require('mongoose');
+    let datatype = new mongoose.Schema({
+        // 普通数组
+        list: [Number]
+    });
+    // 对象数组
+    let child = new mongoose.Schema({
+        // 定义对象内字段
+        name: String,
+        age: Number
+    });
+    let parent = new mongoose.Schema({
+        // 可以多个类型嵌套使用
+        list: [child]
+    });
+    ```
+
+  - 对象：`Object`，也可以用`{}`
+
+    ```js
+    const mongoose = require('mongoose');
+    let datatype = new mongoose.Schema({
+        // 多层级对象
+        obj: {
+            name: String,
+            member: {
+                father: String,
+                mother: String
+            },
+            hobby: [String]
+        }
+    })
+
   - 日期：`Date`
 
     - 存储在数据库中是以==时间戳==的形式，毫秒为单位。但是在可视化工具上看是`Thu Aug 17 2023 20:08:45 GMT+0800 (中国标准时间)`形式
@@ -1397,6 +1440,20 @@ function middleware(req,res,next){
 
 - Tips
   - mongoose 除了`_id`字段会自动往文档里添加`id`字段
+  - 可以用==点表示法==表示嵌套字段
+  
+    - 但是更新文档时不能用这种方式，会更新无效
+  
+    ```js
+    mg.connection.once("open", () => {
+    	let datatype = new mg.Schema({
+    		name: String,
+    		price: String,
+    		num: Number,
+    	});
+    	let obj = mg.model("test2", datatype);
+    	obj.find({'cusKey1.cusKey2': {$gt:10}}).then((data) => {});
+    });
 
 ## 接口
 
