@@ -1174,6 +1174,12 @@ function middleware(req,res,next){
       obj.create({
           name: '可以只传入部分字段，创建出来的文档就只有name'
       }).then(data => {}, err => {})
+      // 批量创建
+      let users = [
+          {name: 'xxx', age: 10},
+          {name: 'xxx2', age: 30},
+      ]
+      obj.create(users).then()
   });
   mongoose.connection.on("error", () => {
   	console.log("连接失败");
@@ -1182,6 +1188,17 @@ function middleware(req,res,next){
   	console.log("连接关闭");
   });
   ```
+
+  - 也可以通过`save()`创建==单个==文档
+
+    ```js
+    // 可以使用mongoose.model实例对象创建文档对象
+    let doc = new obj({
+        name: "菠萝",
+        price: "30",
+        num: 2,
+    })
+    await doc.save()
 
 - ==删除==文档
 
@@ -1217,6 +1234,9 @@ function middleware(req,res,next){
 
 - ==更新==文档
 
+  - 更新文档的语法是`model.update(查询条件, {操作符: {key: newValue}})`，如果没写操作符，一律当`$set`设置值
+
+
   ```js
   mongoose.connection.once('open',()=>{
       let dataType = new mongoose.Schema({
@@ -1241,10 +1261,50 @@ function middleware(req,res,next){
   })
   ```
 
-  - 文档中有数组的情况，使用`$push`、`$shift`等操作
+  - 更新文档中==数组==字段，使用`$push`等操作符
 
     ```js
-    obj.updateOne({name:'test'}, {$push: {list: 'value'}}).then(...)
+    // 数组末尾添加单个元素
+    obj.updateOne({name:'test'}, {$push: {list: newElement}})
+    // 数组末尾添加多个元素
+    obj.updateOne({name:'test'}, {$push: {list: {$each: [newElement1, ...]}}})
+    // 数组任意位置前插入元素 下例表示往数组中第2个位置前插入一个或多个元素
+    obj.updateOne({name:'test'}, {$push: {list: {$each: [newElement], $position: 1}}})
+    // 删除数组中指定值的元素
+    obj.updateOne({name:'test'}, {$pull: {list: elementValue}})
+    // 删除数组头部元素
+    obj.updateOne({name:'test'}, {$pop: {list: -1}})
+    // 删除数组末尾元素
+    obj.updateOne({name:'test'}, {$pop: {list: 1}})
+    // 删除指定索引的元素 下例表示删除数组第4个元素 1表示删除 0保留
+    obj.updateOne({name:'test'}, {$unset: {'list.3': 1}})
+    ```
+
+  - 更新文档中==对象==字段
+
+    ```js
+    // 更新对应字段值
+    obj.updateOne({name:'test'}, {$set: {'obj1.obj2': newValue}})
+    // 替换整个对象
+    obj.updateOne({name:'test'}, {obj1: newObject})
+    ```
+
+  - (推荐)[save()更新文档](https://juejin.cn/post/6844904008490942477)
+
+    - 优点是非常自由，功能全，无需记忆操作符
+
+    ```js
+    obj.find({name:'test'}).then(async (data) => {
+        // 注:find查询结果是数组
+        data[0].key = newValue
+        // save()新版是Promise风格
+        // save()只能操作 单个 文档
+        await data[0].save()
+    })
+    // save是文档身上的方法 所以不能对多个文档查询结果使用
+    let doc = await obj.findOne({name:'test'})
+    doc.key = newValue
+    await doc.save()
 
 - ==读取==文档
 
@@ -1360,6 +1420,10 @@ function middleware(req,res,next){
         // 可以多个类型嵌套使用
         list: [child]
     });
+    // 定义形式很自由 不需要刻板的使用类型对象嵌套
+    let datatype = new mongoose.Schema({
+        list: [{name: String, age: Number}]
+    });
     ```
 
   - 对象：`Object`，也可以用`{}`
@@ -1441,9 +1505,9 @@ function middleware(req,res,next){
 - Tips
   - mongoose 除了`_id`字段会自动往文档里添加`id`字段
   - 可以用==点表示法==表示嵌套字段
-  
+
     - 但是更新文档时不能用这种方式，会更新无效
-  
+
     ```js
     mg.connection.once("open", () => {
     	let datatype = new mg.Schema({
