@@ -1236,7 +1236,6 @@ function middleware(req,res,next){
 
   - 更新文档的语法是`model.update(查询条件, {操作符: {key: newValue}})`，如果没写操作符，一律当`$set`设置值
 
-
   ```js
   mongoose.connection.once('open',()=>{
       let dataType = new mongoose.Schema({
@@ -1259,7 +1258,6 @@ function middleware(req,res,next){
           console.log('更新失败' + err)
       })
   })
-  ```
 
   - 更新文档中==数组==字段，使用`$push`等操作符
 
