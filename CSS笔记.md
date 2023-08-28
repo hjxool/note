@@ -424,3 +424,9 @@ text-overflow：必须搭配overflow：hidden（溢出内容隐藏）和white-sp
     -  用括号圈起来
     -  不要用==逗号==，表示==或==的关系。用==and==，表示==与==
        -  `@medai screen and (min-width:500px) and (max-width:1200px)`
+
+## 引入外部样式表
+
+- 语法
+  - `@import 'path.css'`
+  - `@import url('path.css')`
