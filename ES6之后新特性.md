@@ -807,7 +807,7 @@
     let { bbb, ...new_obj } = obj
     console.log(new_obj) 输出{ name:'xxx', age:23, aaa:111 }
 
-- 对于函数中默认参数·**function (params...)**·，也可以使用解构赋值。使用方式·**function ( {解构参数} )**·，甚至还可以·**function (解构参数：{ parms1,parms2 })**·
+- 对于函数中默认参数`function (params...)`，也可以使用解构赋值。使用方式`function ( {解构参数} )`，甚至还可以`function (解构参数：{ parms1,parms2 })`
 - 因为实参传递到形参时，就隐性进行了一次`let 形参 = 实参`操作，所以在==函数定义处==就可以使用==解构赋值==，`function ({ a, b }或[ a, b ])`
 
 ## 函数参数的默认值
