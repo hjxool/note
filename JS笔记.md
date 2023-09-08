@@ -1026,21 +1026,20 @@
 
 ## Math对象方法
 
-- [Math.floor]()：向下取整(floor意为地板)
+- `Math.floor(num)`：向下取整(floor意为地板)
 
-- [Math.ceil]()：向上取整(ceil意为天花板)
+- `Math.ceil(num)`：向上取整(ceil意为天花板)
 
-- [Math.round]()：四舍五入。等同于Math.floor(x+0.5)，因为能四舍五入进一位的数加上0.5一定可以进一位
+- `Math.round(num)`：四舍五入。等同于Math.floor(x+0.5)，因为能四舍五入进一位的数加上0.5一定可以进一位
 
-- ※[Math.random()]()：生成==**包括**0~**不包括**1==的随机数
-
-  Tips：
+- ※`Math.random()`：生成==**包括**0~**不包括**1==的随机数
 
   - 生成==X~Y==的随机数：`Math.round( Math.random() * ( Y - X ) + X )`（思路是：0~1乘一个数扩大范围，再加一个数确保最小值，但是要保证不超限，所以乘的数等于差值）
 
-- [Math.pow(底数，指数)]()：求幂运算
-- [Math.sqrt]()：开方运算
-- [Math.max/min(a，b，c，...)]()：返回最大/最小值
+- `Math.pow(底数，指数)`：求幂运算
+- `Math.sqrt(num)`：开方运算
+- `Math.max/min(a，b，c，...)`：返回最大/最小值
+- `Math.abs(num)`：绝对值。传入一个数字
 
 ## 定时器
 
