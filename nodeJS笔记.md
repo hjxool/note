@@ -1095,7 +1095,7 @@ function middleware(req,res,next){
         await session.commitTransaction()
     }catch(err){
         // 捕获异常后回滚操作
-        await session.nabortTransaction()
+        await session.abortTransaction()
     }finally{
         // 全部操作执行完毕并提交事务后 释放内存
         session.endSession()
@@ -1276,7 +1276,7 @@ function middleware(req,res,next){
     obj.updateOne({name:'test'}, {$pop: {list: 1}})
     // 删除指定索引的元素 下例表示删除数组第4个元素 1表示删除 0保留
     obj.updateOne({name:'test'}, {$unset: {'list.3': 1}})
-    ```
+  ```
 
   - 更新文档中==对象==字段
 

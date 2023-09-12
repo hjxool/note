@@ -382,7 +382,10 @@
       // 不想让实例使用的属性、方法 用static关键字 只有类才能看到、使用这些属性方法
       // 等同 Person2.fn = ()=>{}添加属性方法 其实例对象看不到
       static bbb = 'bbb'
-      static fn(){}
+      static fn(){
+          // 静态方法里调用另一个静态属性可以用this 这里this是类本身而不是实例对象
+          console.log(this.bbb)
+      }
   }
   let zh = new Person2('zh') // 同function构造函数得到的对象一样 但是简化了原型身上添加属性方法
   ```

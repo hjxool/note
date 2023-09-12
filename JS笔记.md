@@ -4,8 +4,6 @@
 
 - 拖拽排序的时候，设置“目标位置 != 当前”，可以使程序只执行一次；并且要注意有没有接触到外边框，设置条件在外边框不触发；排序逻辑：因为使用的前插入方法，所以小的插在大的后一个的前面，大的插在小的前面；排序判断条件当前索引大小和目标索引大小做比较;计算索引逻辑：不断循环用前一个节点赋值(‘=’)，直到前一个节点为空，累计计算的自定义变量值就是节点的索引值
 
-- 对象.自定义属性 = xxx相当于将xxx赋值给对象下新创建的属性
-
 - 为了避免残留值，应当在**“即将”**调用和请求的地方清空再赋值。
 
 - 滑块必须用clientX/Y计算鼠标到浏览器边框的距离，因为只有键鼠**事件对象**是**动态**值（随鼠标动态改变），而offsetLeft等都是**元素对象**的属性，是**静态**值；还有mousedown事件包裹mouseover最好不用点击的对象作为调用者，最好用window，因为鼠标滑动过快，超出点击的对象就会出现问题
@@ -67,7 +65,9 @@
 
 - transform是相对于自身**当前**位置
 
-- 自定义属性**必须以data-开头**，取值通过`dataset['']`获取（注意:data-my-name在取值时要写成myName）
+- (HTML5)自定义属性
+
+  - **必须以data-开头**，取值通过`dataset['myName']`获取（注data-my-name在取值时要写成myName）
 
 - js**原生**事件处理函数事件名必须叫`event`
 
@@ -1060,66 +1060,89 @@
 
 ## 元素在页面中的位置
 
-- ![img](https://upload-images.jianshu.io/upload_images/6322775-d2bce26f79b3c151.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+![img](https://upload-images.jianshu.io/upload_images/6322775-d2bce26f79b3c151.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
 
-  Tips：
+- [offsetWidth/Height]()：元素整个大小。包括宽高、==边框==
 
-  - [offsetWidth/Height]()：元素整个大小。包括宽高、==边框==
+- [clientWidth/Height]()：可视大小，有滚动条的话，会==减去滚动条大小==。包括padding、content
+  - ==鼠标==的[clientX/Y]()也是==相对于**可见窗口(body)**==的位置，可视窗口的左上角始终是(0,0)点。想要获取相对于==页面(超出body大小)==的坐标用[pageX/Y]()
+  
+- [scrollHeight/Width]()：滚动大小(==不是元素自身大小！是被撑大后的大小==)。包括==可视区域（clientHeight）==、滚动条大小、隐藏部分
+- ==判断滚动条到底==：`scrollHeight - scrollTop == clientHeight`
+    - **注意**：`offsetHeight + scrollTop > scrollHeight`
+- 滚动大小实际上就等于==滚动条可滚动宽/高==加上==可视窗口大小==
 
-  - [clientWidth/Height]()：可视大小，有滚动条的话，会==减去滚动条大小==。包括padding、content
+![img](https://upload-images.jianshu.io/upload_images/6322775-0cf168f634ec329d.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
 
-    Tips:
-
-    - ==鼠标==的[clientX/Y]()也是==相对于**可见窗口(body)**==的位置，可视窗口的左上角始终是(0,0)点。想要获取相对于==页面(超出body大小)==的坐标用[pageX/Y]()
-
-  - [scrollHeight/Width]()：滚动大小(==不是元素自身大小！是被撑大后的大小==)。包括==可视区域（clientHeight）==、滚动条大小、隐藏部分
-
-    Tips：
-
-    - ==判断滚动条到底==：`scrollHeight - scrollTop == clientHeight`
-      - **注意**：`offsetHeight + scrollTop > scrollHeight`
-    - 滚动大小实际上就等于==滚动条可滚动宽/高==加上==可视窗口大小==
-
-- ![img](https://upload-images.jianshu.io/upload_images/6322775-0cf168f634ec329d.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
-
-offsetTop/Left是相对父级（注：滚动显示容器里，里面的每一个元素它的offset父级都是显示容器），并且会显示(※)**累计滚动隐藏部分**；
-
-​    offset返回的是绝对值，哪怕设置的是百分比，返回的也是px；offsetHeight是自身
+- offsetTop/Left是相对父级（注：滚动显示容器里，里面的每一个元素它的offset父级都是显示容器），并且会显示(※)**累计滚动隐藏部分**；
+- offset返回的是绝对值，哪怕设置的是百分比，返回的也是px；offsetHeight是自身
 
 ![img](https://upload-images.jianshu.io/upload_images/6322775-6dd4b0d7e07d70c9.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
 
-<center/>scrollHeight代表包括不可见部分的元素高度（只包含padding和content，即使是在IE盒模型下也不会计算border的值）
+- `scrollHeight`包括不可见部分的元素高度（只包含padding和content，即使是在IE盒模型下也不会计算border的值）
 
 ![img](https://upload-images.jianshu.io/upload_images/6322775-3a3c4a65808c7cb1.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
 
 <center/>scrollTop（滚动条向下滚动的距离）
 
-![img](https://upload-images.jianshu.io/upload_images/6322775-3e30a11ad6d49ba4.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+![image-20230912111718695](C:/Users/admin/AppData/Roaming/Typora/typora-user-images/image-20230912111718695.png)
 
-<center/>getBoundingClientRect()求元素距视窗边距
+- `getBoundingClientRect()`求元素==距视窗==边距
 
-### Tips：
+  - 会随滚动而变化，不是元素在页面的固定边距！
 
-1. [onwheel]()：鼠标滚轮事件
-   - 想横向滚动，可以用“@wheel”，此事件在**鼠标滚轮**滚动时触发，然后手动设置，事件触发一次横向滚动距离
-   - wheelDelta为正则是滚轮向上，为负则向下
+- ==懒加载==
 
-2. [onscroll]()：滚动条滚动事件
-3. ※**offset偏移量**是依据**上一级定位元素(position:relative等)**确定的
+  - 方法一：触发频繁不推荐
 
-4. ※**offsetParent**和**parentNode**的区别：
-   - [offsetParent]()
-     - 查找路径：有带有·**position**·属性的上一级→带有position属性的上一级。(body虽然没设置position，但是因为所有元素都脱离不了body文档流，所以总能找到body是最外层)
-     - 最外层：body→null
-   - [parentNode]()
-     - 查找路径：·**不考虑position**·，单纯的父级元素往上查找。
-     - 最外层：body→html→document→null
+    - 通过`data-`自定义属性，使得既保留图片地址，又不会自动加载
 
-5. [判断滚动触底]()：
-   - [scrollTop]()取值范围：[0，==( scrollHeight  - clientHeight )==]
-     - ==滚动条到底==：scrollTop = scrollHeight  - clientHeight
-     - ==滚动条距离底部50px以内==：(scrollHeight  - clientHeight) - scrollTop <= 50
-     - ==滚动条距离底部5%以内==：scrollTop / (scrollHeight  - clientHeight) >= 0.95
+      ```html
+      <img data-src="1.png">
+      <img data-src="2.png">
+      <img data-src="3.png">
+
+    - 判断距离视窗顶部距离是否小于视窗高度，如果小于则将自定义属性取出添加到`<img src>`属性上
+
+      ```js
+      let img_list = document.querySelectorAll('img')
+      // 监听滚动事件
+      window.addEventListener('scroll', e => {
+          for(let val of img_list){
+              let img_top = val.getBoundingClientRect().top
+              if(img_top < window.innerHeight){
+                  let src = val.getAttribute('data-src')
+                  val.setAttribute('src', src)
+              }
+          }
+      })
+      ```
+
+  - 方法二：浏览器提供的构造函数`intersectionObserver`
+
+    - `intersectionObserver`是==构造函数==，因此要创建实例
+
+- Tips
+
+  - `onwheel`：鼠标滚轮事件
+    - 想横向滚动，可以用“@wheel”，此事件在**鼠标滚轮**滚动时触发，然后手动设置，事件触发一次横向滚动距离
+    - wheelDelta为正则是滚轮向上，为负则向下
+  - `onscroll`：滚动条滚动事件
+  - ※**offset偏移量**是依据**上一级定位元素(position:relative等)**确定的
+  - ※**offsetParent**和**parentNode**的区别：
+
+  - `offsetParent`
+    - 查找路径：有带有**position**属性的上一级→带有position属性的上一级。(body虽然没设置position，但是因为所有元素都脱离不了body文档流，所以总能找到body是最外层)
+    - 最外层：body→null
+
+  - `parentNode`
+    - 查找路径：**不考虑position**，单纯的父级元素往上查找。
+    - 最外层：body→html→document→null
+  - ==判断滚动触底==
+    - `scrollTop`取值范围：`[0，(scrollHeight - clientHeight)]`
+    - ==滚动条到底==：`scrollTop = scrollHeight  - clientHeight`
+    - ==滚动条距离底部50px以内==：`(scrollHeight  - clientHeight) - scrollTop <= 50`
+    - ==滚动条距离底部5%以内==：`scrollTop / (scrollHeight  - clientHeight) >= 0.95`
 
 ## iframe标签
 
@@ -1449,7 +1472,34 @@ offsetTop/Left是相对父级（注：滚动显示容器里，里面的每一个
           dom.style.fontSize = `${fontsize}px`
       }
 
-- [setAttribute(属性，值)]()：用以给标签元素设置自定义属性
+- `setAttribute(属性，值)`：用以给标签元素设置属性
+
+  - 注！不是==自定义==属性，属性名写什么就是什么，没有`data-`前缀
+  - 例`imgDom.setAttribute('src', '1,png')`
+
+- `getAttribute(属性名)`：获取标签元素属性值
+
+  - 例` let src = imgDom.getAttribute('data-src')`
+
+- `dom.dataset['自定义属性名']`：获取元素身上==自定义属性==
+
+  ```html
+  <div data-xx="aaa"></div>
+  <div data-xx="bbb"></div>
+  ```
+
+  ```js
+  let dom_list = document.querySelector('div')
+  for(let val of dom_list){
+      val.onclick = (e) => {
+          // 通过event事件对象获取
+          //data-前缀的自定义属性都在dataset属性中
+          console.log(e.path[0].dataset.xx)
+          // 通过dataset属性获取
+          console.log(val.dataset['xx'])
+      }
+  }
+
 
 
 ## BOM对象
