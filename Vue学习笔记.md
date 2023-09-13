@@ -401,8 +401,16 @@ created:function(){
   - 因为beforeUpdate之前的生命周期都是在==初始化==，初始化没完成之前，==new Vue还没有返回值！==
   - **但是**==不论在哪个生命周期==，==this==都能取到vue实例，因为钩子函数也是函数，this指向它的调用者，也就是内部正在运作的vue实例，但是new Vue还没有返回这个实例
 
-
 ![img](https://upload-images.jianshu.io/upload_images/6322775-7de7c499c66ac7e6.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+
+- 配置项==执行顺序==
+  1. `props`：父组件传递给子组件的属性优先被处理
+  2. `data`：处理完`props`后才处理，将其加入Vue实例中
+  3. `computed`：处理完`data`后计算属性添加到Vue实例中
+  4. `watch`：在得到计算属性后添加侦听器
+  5. `created`：处理完以上选项后，才调用声明周期钩子函数，完成实例化
+  6. `mounted`等生命周期
+  7. `methods`：在`mounted`后将方法添加到Vue实例中
 
 ## axios异步
 
