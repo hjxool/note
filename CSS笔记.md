@@ -432,3 +432,15 @@ text-overflow：必须搭配overflow：hidden（溢出内容隐藏）和white-sp
 - 语法
   - `@import 'path.css'`
   - `@import url('path.css')`
+
+## 段落前加空格
+
+- 使用`:before`
+
+  ```css
+  .text::before{
+      content: '';
+      /* 这个很重要，既不会像block独占一行也可以显示为块 */
+      display: inline-block;
+      width: 50px;
+  }
