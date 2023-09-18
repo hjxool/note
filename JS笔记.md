@@ -162,8 +162,6 @@
   - [<<]()：向左位移。高位舍弃，低位==补零==
   - [>>>]()和[<<<]()：无符号的右移和左移。无符号指==右移==时，不再考虑是正数还是负数，一律高位补零
 
-
-
 ## 条件语句
 
 - [switch]()：首先会执行==case条件判断==，再执行==之后所有代码==，没有break、return，则会把之后所有case内的代码执行
@@ -639,41 +637,42 @@
 
 
 - 不传入参数，默认用==逗号==分隔！最好是传入==空字符串==
-
 - `reverse`：反转数组中元素顺序，会==改变原数组==
 
   - 字符串虽然可以像数组那样取值，但是并没有[reverse]()方法。可以通过字符串的[split('')]()切分，转换成数组
-
 - `some((当前元素的值) => { return 条件 } )`
 
   - 检查数组中是否有某元素，返回的是boolean值
-
 - `filter( (当前元素的值) => { return 条件} )`过滤器
 
   - 返回指定条件的元素组成的==数组==，不会改变原数组
   - ==当前值==是Arry中每一个元素，因为filter其实执行了一次遍历，将Arry中每一个元素拿出来跟return中的判断条件进行比对，再将符合条件的元素合成一个新数组
   - 例如：`数组.filter((数组元素) => { return 数组元素.indexOf(变量) != -1 })`
-
 - `find(当前值 =>{ return 条件 })`返回符合条件的==元素==。
   - 跟`filter`很像，但filter返回的是==数组==，**而**`find`返回的是==数组元素==
-
 - `findIndex(数组元素 => {return 条件})`返回数组中==第一个==符合条件的元素的==索引==
 
   - 没有符合条件的元素返回 `-1`
   - 对于空数组不会执行
-
 - `list.includes(内容)`(ES7)
 
   - 检测数组中是否包含指定内容。返回==true/false==
-
 - `forEach( (当前值，索引)=>{ } )`
 
   - foreach中回调的函数是数组中每一个元素都调用一次
+- `reduce((前一次循环返回值，当前数组元素内容) => {return 统计计算}，初始值)`
 
-- `reduce( (前一次返回值，当前数组元素内容)=>{ return 统计 }，初始值 )`
 
+  - 返回最后一次回调函数执行结果
+
+  ```js
+  // 计算1+2+3+4
+  let list = [1,2,3,4]
+  let res = list.reduce((pre, cur) => {
+      return pre + cur
+  })
+  console.log(res) // 10
 - `for(let i of array)`遍历数组
-
 - `indexOf('检索值'，'起始位置')`
 
   - 检索数组中是否有**指定元素**
@@ -681,9 +680,7 @@
   - 只检索元素中部分内容是不行的
 
   - 元素类型不对也是不行的
-
 - `Object.keys(数组)`返回对象**键**组成的数组
-
 - `sort(function(a，b){return a-b或b-a})`
   - 回调函数遵循几个个规则(==改变原数组==)
     - a在数组中的位置==必定==在b==前面==
@@ -692,11 +689,21 @@
     - 返回值==小于==0，位置==不变==
     - 返回值==等于==0，认为元素相等，位置==不变==
     - 因此[a-b]()大于0则a，b交换位置，是==升序==；而[b-a]()，后面的元素减前面的元素，大于0则b，a交换位置，是==降序==
-
 - `concat(source，...)`
 
   - 拼接多个数组及元素组合成新数组
   - ==不改变原数组==
+- `list.map(item => {return 处理item})`返回一个新==数组==
+
+  - ==不改变原数组==
+  - 数组中的元素为回调函数处理后的返回值
+  - ==空数组==不会执行
+  - 回调函数参数`list.map((currentValue, index, arr) => {})`
+
+    - `currentValue`：当前元素值
+    - `index`：当前元素索引值
+    - `arr`：当前元素所属数组
+
 
 ###   string方法：
 
@@ -1118,9 +1125,41 @@
       })
       ```
 
-  - 方法二：浏览器提供的构造函数`intersectionObserver`
+  - 方法二：浏览器提供的构造函数`intersectionObserver`(推荐)
 
-    - `intersectionObserver`是==构造函数==，因此要创建实例
+    - 只有节点进入和离开==可见区域==时才触发，对比方法一是滚动时一直触发。其次触发一次后取消观察即可，后续不会再重复执行，触发频率低
+    - `intersectionObserver`是==构造函数==，因此要创建实例`const observer = new IntersectionObserver(callback)`，传入回调函数作为参数
+    - 实例身上的方法
+      - `observer.observe(DOM节点)`观察目标节点，当目标节点出现和消失在可见区域内时触发回调函数
+      - `observer.unobserve(DOM节点)`==取消==观察目标节点
+
+    ```js
+    // HTML部分和方法一相同
+    
+    // 获取节点
+    let img_list = document.querySelectorAll('img')
+    // 此回调函数会在看见时和看不见时触发
+    const callback = (entries) => {
+        // 传入的形参是 所有观察对象组成的数组
+        entries.forEach(item => {
+            // 每项的isIntersecting属性值为boolean 表示是否交叉 即是否在可见区域内
+            if(item.isIntersecting){
+                // target属性即观察对象节点
+                let dom = item.target
+                // 将自定义属性值取出放到src属性上
+                let src = dom.getAttribute('data-src')
+                dom.setAttribute('src', src)
+                // 触发后已经将src赋值加载到页面了不再需要观察
+                observer.unobserve(dom)
+            }
+        })
+    }
+    // 创建实例
+    const observer = new IntersectionObserver(callback)
+    // 对每个图片节点都进行观察
+    img_list.forEach(dom => {
+        observer.observe(dom)
+    })
 
 - Tips
 
@@ -1381,6 +1420,8 @@
 
 - js操作DOM本质其实是修改==标签可配置属性==，所以像==css文件==中的样式是无法通过js读取的
 
+- 元素节点也是对象，既可以用`===`判断是否为同一节点，修改节点属性也不会改变节点对象的==地址值==，因此还是同一节点
+
 - [classList]()：虽然是个只读对象，但是拥有特殊方法修改
 
   - `add('class1',...)`，往对象身上添加一个或多个class，同名的不会添加
@@ -1499,8 +1540,6 @@
           console.log(val.dataset['xx'])
       }
   }
-
-
 
 ## BOM对象
 
@@ -1686,3 +1725,136 @@
     - 返回值为==基本类型==，finally执行完不会改变返回值
     - 返回值为==对象==，finally执行完会改变返回值
     - finally中有`return`会改变try、catch的返回值
+
+## 宏任务和微任务
+
+- 宏任务
+  - 花费时间较长
+  - 包括
+    - 新程序或子程序被直接执行，如`<script>`标签中运行的代码，控制台中输入的代码属于==子程序
+    - 事件回调函数，如鼠标点击事件
+    - `setTimeout`、`setInterval`
+    - `I/O`操作、`UI rendering`等
+- 微任务
+  - 花费时间短
+  - 包括
+    - `Promise.then().catch().finally()`
+    - `MutationObserver `
+    - `Object.observe`
+- 事件循环`event loop`
+  - 是一个不断进行循环的机制，寻找可以执行的任务
+  - 在执行完==同步任务==，即清空==调用栈==后，会**先**执行==微任务==，将微任务==队列==清空后才会执行==宏任务==
+  - `主线程宏任务`→`微任务`→`渲染`→`宏任务`
+
+## 柯里化
+
+- 用嵌套函数闭包的形式将接收==多个参数==的函数变换成接收==单一==参数的函数
+
+  ```js
+  function fn1(p) {
+      return function fn2(p2, p3) {
+          return `${p}${p2}:${p3}`
+      }
+  }
+  // 第一个参数是重复的 就可以作为闭包中默认参数
+  const url = fn1('https://')
+  let t = url('127.0.0.1','8080')
+  console.log(t)
+  ```
+
+- 柯里化在兼容性方面的应用
+
+  ```js
+  // IE等老浏览器没有addEventListener
+  // 执行script脚本时自执行 添加一个全局变量(函数) 使用返回的新函数添加事件监听
+  const whichEvent = (function () {
+      // 如果支持addEventListener方法
+     if(window.addEventListener) {
+         return function (dom, type, callback, useCapture) {
+             // useCapture是进行捕获或事件冒泡的选项 默认false冒泡
+             dom.addEventListener(type, function (event) {
+                 // 因为传入的回调函数不确定是什么形式this指向不同 为了规避this指向问题
+                 // 就得用call强制改变调用者为触发事件的元素节点 并传入event事件参数
+                 callback.call(dom, event)
+             }, useCapture)
+         }
+     } else if(window.attachEvent) {
+         return function (dom, type, callback) {
+             dom.attachEvent('on' + type, function (e) {
+                 callback.call(dom, e)
+             })
+         }
+     }
+  })()
+  
+  // 绑定事件监听时
+  let dom = document.querselector('.aa')
+  whichEvent(dom, 'click', function (e){...}, false)
+
+- 面试题
+
+  - 观察规律可得，每个函数的返回值都是一个新的函数复制，且执行累加计算
+
+  ```js
+  count(1)(2)(3) = 6
+  count(1,2,3)(4) = 10
+  count(1)(2)(3)(4)(5) = 15
+  ```
+
+  - 关键点
+
+    - `count()`函数执行结果不能只返回一个函数，其返回函数的返回值也得是该函数本身
+    - 函数的返回值是另一个函数，但是在==**打印输出**==时会==隐式转换==为==字符串==，也就是执行了`toString()`
+      - 这里打印输出很重要！因为函数执行结果是函数本身，那这个函数是没有办法终止并最终输出结果的，但是在函数被`console.log()`打印输出时，会执行`toString()`，所以只要==覆写==`toString`方法让其计算结果即可
+
+    ```js
+    function count(...params) {
+        // 注:这里用了rest参数 是数组
+        let fn = (...params2) => {
+            // 注:这里用了拓展运算符将数组展开
+            params.push(...params2)
+            // 注此处是后续fn返回fn自身
+            return fn
+        }
+        // 覆盖toString方法 计算结果 params是闭包变量
+        // console.log打印的是fn()执行结果 因此要覆盖fn的toString
+        fn.toString = () => {
+            return params.reduce((pre, cur) => {
+                return pre + cur
+            })
+        }
+        // 此处是count()第一次执行返回的fn
+        return fn
+    }
+    console.log(count(1)(2)(3)) // 6
+
+- 柯里化==箭头函数==的使用
+
+  ```js
+  let list1 = [
+      {aaa: '111', bbb: '222'},
+      {aaa: '333', bbb: '444'},
+  ]
+  let list2 = [
+      {ddd: false},
+      {ddd: true},
+  ]
+  // 柯里化
+  let fn = name => item => item[name]
+  // 等同于
+  let fn = (name) => {
+      // 箭头函数只接受 单个参数 时可以省略()
+      return (item) => {
+          // return后只有 一个值 时可以省略 return
+          return item[name]
+      }
+  }
+  let name_aaa = fn('aaa')
+  let name_ddd = fn('ddd')
+  // 数组.map返回传入回调执行结果组成的数组
+  console.log(name_aaa.map(name_aaa)) // ['111', '333']
+  console.log(name_aaa.map(name_ddd)) // [false, true]
+  
+  // 对比非柯里化函数
+  list1.map(item => item.aaa)
+  list2.map(item => item.ddd)

@@ -507,9 +507,9 @@
 
     - **但是**作为属性名不能用`.`运算符，必须用方括号。因为t是字符串
 
-  - 不会出现在[for...in]()和[for...of]()、[Object.entries]()中
+  - 不会出现在`for...in`和`for...of`、`Object.entries`中
 
-    - 只能用[Object.getOwnPropertySymbols(obj)]()和[Reflect.ownKeys(obj)]()获取
+    - 只能用`Object.getOwnPropertySymbols(obj)`和`Reflect.ownKeys(obj)`获取
 
 - ==对象自定义遍历==
 
@@ -521,13 +521,16 @@
         [Symbol.iterator](){
             let index = 0
             return {
-                next:()=>{	next函数是固定写法
+                // next函数是固定写法
+                next:()=>{
                     if(index < this.array.length){
                         let a = this.array[index]
                         index++
-                        return { value:a, done:false }	return的对象也是固定写法
+                        // return的对象也是固定写法
+                        return { value:a, done:false }
                     }else{
-                        return { value:undefined, done:true }	undefined 和 done是固定属性写法
+                        // undefined 和 done是固定属性写法
+                        return { value:undefined, done:true }
                     }
                 }
             }
@@ -537,23 +540,25 @@
 
 - ==登记注册==
 
-  - ```js
+  - `Symbol('')`创建的原始值都是不相等的，但是用`Symbol.for('')`可以创建一个共享的`Symbol`，如果存在共享的`Symbol`，则会返回已有的`Symbol`
+    
+    - 首先在==全局搜索==被登记的Symbol是否有==该字符串==作为名称的Symbol值，如果有即返回该值，没有则新建，并登记
+    
+    
+    ```js
     let t = Symbol('a')
     let t2 = Symbol.for('a')
     t === t2 // false
     let t3 = Symbol.for('a')
     t2 === t3 // true
+    
+  - `Symbol.keyFor(symbol)`查询一个==已登记==的Symbol的==key==
 
-  - 类似单例模式(只有一个实例对象)。首先在==全局搜索==被登记的Symbol是否有==该字符串==作为名称的Symbol值，如果有即返回该值，没有则新建，并登记
-
-  - ```js
+    ```js
     let t = Symbol.for('a')
     Symbol.keyFor(t) // 'a'
     let t2 = Symbol('p')
     Symbol.keyFor(t2) // undefined
-    ```
-
-  - 查询一个==已登记==的Symbol的==key==
 
 - Symbol的==值==**不能**与其他类型数据进行运算
 
