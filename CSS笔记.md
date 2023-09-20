@@ -309,7 +309,12 @@ text-overflow：必须搭配overflow：hidden（溢出内容隐藏）和white-sp
     - 也可以给==变形的元素父级==加上perspective属性
 
   - [transform-style]()：默认值flat，2D平面效果。可选值，==preserve-3d==3D效果
-  - [transform-origin]()：变形原点。默认值在中心点。
+  - `transform-origin`：以某点为圆心旋转
+    - 默认元素左上角`0,0`点
+    - `transform-origin: center`：以元素中心点为圆心旋转
+  - `transform: rotate(角度)`：以圆心为基点旋转一定角度
+    - 角度为负：逆时针旋转
+    - 角度为正：顺时针旋转
 
 ## table
 
