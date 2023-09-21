@@ -255,16 +255,6 @@ line-height是行高，在一行中字体是默认居中的，当行高与块级
 
 ------
 
-**清除input默认样式：**
-
-​    background：默认背景白色
-
-​    border：默认边框
-
-​    outline：默认选中颜色，设为0则清除默认设置
-
-------
-
 图片默认可拖拽，要阻止默认设置，可以用“user-drag：none”
 
 ------
@@ -450,3 +440,10 @@ text-overflow：必须搭配overflow：hidden（溢出内容隐藏）和white-sp
       display: inline-block;
       width: 50px;
   }
+
+## input样式修改
+
+- 清除input默认样式
+  - `background`：默认背景白色
+  - `border`：默认边框
+  - `outline`：默认选中颜色，设为0则清除默认设置
