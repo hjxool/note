@@ -315,6 +315,7 @@ text-overflow：必须搭配overflow：hidden（溢出内容隐藏）和white-sp
 - [border-box]()：
   - `border + padding + content = css设置大小`
   - 仅在`border-box`下才能做出==三角形==，通过将一边的`border`属性拉长>=宽/高，再将两侧的border拉长到宽/高的一半
+    - 注！`border-left: 100% solid;`不能用==百分比==
 - padding可以限制内部宽高
 - ![img](https://upload-images.jianshu.io/upload_images/6322775-4d3009044c7807f7.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
 
