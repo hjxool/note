@@ -130,32 +130,26 @@
 
 - [Unicode编码]()：用处很多！用`\u2620`等编码形式可以表示==中文==、==图标(element UI的小图标就是编码)==
 
-  - Tips：
-    - 在==JS==中`\u2620`是==十六进制==表示
-    - 在==HTML标签==中是==十进制==表示，`<span>&#9760;`(注意&#开头)。通过计算器计算
-    - 在==CSS==中也是==十六进制==，但是不需要==u==，`\2620`
-
+  - 在==JS==中`\u2620`是==十六进制==表示
+  - 在==HTML标签==中是==十进制==表示，`<span>&#9760;`(注意&#开头)。通过计算器计算
+  - 在==CSS==中也是==十六进制==，但是不需要==u==，`\2620`
+  
 - [进制转换]()：
 
   - 使用[toString(参数)]()方法，里面参数传入几，就是转换到几进制，例如`num.toString(2)`
 
-    Tips:
-
     - toString转成的==字符串==，不能再使用toString
-
   - [parseInt(字符串/数字，radix)]()
-
-    Tips:
-
     - 只能转换第一个字符是数字的字符串
-    - 第二个参数只能传==2~36==，不传则根据规则解析为不同进制的==整数==。==0X==开头的解析为十六进制；==0==开头的解析为八进制或十六进制；==1~9==开头的解析为十进制；==只有==传入==2==，才能按==二进制==去转换为==十进制==
-
+    - 第二个参数只能传==0==或者==2~36==
+      - ==0==表示第一个参数是==十进制==，2~36表示==二进制==等
+      - 不传则根据规则解析为不同进制的==整数==
+        - ==0X==开头的解析为十六进制
+        - ==0==开头的解析为八进制或十六进制
+        - ==1~9==开头的解析为十进制
   - [toString(radix)]()：只能传入==2~36·==的基数
-
-    Tips:
-
-    - 传入2，数字以二进制显示；传入8，以八进制；16是十六进制
-
+  - 传入2，数字以二进制显示；传入8，以八进制；16是十六进制
+  
 - [位运算符]():
 
   - [十进制数 >> 位移个数]()：向右位移。低位==舍弃==，十进制数如果为正则左边高位补零，为负则补1
@@ -166,21 +160,19 @@
 
 - [switch]()：首先会执行==case条件判断==，再执行==之后所有代码==，没有break、return，则会把之后所有case内的代码执行
 
-  - Tips：
-
-    - ```javascript
-      case a:         等同于    if(xxx===a||xxx===b){
-      case b:	                     /*代码块*/
-          /*代码块*/            }
-      break;
-      ```
-
-    - ```javascript
-      switch(true){           小技巧：switch进行范围判断，通过switch传入true值与case中的条件进行判断
-          case xxx > 60:
-              break;
-      }
-      ```
+  - ```javascript
+    case a:         等同于    if(xxx===a||xxx===b){
+    case b:	                     /*代码块*/
+        /*代码块*/            }
+    break;
+    ```
+  
+  - ```javascript
+    switch(true){           小技巧：switch进行范围判断，通过switch传入true值与case中的条件进行判断
+        case xxx > 60:
+            break;
+    }
+    ```
 
 ## 循环语句
 
@@ -482,7 +474,7 @@
 ## 构造函数和工厂函数
 
 - ```js
-  #工厂函数     用于批量生产**同类型**对象 都是由Object生成
+  #工厂函数     用于批量生产 同类型 对象 都是由Object生成
   function person(name,age){
       let obj ={}
       obj.name = name
@@ -496,9 +488,9 @@
   ```
 
 - ```js
-  #构造函数     声明方式和普通函数相同 但是使用时用**new关键词**创建**实例对象** 由构造函数生成
+  #构造函数     声明方式和普通函数相同 但是使用时用 new关键词 创建 实例对象 由构造函数生成
   function Person(name,age){
-      this.name = name   此处this指向new**创建的对象**
+      this.name = name   此处this指向new 创建的对象
       this.age = age
   }
   let newObj = new Person('xxx',18)
@@ -710,7 +702,7 @@
 - `list.map(item => {return 处理item})`返回一个新==数组==
 
   - ==不改变原数组==
-  - 数组中的元素为回调函数处理后的返回值
+  - 数组中的元素为回调函数处理后的==返回值==
   - ==空数组==不会执行
   - 回调函数参数`list.map((currentValue, index, arr) => {})`
 
@@ -912,6 +904,27 @@
     let t2 = {aaa:'qwe'}
     t.fn1()() //123
     t.fn1.call(t2)() //'qwe'
+    ```
+
+  - `call`原理
+
+    ```js
+    Function.prototype.newcall = function (obj, ...p) {
+        let obj = obj || window //call方法传入null时默认指向window
+        obj.p = this //关键点 因为调用者是函数所以直接复制下来
+        let res = obj.p(...p) // 传参、执行并存储返回结果
+        delete obj.p //关键点 因为不改变原对象所以要删除复制的属性
+        return res
+    }
+    function fn(...p) {
+        console.log(this.name)
+        console.log(...p)
+        return 1
+    }
+    let obj1 = {
+        name: 'xxx1'
+    }
+    console.log(fn.newcall(obj1, 1, 2, 3, 4))
 
 - `fn.apply(obj, [...args])`：同`call`，但第二个参数是==实参==组成的==数组==，==传入==函数时已经被==展开==，并==依次==赋值给形参
 
@@ -921,6 +934,24 @@
 - `fn.bind(newObj, params1, params2,...)`：不同于`call`和`apply`，**返回**的是一个函数，==不会直接调用==
 
   - 直接调用：`obj.fn.bind(newObj)(params)`
+  
+  - 原理
+  
+    ```js
+    Function.prototype.newBind = function (obj, ...p){
+        let that = this //关键点 返回的匿名函数 保存this
+        let fn = function (){
+            // 关键点 bind返回的函数可以用 new关键字 只不过会丢失this
+            // 而instanceof 可以判断是否是实例关系 利用这点可以判断是否使用了new
+            if(this instanceof fn){
+                // 关键点 因为要判断是否使用了new即实例 所以必须用具名函数
+                that.call(this, ...p)
+            }else{
+                that.call(obj, ...p)
+            }
+        }
+        return fn
+    }
 
 
 ## js对象(数组)
@@ -1740,12 +1771,14 @@
 
 ## 事件流
 
-1. 捕获
+1. 首先是从最外层想内的捕获阶段
    - 从外向内，找到最内层子元素事件
    - 捕获过程中遇到的事件都==不会触发==
 2. 执行目标元素身上的事件
-3. 冒泡
+3. 再从目标元素事件向最外层冒泡阶段
    - 从内向外，依次触发父级元素身上的事件
+
+![image-20231001230911835](C:\Users\admin\AppData\Roaming\Typora\typora-user-images\image-20231001230911835.png)
 
 ## try catch finally
 
@@ -1901,3 +1934,12 @@
   // 对比非柯里化函数
   list1.map(item => item.aaa)
   list2.map(item => item.ddd)
+  ```
+  
+## 拖拽
+
+  - 事件
+
+    ![image-20231001214934163](C:\Users\admin\AppData\Roaming\Typora\typora-user-images\image-20231001214934163.png)
+
+    - `dragover`和`drop`需要`e.preventDefault()`取消默认行为
