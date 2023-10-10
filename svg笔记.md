@@ -176,6 +176,7 @@
 - `<g>`：将多个图形分到一组
 
   - 配合`<use>`整体复制
+  - 注！不能设置宽高！大小随内容撑大
 
   ```html
   <svg>
@@ -229,6 +230,34 @@
 
   ```html
   <image xlink:href="xxx.png" width="50%" height="50%"></image>
+  ```
+
+- `<marker>`：标记
+
+  - 常用于给线段添加箭头，写在`<defs>`中用于可复用图形
+
+  - `markerWidth markerHeight` 设置标识大小
+
+  - `refX refY`：以标识图形左上角为`(0,0)`点，`refX refY`表示依附在线段==端点==的==基准点==
+
+    ![image-20231010174604052](C:/Users/admin/AppData/Roaming/Typora/typora-user-images/image-20231010174604052.png)
+
+  - `orient`：绘制的方向(角度值或`auto`)。`auto`表示以随线段方向自动变化
+
+  ```html
+  <defs>
+  	<marker markerWidth="13" markerHeight="13" refX="2" refY="6" orient="auto"></marker>
+  </defs>
+  ```
+
+- `<foreignObject>`：在svg中插入HTML标签
+
+  - 默认以`<svg>`左上角为原点，多个`<foreignObject>`会重叠在一起，跟`<g>`一样只能用`transform`样式属性挪动
+
+  ```html
+  <foreignObject style="width:100px;height:100px">
+  	<div>{{可以使用Vue相关语法}}</div>
+  </foreignObject>
 
 ## 使用stroke虚线实现伸长变幻动画
 
