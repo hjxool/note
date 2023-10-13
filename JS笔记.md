@@ -1944,3 +1944,18 @@
     ![image-20231001214934163](C:\Users\admin\AppData\Roaming\Typora\typora-user-images\image-20231001214934163.png)
 
     - `dragover`和`drop`需要`e.preventDefault()`取消默认行为
+
+## MSE(Media Source Extensions)
+
+- B站开源的==flv.js==思路就是将FLV文件流转码成MP4片段(video标签可播放格式)，然后通过MSE将MP4片段喂给`<video>`
+- MSE是W3C规范，即新的API接口，允许JS为`<audio>`和`<video>`==动态==构造数据源
+  - 没有MSE时，对`<video>`的操作仅止于标签提供的能力，不能对视频流进行操作
+  - 如在线视频播放切换清晰度，直接替换`src`会导致视频中断，重新播放
+  - MSE可以创建多个`sourceBuffer`对象，可以理解为准备了多个不同清晰度的源。对象内可以==动态==添加==数据片段==，这些数据片段可以是不同清晰度
+  - 例YouTube的video标签中`src="blob:https://..."`，可以看到地址栏是一个二进制文件对象，可以像操作文件一样操作Blob对象，从而动态的往`<video>`标签塞入二进制数据
+- MSE可以
+  - 动态清晰度切换
+  - 视频拼接。如视频插入广告
+  - 音频语言切换
+  - 动态控制视频加载
+  - ...

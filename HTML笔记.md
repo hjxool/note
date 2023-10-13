@@ -310,3 +310,14 @@ HTML**属性名**对大小写不敏感，会统一转换成小写，在js中是�
 
   - 默认有边框，去除边框`frameborder="0"`
   - 默认有滚动条，去除滚动条`scrolling="no"`
+
+## video标签
+
+- `<video src>`标签内的`<source src>`表示多个片段，按先后顺序拼接，如果只有一个`<source>`就可以`<video src="..." type="...">`，有多个片段则
+
+  ```html
+  <video autoplay controls>
+      <source src="..." type="..."></source>
+      <source src="..." type="..."></source>
+  	...
+  </video>
