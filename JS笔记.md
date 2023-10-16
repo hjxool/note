@@ -1507,6 +1507,10 @@
 
 - [getElements...]()：带有`Elements`字眼的获取到的节点，哪怕只有一个也会封装到==数组==里返回
 
+  - 获取的是==动态==节点数组，如，创建全局变量保存节点数组，后续进行增删节点，全局变量的节点数组也会随之改变
+
+  - **但是**`querySelectorAll`返回的是静态长度的固定长度数组
+
 - 获取到节点后，控制台输出的第一层字段==都是可配置属性==，比如要获取`<input value="xxx"/>`输入框中的内容，就用==元素.属性名==
 
   - 所有==属性==均适合这个规则，==除了Class！==，因为==class==是==保留字段==，想取用得用==元素.className==
@@ -1548,7 +1552,7 @@
   - 同样可以用于某一元素下去搜索子、孙元素
   - [querySelectorAll]()：查找==所有==符合条件的元素
     - 返回的==始终==是一个==数组==
-    - `querySelectorAll`其实不如`getElementsByClassName`等方法好用，因为`querySelectorAll`返回的是==固定长度==数组，而`getElementsByTagName`等返回的数组会随着==DOM节点数量改变而改变==
+    - `querySelectorAll`其实不如`getElementsByClassName`等方法好用，因为`querySelectorAll`返回的是==固定长度==数组，而`getElements...`等返回的数组会随着==DOM节点数量改变而改变==
     - `querySelectorAll`节点属性会动态改变，只是返回的数组长度不变
 
 - [createElement]()：创建完元素以后==并不能==查找到节点，因为还在内存中，并没有放入页面，得[appendChild]()放入页面后才能查到
