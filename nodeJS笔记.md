@@ -627,7 +627,7 @@ server.listen(端口号,()=>{ 回调函数在 服务启动成功 后被调用
 
 - 也是一个==工具包==，封装了多个功能，便于开发 HTTP 服务
 
-  - 导入的工具包是**函数**，使用前需创建==函数对象==，`const app = express()`，`app`其实是一个函数，所以可以传入`http或https.createServer`
+  - 导入的工具包是**函数**，使用前需创建==函数对象==，`const app = express()`，`app`其实是一个函数，所以可以传入`http或https.createServer(..., app)`
 
 - 与 node 原生 http 模块区别
 
@@ -666,7 +666,7 @@ server.listen(端口号,()=>{ 回调函数在 服务启动成功 后被调用
   	res.send("收到数据" + req.body + "对象");
   });
   
-  // http模块也可以使用express创建的应用对象
+  // ※http模块也可以使用express创建的应用对象
   const server = http.createServer(app)
   ```
 
@@ -1258,7 +1258,7 @@ function middleware(req,res,next){
           console.log('更新失败' + err)
       })
   })
-
+  ```
   - 更新文档中==数组==字段，使用`$push`等操作符
 
     ```js
@@ -1276,7 +1276,7 @@ function middleware(req,res,next){
     obj.updateOne({name:'test'}, {$pop: {list: 1}})
     // 删除指定索引的元素 下例表示删除数组第4个元素 1表示删除 0保留
     obj.updateOne({name:'test'}, {$unset: {'list.3': 1}})
-  ```
+    ```
 
   - 更新文档中==对象==字段
 
@@ -1570,7 +1570,7 @@ function middleware(req,res,next){
 
   - cookie
 
-    - HTTP 服务器发送到==浏览器保存==的一小块数据
+    - HTTP 服务器发送到==浏览器保存==的一小块数据，主要是用作==载体==，用于将服务端生成的`session`传递给客户端，或是由客户端通过`cookie`传递数据给服务端
     - 按==域名==划分保存
     - `key=value;`形式的键值对
     - 特性
@@ -1607,7 +1607,7 @@ function middleware(req,res,next){
 
   - session
 
-    - 保存在==服务器端==的数据
+    - 诞生并保存在==服务器端==的数据，由服务器端主导一切
 
     - 运行流程
 
@@ -1670,7 +1670,7 @@ function middleware(req,res,next){
 
   - token
 
-    - 由==服务端==返回给客户端的加密字符串，保存着==用户信息==
+    - 诞生自==服务端==，保存在客户端，由客户端主导。返回给客户端的加密字符串，保存着==用户信息==
 
     - 与`cookie`不同的是，`token`是由客户端发送请求时手动添加到请求报文中，一般放在请求头
 
@@ -1709,6 +1709,11 @@ function middleware(req,res,next){
       - 因为token不存在服务端，因此无法刷新延长过期时效，想要像session一样时效内刷新token过期时间，只能把数据存储在服务端验证
     
         - 思路：生成不设过期时间的token，并存在数据库，添加字段表示过期时间。同一用户拿这个token请求时，服务端先从数据库中查找对应token，查看是否过期。如果在过期时间内，则重置过期时间字段。如果已经过期，则删除数据库对应token数据，并给前端返回登陆过期
+    
+      - ※为什么要将token放在`headers:{Authorization: Bearer token}`
+    
+        - 因为`Authorization`是专门用来做认证的请求头
+        - ==OAuth2.0规则==要求使用`Bearer token`的形式
     
     - 应用
     
@@ -1805,7 +1810,8 @@ function middleware(req,res,next){
            key: fs.readFileSync('C:\\Certbot\\live\\www.custom.com\\privkey.pem','utf8'),
            cert: fs.readFileSync('C:\\Certbot\\live\\www.custom.com\\cert.pem','utf8'),
            ca: fs.readFileSync('C:\\Certbot\\live\\www.custom.com\\chain.pem','utf8'),
-       },app).listen(443,()=>{
+       },	// 在http或https.createServer中配置express对象
+           app).listen(443,()=>{
            // https默认端口号443
            console.log('443端口监听中')
        })

@@ -847,8 +847,6 @@
     - `sessionStroage`还要求在==同一浏览器标签页下==
     - 生存周期不同：`localStorage`只要不主动清除不会消失，`sessionStroage`关闭浏览器**标签页**就会消失
 
-
-
 ### document方法：
 
 - [cookie]()：
@@ -955,7 +953,7 @@
     }
 
 
-## js对象(数组)
+## 对象
 
 - 对象细节问题
 
@@ -971,7 +969,7 @@
   - `object.obj2`是对象吗？
     - 不，只是obj2的==地址值==，只有加`.`才是去对象中取值
 
-- 只要是==函数==，加==（）==就可以执行，哪怕是==变量==形式
+- 只要是==函数==，加`()`就可以执行，哪怕是==变量==形式
 
 - 区分==对象==和==数组==
 
@@ -980,9 +978,6 @@
   - ``xxx instanceof Array/Object`
 
   - `Array.isArray(xxx) //true或false`
-
-
-  Tips：
 
   - [typeof]()是区分==基本==类型和==引用(对象)==类型的，返回的是==字符串==，注意全是==小写==；
 
@@ -1020,15 +1015,32 @@
 
 - ==变量==和==值==是存在[栈内存]()中，而引用类型数据是存在[堆内存]()中，，当变量保存的是一个引用类型数据时，栈中是以`key：value`的形式保存着引用类型数据在==堆空间==中的==物理地址==
 
-- [function函数也是对象]()：[不加()]()，作为实参时传入的是==函数对象==，不会执行；[加()]()，作为实参时则==先执行==再传入执行后的==结果==
+- function==函数也是对象==
 
-  - Tips：
+  - 不加`()`，作为实参时传入的是==函数对象==，不会执行
 
-    - ```js
-      匿名函数：
-      let a = function (){ }             function(){ /*代码块*/ } 这样写会有问题 没有函数名会当成两个独立的部分
-      a(params)                          正确的匿名函数写法 (function(){ }) 这样才会当成一个整体
-      ```
+  - 加`()`，作为实参时则==先执行==再传入执行后的==结果==
+
+  - 没有跟在`return`后的匿名函数，要么赋值保存`let fn = function()`，否则单`function (){}`会因为==没有函数名==被视作两个独立部分，因此需要用括号包裹`(function (){})`，表示成整体，==自执行函数==由此演化而来
+
+  - ※函数既是对象，因此也可以往其自身添加属性及方法
+
+    ```js
+    function express(){
+        let app = function (){}
+        app.use = function(params){...}
+        const http = require('http')
+        const server = http.createrServer(app)
+        app.listen = function(port, callback){
+            server.listen(port, callback)
+        }
+        return app
+    }
+    let app = express()
+    app.use(...)
+    app.listen(80, ()=>{
+        console.log('80端口开启')
+    })
 
 - [对象中定义函数方法]()
 

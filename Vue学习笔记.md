@@ -396,10 +396,8 @@ created:function(){
 
 - created：方法和回调都==已经配置==，但是跟html页面对应的属性和方法还没有挂载上去，$el不可见；
 
-  Tips：
-
   - 请求一开始能看到的页面元素数据
-  - created阶段，data中的变量和methods中的方法都已经创建好了，但是在生命周期函数中为“data变量”赋值时，data中的数据是不能为空的，要么随便给一个初始值，要么用“Number、String”等类限制传入数据类型
+- created阶段，data中的变量和methods中的方法都已经创建好了，但是在生命周期函数中为“data变量”赋值时，data中的数据是不能为空的，要么随便给一个初始值，要么用“Number、String”等类限制传入数据类型
 
 ![img](https://upload-images.jianshu.io/upload_images/6322775-85b5be56f78a787b.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
 
