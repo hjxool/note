@@ -448,3 +448,40 @@ text-overflow：必须搭配overflow：hidden（溢出内容隐藏）和white-sp
   - `background`：默认背景白色
   - `border`：默认边框
   - `outline`：默认选中颜色，设为0则清除默认设置
+
+## video样式修改
+
+```css
+/* 隐藏进度条 */
+video::-webkit-media-controls-timeline {
+	display: none;
+}
+/* 隐藏播放按钮 */
+video::-webkit-media-controls-play-button {
+	display: none;
+}
+/* 隐藏全屏按钮 */
+video::-webkit-media-controls-fullscreen-button {
+	display: none;
+}
+/* 隐藏当前播放时间 */
+video::-webkit-media-controls-current-time-display {
+	display: none;
+}
+/* 隐藏剩余时间 */
+video::-webkit-media-controls-time-remaining-display {
+	display: none;
+}
+/* 隐藏音量按钮 */
+video::-webkit-media-controls-mute-button {
+	display: none;
+}
+/* 音量控制条 */
+video::-webkit-media-controls-volume-slider {
+	display: none;
+}
+/* 所有控件 */
+video::-webkit-media-controls-enclosure {
+	display: none;
+}
+```

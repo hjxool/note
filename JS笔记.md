@@ -1341,7 +1341,7 @@
     obj.test = 'hhh' // 触发set() 修改了局部变量
     console.log(obj.test) //触发get() 返回修改后的局部变量
 
-- [object.defineProperty(对象名，'键'，{ 配置项 })]()
+- `object.defineProperty(对象名，'键'，{ 配置项 })`
 
   - ```js
     let source = {
@@ -1366,9 +1366,9 @@
 
 <center>为指定对象添加属性；并且该属性不可被遍历
 
-- defineProperty定义的属性==默认不可被修改、检索==
+- `defineProperty`定义的属性==默认不可被修改、检索==
 
-- defineProperty的好处：
+- `defineProperty`的好处
   1. js默认没有数据绑定，js不会帮你做这个事情，定义过的变量用变量名赋值给另一个属性后，不会随着原先的变量改变而改变。但是defineProperty中的**get函数**可以将其**绑定**
   2. get函数作用是**双向**绑定(**改原始值**会跟着变动)，**get函数**本身不会传入参数，它“return”返回的是外面定义好的变量，所以当**set函数**修改了外部定义的变量，get中**返回值**也就变了；set函数是**改对象属性**时触发，修改后**原始值**也会发生改变(原始值会发生改变是因为修改值对原始值进行了**赋值**操作，**再触发**的**get函数**)；使用set函数时必须也要有get函数，不然set修改完值后，没有对应的属性接收
   3. 数据代理：通过另一个对象来操作原先的对象属性，通过get、set函数实现
@@ -1794,8 +1794,6 @@
 2. 执行目标元素身上的事件
 3. 再从目标元素事件向最外层冒泡阶段
    - 从内向外，依次触发父级元素身上的事件
-
-![image-20231001230911835](C:\Users\admin\AppData\Roaming\Typora\typora-user-images\image-20231001230911835.png)
 
 ## try catch finally
 

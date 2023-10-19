@@ -486,7 +486,7 @@
     }
 
 
-## Symbol
+## Symbol、迭代器
 
 - ES6提出的一种原始数据类型，跟Number等一样，只能接受字符串作为参数
 
@@ -511,32 +511,48 @@
 
     - 只能用`Object.getOwnPropertySymbols(obj)`和`Reflect.ownKeys(obj)`获取
 
-- ==对象自定义遍历==
+- 迭代器
 
-  - 通常来说对象不能用==for...of==方法遍历，这个方法只能用于数组这种，对象里自带==Symbol.iterator==方法，要想遍历对象就需要添加同样的方法，还可以自定义返回的数据
+  - 迭代器(iterator)是一种==接口==，即一个==函数方法==，接口就是为不同的数据提供统一的操作处理，而迭代器这一接口的作用是提供统一的访问操作
 
-    ```js
-    let t = {
-        array:[1,2,3,4],
-        [Symbol.iterator](){
-            let index = 0
-            return {
-                // next函数是固定写法
-                next:()=>{
-                    if(index < this.array.length){
-                        let a = this.array[index]
-                        index++
-                        // return的对象也是固定写法
-                        return { value:a, done:false }
-                    }else{
-                        // undefined 和 done是固定属性写法
-                        return { value:undefined, done:true }
+  - 目的：实现自定义遍历方式
+
+  - 原理
+
+    1. 创建一个==指针==对象，指向当前数据结构的==起始位置==
+       - 这个对象指用`[Symbol.iterator](){}`函数返回的对象
+    2. ==第一次==调用`next()`方法，会自动指向第一个元素
+    3. 接下来不断调用`next()`方法，指针一直向后移动，直到最后一个元素
+    4. 每次调用`next()`返回一个包含对象`{value: '元素值', done: false或者true}`
+       - `done`表示是否遍历完
+
+  - 应用
+
+    - ==对象自定义遍历==
+
+      - 通常来说对象不能用==for...of==方法遍历，这个方法只能用于数组这种，对象里自带==Symbol.iterator(迭代器)==方法，要想遍历对象就需要添加同样的方法，还可以自定义返回的数据
+
+        ```js
+        let t = {
+            array:[1,2,3,4],
+            [Symbol.iterator](){
+                let index = 0
+                return {
+                    // next函数是固定写法
+                    next:()=>{
+                        if(index < this.array.length){
+                            let a = this.array[index]
+                            index++
+                            // return的对象也是固定写法
+                            return { value:a, done:false }
+                        }else{
+                            // undefined 和 done是固定属性写法
+                            return { value:undefined, done:true }
+                        }
                     }
                 }
             }
         }
-    }
-    ```
 
 - ==登记注册==
 
@@ -892,20 +908,69 @@
   fn({a:'123',b:123,c:'root'}) // '123',123,'root'
   fn({b:'qwe'}) // 1,'qwe',undefined
 
-## 数据代理
+## proxy数据代理
 
 - 在ES6之前使用`defineProperty(要代理的对象, 自命名属性, {get(), set()})`，很笨拙，需要知道代理对象的属性名才能检测数据变化，且需要一个一个设置get和set
 
 - 在ES6之后提出了`proxy`，它不用笨拙的对属性一个个进行代理，而是对整个目标对象代理
 
-  - 使用方法：`proxy(target, {get(target, name), set(target, name, value)}, deleteProperty(target，name))`
+  - `Object.defineProperty`监测不到劫持对象的==增删==，而==proxy==的set加入了监测==**增**==的能力，当`obj.新属性`时，也可以监测的到
+  - ※Proxy不是==深拷贝==，只是==浅拷贝==，即如果是多层结构的对象，代理这个对象==无法检测==到里层属性值的变化
 
-    - get函数中有两个默认参数：`target`是==要代理的对象==、`name`是==检测到读取的**属性名**==。所以get中的return要这么写`return target[name]`
+  ```js
+  let obj = {
+      a: 1,
+      // Proxy代理数据能捕获到数据变化的只有第一层 此处代理的是b 地址值
+      b: {
+          c: 2
+      }
+  }
+  // proxy代理普通对象
+  let proxy_obj = new Proxy(obj, {
+      get(target, key, receiver){
+          // target 是目标对象，即obj
+          // key 是要访问的键名，如obj.a，key就是'a'
+          // receiver 是代理对象，即proxy_obj
+          console.log('触发读取')
+          return target[key]
+      },
+      set(target, key, value){
+          // value 是修改属性传入的值
+          console.log('触发修改')
+          target[key] = value
+      },
+      // 拦截删除对象属性操作
+      // 必须 要有 返回值
+      deleteProperty(target, key){
+          return delete target[key]
+      }
+  })
+  // 代理函数对象
+  function fn(a, b){
+      return a + b
+  }
+  new Proxy(fn, {
+      // 拦截函数调用
+      apply(target, thisArg, params){
+          // target 目标函数
+          // thisArg 调用者
+          // params 调用函数传入的参数数组
+          return
+      }
+  })
+  ```
 
-    - set函数有三个默认参数：前两个target、name和get函数的相同、第三个`value`是==修改传入的值==
-      - ==defineProperty==监测不到劫持对象的==增删==，而==proxy==的set加入了监测==**增**==的能力，当`obj.新属性`时，也可以监测的到
+- 对比Object.defineProperty
 
-    - ==**delete**Property==函数有两个默认参数，同get函数，**必须**要有返回值，`return delete target[name]`
+  ```js
+  let obj = {a: 1}
+  let proxy_obj = {}
+  Object.defineProperty(proxy_obj, 'a', {
+      get(){
+          console.log('触发读取')
+          return obj.a
+      }
+  })
 
 - Tips：
 
