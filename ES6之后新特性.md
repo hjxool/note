@@ -928,16 +928,20 @@
   // proxy代理普通对象
   let proxy_obj = new Proxy(obj, {
       get(target, key, receiver){
-          // target 是目标对象，即obj
-          // key 是要访问的键名，如obj.a，key就是'a'
-          // receiver 是代理对象，即proxy_obj
+          // target 目标对象，即obj
+          // key 要访问的键名，如obj.a，key就是'a'
+          // receiver 代理对象或继承代理的对象，本例中是proxy_obj
           console.log('触发读取')
           return target[key]
       },
-      set(target, key, value){
-          // value 是修改属性传入的值
+      set(target, key, value, receiver){
+          // value 修改属性传入的值
+          // receiver 通常是代理对象，但也有可能set方法在原型链上，或以其他方式间接调用，因此不一定是代理对象
+          // 如xx.name='Alex'，xx不是代理对象，且自身不含name属性，但它的原型链上有一个代理对象，那么这个代理对象的set()会触发，此时receiver接收到的是xx而不是代理对象
           console.log('触发修改')
           target[key] = value
+          // 应当返回一个boolean值 true表示修改成功 在严格模式下false会抛出异常
+          return true
       },
       // 拦截删除对象属性操作
       // 必须 要有 返回值
@@ -946,21 +950,62 @@
       }
   })
   // 代理函数对象
-  function fn(a, b){
+  function fn(a, b) {
       return a + b
   }
-  new Proxy(fn, {
+  function create_proxy(obj, config) {
+      return new Proxy(obj, config)
+  }
+  let config = {
       // 拦截函数调用
       apply(target, thisArg, params){
           // target 目标函数
           // thisArg 调用者
           // params 调用函数传入的参数数组
-          return
+          console.log(thisArg)
+          return target(...params) * 10 // 结果乘10
+      }
+  }
+  let p = {
+      fn: create_proxy(fn, config)
+  }
+  console.log(p.fn(4, 5)) // 90 thisArg为对象p
+  // 拦截new操作符
+  function fn(a) {
+      this.age = a
+  }
+  let p = new Proxy(fn, {
+      // new newTarget时触发 必须要返回一个对象
+      construct(target, params, newTarget) {
+          // target 目标对象
+          // params new实例时传入的参数数组
+          // newTarget 最初被调用的构造函数 本例中是p
+          // 不能用new newTarget不然会死循环一直触发construct
+          return new target(...params)
       }
   })
+  console.log(new p(55)) // {age: 55}
+  // 拦截in操作符
+  let obj = {
+      name: 'xxx',
+      age: 22
+  }
+  let p = new Proxy(obj, {
+      has(target, prop) {
+          // target 目标对象
+          // prop 检测是否存在的属性名
+          if (prop in obj) {
+              // 没有return 默认返回false
+              return true
+          } else {
+              return false
+          }
+      }
+  })
+  console.log('age' in p) // true
   ```
 
-- 对比Object.defineProperty
+- 对比`Object.defineProperty`
 
   ```js
   let obj = {a: 1}
@@ -972,13 +1017,52 @@
       }
   })
 
+- `new Proxy(obj, handle)`还有以下处理函数
+
+  - [defineProperty()](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Proxy/Proxy/defineProperty)：拦截对对象的`Object.defineProperty`操作
+
+  - [Object.getOwnPropertyDescriptor](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Proxy/Proxy/getOwnPropertyDescriptor)：`Object.getOwnPropertyDescriptor`调用劫持
+
+  - [getPrototypeOf()](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Proxy/Proxy/getPrototypeOf)：拦截对象**原型**的读取操作
+
+  - [isExtensible()](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Proxy/Proxy/isExtensible)：拦截对对象的`Object.isExtensible()`
+
+  - [ownKeys()](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Proxy/Proxy/ownKeys)：`Object.getOwnPropertyNames`和`Object.getOwnPropertySymbols`的调用劫持
+
+  - [preventExtensions()](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Proxy/Proxy/preventExtensions)：对`Object.preventExtensions()`的拦截
+
+  - [setPrototypeOf()](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Proxy/Proxy/setPrototypeOf)：拦截`Object.setPrototypeOf()`
+
+- ==可撤销==代理
+
+  ```js
+  let obj = {
+      name: 'sss'
+  }
+  // 通过Proxy函数对象上的方法创建
+  let revocable = Proxy.revocable(obj, {
+      // 配置方法同new Proxy
+  })
+  // 返回值不同于new Proxy
+  // 代理对象在proxy属性中，并且有revoke函数
+  console.log(revocable) // {proxy: proxy, revoke: revoke()}
+  // 创建的代理
+  let proxy_obj = revocable.proxy
+  // 撤销代理
+  // 一旦撤销就不能恢复 与它关联的目标对象以及代理对象都有可能被垃圾回收
+  // 重复revoke()不会有任何效果，也不会报错
+  // 撤销后任何 拦截操作 都会抛出异常
+  revocable.revoke()
+
 - Tips：
 
-  - 当省略第三个参数==deleteProperty==时，对象可以==直接==删除操作，当写了==deleteProperty==，**必须**要在==return时==执行删除，不然删除无效，其实就是当你删除操作时，js帮你把删除操作放到了==deleteProperty==函数中执行，**同时**帮你**监测**删除动作
+  - 当省略`deleteProperty(){}`时，对象的删除操作，其实有一个默认的`deleteProperty`执行
 
   - 没有使用脚手架时，用`<script/>`标签引入等同于==import==导入，同样都可以用vue的==mixins==等导入外部配置项对象
 
   - 对数据代理本质的理解：对原始数据的操作是无法监测的，而数据代理就像一道筛网，通过另一个对象来映射原始数据，同时在映射对象身上添加了对应各种操作的拦截方法，从而达到修改映射对象时，既可以修改原始数据，同时还能拦截到操作
+
+  - `Proxy`没有`prototype`原型对象，因为，其实例对象**仅仅是**目标对象的一个**代理**，不需要初始化属性和方法
 
 ## Reflect
 
