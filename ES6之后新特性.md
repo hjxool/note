@@ -1054,6 +1054,33 @@
   // 撤销后任何 拦截操作 都会抛出异常
   revocable.revoke()
 
+- 多层级对象代理
+
+  ```js
+  let t = {
+      aaa: 11,
+      bbb: {
+          ccc: 222,
+      },
+      ddd: [{ eee: '1' }, { eee: '2' }]
+  }
+  function create_proxy(obj) {
+      if (typeof obj !== 'object') {
+          return obj
+      } else {
+          return new Proxy(obj, {
+              get(target, key, receiver) {
+                  console.log(`触发${key}的读取`)
+                  // 关键点 对象的内存地址也作为返回值，并对该对象进行代理
+                  return create_proxy(target[key])
+              }
+          })
+      }
+  }
+  let p = create_proxy(t)
+  p.bbb.ccc
+  p.ddd[1].eee
+  
 - Tips：
 
   - 当省略`deleteProperty(){}`时，对象的删除操作，其实有一个默认的`deleteProperty`执行
