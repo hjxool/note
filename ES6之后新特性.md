@@ -258,6 +258,8 @@
 
       - 因为返回值是Promise对象，且状态有可能失败，因此必须`Promise.all(...).catch()`
     
+    - 使用`await Promise.all()`会==等==全部任务(==不分执行先后==)状态==全部成功后==再执行后续代码
+    
   - `Promise.race(promiseObjArray)`
     - 参数：同`all`方法
     - 返回值：返回一个新的promise对象，值为==**第一个**==完成的promise的==结果==及==状态==
@@ -662,6 +664,8 @@
 
   - ※`async`函数默认返回一个promise对象，即使没写return也会返回值为undefined的promise对象
 
+    - 注！`async`会立即返回一个状态为`pending`的Promise对象，等里面的`await`以及其他逻辑==执行完才会将状态改为==成功或失败
+
   - **返回值**会自动加工成==Promise对象==！哪怕返回的是基本类型数据，得到的返回值也是Promise对象
 
     - **但**如果async函数返回给==父级==函数(父级函数也是async)，父级函数用`await`关键字可以把==状态成功==的Promise对象值取出来，即==原数据类型==
@@ -839,48 +843,52 @@
 - ※对象的解构赋值
 
   - `let { key1, key2 } = 对象`，无需调用对象属性就可以取出
+  
+  
+    - ==左边==必须跟右边赋值对象中属性==同名==
+  
+  
+  
+    - 可以用此方法[删除对象属性]()，用[rest参数]()设定一个形参，就会将没有单独提出来的属性装入==新对象==
+  
+      ```js
+      let obj = {
+          name: 'xxx',
+          age: 23,
+          aaa:111,
+          bbb:222
+      }
+      // 使用rest参数
+      let { bbb, ...new_obj } = obj
+      console.log(new_obj) // 输出{ name:'xxx', age:23, aaa:111 }
+      // 可以在解构赋值时重新命名
+      let {name:newName, age:newAge} = obj
+      console.log(newName, newAge) // 输出'xxx' 23
+      // 如果是数组中取值作为命名
+      let keys = ['name']
+      let { [keys[0]]:newName } = obj // 注:属性名要加中括号
+      // 如果解构的对象没有对应属性
+      let {eee: newEee = 333} = obj // obj内没有eee，则newEee为新值
+      
+      // 还可以嵌套解构
+      let obj2 = {
+          a: {
+              b:{
+                  c: '111'
+              },
+              d: {
+                  e: '222',
+                  f: '333'
+              }
+          }
+      }
+      let {a: {d: {f: newF}}} = obj2
+      // 等于
+      let {d: {f: newF}} = obj2.a
+      let {f: newF} = obj2.a.d
+      let newF = obj2.a.d.f
+  
 
-
-  - ==左边==必须跟右边赋值对象中属性==同名==
-
-  - 可以用此方法[删除对象属性]()，用[rest参数]()设定一个形参，就会将没有单独提出来的属性装入==新对象==
-
-    ```js
-    let obj = {
-        name: 'xxx',
-        age: 23,
-        aaa:111,
-        bbb:222
-    }
-    // 使用rest参数
-    let { bbb, ...new_obj } = obj
-    console.log(new_obj) // 输出{ name:'xxx', age:23, aaa:111 }
-    // 可以在解构赋值时重新命名
-    let {name:newName, age:newAge} = obj
-    console.log(newName, newAge) // 输出'xxx' 23
-    // 如果是数组中取值作为命名
-    let keys = ['name']
-    let { [keys[0]]:newName } = obj // 注:属性名要加中括号
-    // 如果解构的对象没有对应属性
-    let {eee: newEee = 333} = obj // obj内没有eee，则newEee为新值
-    
-    // 还可以嵌套解构
-    let obj2 = {
-        a: {
-            b:{
-                c: '111'
-            },
-            d: {
-                e: '222',
-                f: '333'
-            }
-        }
-    }
-    let {a: {d: {f: newF}}} = obj2
-    // 等于
-    let {d: {f: newF}} = obj2.a
-    let {f: newF} = obj2.a.d
-    let newF = obj2.a.d.f
 
 - 对于函数中默认参数`function (params...)`，也可以使用解构赋值。使用方式`function ( {解构参数} )`，甚至还可以`function (解构参数：{ parms1,parms2 })`
 - 因为实参传递到形参时，就隐性进行了一次`let 形参 = 实参`操作，所以在==函数定义处==就可以使用==解构赋值==，`function ({ a, b }或[ a, b ])`
