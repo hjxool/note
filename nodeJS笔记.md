@@ -12,6 +12,10 @@
 
   - 但是这样就无法使用`require(path)`方法，会报错
   - 并且没有`__dirname`全局变量了，需要根据控制台==当前==目录，使用`import.meta.url`作为替代
+  - 通过`"type"`切换ES6和`commonJS`只能==二选一==，`node ./文件`时只能都用ES6或者`commonJS`
+    - 通过==改后缀名==方式可以灵活切换
+      - `.mjs`支持ES6语法
+      - `.cjs`支持`commonJS`语法
 
 - 配置文件`package.json`中的`"scripts"`配置的运行指令是以`package.json`文件为**根目录**！
 
