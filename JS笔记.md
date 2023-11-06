@@ -753,7 +753,8 @@
     let r = /<a>(?<name>.*?)<\/a>.*?<p>(?<time>.*?)<\/p>/gs  全局匹配、包括换行、()捕获、?<>分组命名
     let result = t.matchAll(r)
     for (let val of result) {
-        console.log(val)	输出匹配结果数组
+        //输出匹配结果数组
+        console.log(val) // [0:匹配值, ..., groups:有()或分组的显示在这, index:位置索引, input:原始数据]
     }
 
 - `replace(string，new string)`
@@ -763,15 +764,9 @@
   
     - 只会替换==第一个匹配==的字符
   
-  
-  
     - 要替换全部匹配字符，需要用`replaceAll`或者※`replace(/正则/全局匹配，"替换内容")`
   
-  
-  
     - `字符串`中见到`\n`就是换行
-  
-  
   
     - 返回==修改后==的字符串
   
