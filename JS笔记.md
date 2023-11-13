@@ -758,16 +758,16 @@
 - `replace(string，new string)`
 
   - 用新字符串替换指定字符，或者用新字符串替换==正则匹配==的字符。该方法==不会改变原字符串==
-  
-  
+
+
     - 只会替换==第一个匹配==的字符
-  
+
     - 要替换全部匹配字符，需要用`replaceAll`或者※`replace(/正则/全局匹配，"替换内容")`
-  
+
     - `字符串`中见到`\n`就是换行
-  
+
     - 返回==修改后==的字符串
-  
+
 
 
 - `substring(start，end)`
@@ -1525,27 +1525,42 @@
 
 - 获取==父/子==元素
 
-  - [children]()：属性，返回==数组==。获取==子元素==标签`dom.children`(与[childNodes]()相反，childNodes是获取所有==节点==)
+  - `children`：属性，返回==数组==
 
-  - [parentNode]()：属性，返回==单个元素==。获取==父元素==标签。最多到document层
+    - 获取==子元素==标签`dom.children`(与[childNodes]()相反，childNodes是获取所有==节点==)
 
-    Tips：
+  - `parentNode`：属性，返回==单个元素==
+
+    - 获取==父元素==标签。最多到document层
+
 
     - 不要用此方法配合`offsetLeft`等方法获取边距，因为会获取到`document`，offset就应该用offset开头的方法
 
-  - [offsetParent]()：属性。获取上一级带有`position`属性的父级。最多到body层
+  - `offsetParent`：属性。获取上一级带有`position`属性的父级。最多到body层
 
-  - [父节点.getElementBy...]()：函数方法。除了用`document`去调用getElement，节点也可以用该方法来获取底下的所有子节点、孙节点
+  - `父节点.getElementBy...`：函数方法。除了用`document`去调用getElement，节点也可以用该方法来获取底下的所有子节点、孙节点
 
-  - [innerHTML]()：属性。不止用于设置和获取==标签内==文本内容，最主要的作用是显示和设置==标签内所有节点==
+  - `innerHTML`：属性。不止用于设置和获取==标签内==文本内容，最主要的作用是显示和设置==标签内所有节点==
 
-    - ```js
-      例如：ul.innerHTML = `<li>1</li>
-      					<li>2</li>
-      					<li>3</li>`
-      这样就可以直接 增/删/改 元素   删改 不建议 用这种方式 因为动作幅度太大
-      但是往一个 空 的标签里添加 多个元素 用这种方式更便捷
-      ```
+    ```js
+    例如：ul.innerHTML = `<li>1</li>
+    					<li>2</li>
+    					<li>3</li>`
+    这样就可以直接 增/删/改 元素   删改 不建议 用这种方式 因为动作幅度太大
+    但是往一个 空 的标签里添加 多个元素 用这种方式更便捷
+
+- 添加节点
+
+  - `parent.appendChild(节点)`或`parent.append(节点)`
+    - 在指定父节点的子节点列表末尾插入节点
+
+    - 节点会在传入`append`方法时，从它的==父节点中删除再插入新的位置==
+      - 因为同一个节点不可能出现在文档中不同位置
+      - 要保留原节点，需==先使用==`child.cloneNode()`创建一个副本，再将副本插入目标父节点
+        - 注：副本不会自动保持节点状态同步
+
+    - ==返回值==：追加后的子节点，如果是虚拟节点`documentFragment`，则会返回空`documentFragment`
+    - 如果传入的是`documentFragment`，则会将`documentFragment`中所有节点==转移==到父节点，并留下一个空的`documentFragment`
 
 - 获取==兄弟==元素
 
@@ -1625,6 +1640,27 @@
           console.log(val.dataset['xx'])
       }
   }
+
+## 虚拟节点documentFragment
+
+- 一个文档片段，轻量版的`document`，不是真实DOM树的一部分，它的改变不会触发DOM树重新渲染
+
+- 用例
+
+  ```js
+  // 创建
+  // 此时是一个空的文档片段
+  let fragment = document.createDocumentFragment()
+  // 从真实DOM树装入节点
+  let dom = docuemnt.querySelector('ul')
+  let child
+  // 每次循环将dom的第一个节点转移到虚拟节点树中
+  // 通过appendChild装入的节点会从真实DOM树中删除
+  while (child = dom.firstChild) {
+      fragment.appendChild(child)
+  }
+  // 对虚拟节点编辑后插入真实DOM树
+  dom.appendChild(fragment)
 
 ## BOM对象
 
