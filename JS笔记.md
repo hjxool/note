@@ -675,6 +675,29 @@
       return pre + cur
   })
   console.log(res) // 10
+  // 取对象里的值
+  let obj = {
+      a: {
+          b: [1, 2, 3]
+      }
+  }
+  let str = 'a.b[2]'
+  let list = str.split('.')//将先按.拆成数组
+  for(let i in list){
+      let val = list[i]
+      if(val.indexOf('[') !== -1){
+          let array = val.split('[')
+          let t = []
+          for(let k in array){
+              let t2 = array[k].replace(']', '')
+              t.push(t2)
+          }
+          list.splice(Number(i), 1, ...t)
+      }
+  }
+  let result = list.reduce((total, current) => {
+      return total[current]
+  }, obj)
   ```
 - `for(let i of array)`遍历数组
 - `indexOf('检索值'，'起始位置')`
@@ -761,11 +784,11 @@
 
 
     - 只会替换==第一个匹配==的字符
-
+    
     - 要替换全部匹配字符，需要用`replaceAll`或者※`replace(/正则/全局匹配，"替换内容")`
-
+    
     - `字符串`中见到`\n`就是换行
-
+    
     - 返回==修改后==的字符串
 
 
