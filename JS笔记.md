@@ -682,12 +682,16 @@
       }
   }
   let str = 'a.b[2]'
-  let list = str.split('.')//将先按.拆成数组
+  let list = str.split('.')//将先按.拆成数组 [a, b[2]]
   for(let i in list){
       let val = list[i]
+      // 找到带[的元素
       if(val.indexOf('[') !== -1){
+          // 将其以[拆成数组 ['b', '2]']
           let array = val.split('[')
           let t = []
+          // 遍历 将]剔除 组成新的数组 因为用splice方法必须知道]位置索引
+          // 而replace又不能修改原数组 只能将替换生成的新元素组成新数组再替换[a, b[2]]中的b[2]
           for(let k in array){
               let t2 = array[k].replace(']', '')
               t.push(t2)
@@ -695,6 +699,7 @@
           list.splice(Number(i), 1, ...t)
       }
   }
+  // 设置初始值为obj obj.a.b[2]本质是结果累加 所以用reduce方法
   let result = list.reduce((total, current) => {
       return total[current]
   }, obj)
