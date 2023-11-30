@@ -2014,6 +2014,20 @@
 
 - ※`drag`事件中，想要`drop`必须阻止`dragover`的默认操作
 
+- 用在拖拽**目标**上的事件
+
+  - `ondragstart `开始拖动**元素**时触发
+
+
+  - `ondrag `**元素**正在拖动时触发
+
+  - `ondragend `完成**元素**拖动后触发
+  - `ondragenter `当被鼠标拖动的对象进入其**容器范围**内时**触发**此事件
+  - `ondragover `被拖动的对象在另一对象**容器范围**内拖动时**触发**此事件
+  - `ondragleave `鼠标拖动的对象离开其**容器范围**内时**触发**此事件
+  - `ondrop `在一个拖动过程中，释放鼠标键时触发此事件
+
+
 ## MSE(Media Source Extensions)
 
 - B站开源的==flv.js==思路就是将FLV文件流转码成MP4片段(video标签可播放格式)，然后通过MSE将MP4片段喂给`<video>`
