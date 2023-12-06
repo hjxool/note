@@ -847,8 +847,6 @@
   
     - ==左边==必须跟右边赋值对象中属性==同名==
   
-  
-  
     - 可以用此方法[删除对象属性]()，用[rest参数]()设定一个形参，就会将没有单独提出来的属性装入==新对象==
   
       ```js
@@ -869,6 +867,8 @@
       let { [keys[0]]:newName } = obj // 注:属性名要加中括号
       // 如果解构的对象没有对应属性
       let {eee: newEee = 333} = obj // obj内没有eee，则newEee为新值
+      // 赋值对象没有对应属性 则为undefined
+      let {eee: newEee} = obj // newEee为undefined
       
       // 还可以嵌套解构
       let obj2 = {
