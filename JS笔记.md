@@ -154,21 +154,30 @@
 
 ## 条件语句
 
-- [switch]()：首先会执行==case条件判断==，再执行==之后所有代码==，没有break、return，则会把之后所有case内的代码执行
+- [switch]()：首先会执行==case条件判断==，再执行==之后所有代码==，没有break、return等则会把之后所有case内的代码执行
 
-  - ```javascript
-    case a:         等同于    if(xxx===a||xxx===b){
-    case b:	                     /*代码块*/
-        /*代码块*/            }
-    break;
-    ```
-  
-  - ```javascript
-    switch(true){           小技巧：switch进行范围判断，通过switch传入true值与case中的条件进行判断
-        case xxx > 60:
-            break;
-    }
-    ```
+  ```js
+  // 或
+  case a:         等同于    if(xxx===a||xxx===b){
+  case b:	                     /*代码块*/
+      /*代码块*/            }
+  break;
+  // switch进行范围判断
+  switch(true){
+      case xxx > 60:
+          break;
+  }
+  // break只能作用到switch不能作用到最近的for循环
+  for(let key in obj){
+      switch(key){
+          case 'id':
+             // continue可以作用于最近的for循环
+             continue;
+          case 'key2':
+             // return 作用于最近的函数
+             return;
+      }
+  }
 
 ## 循环语句
 
