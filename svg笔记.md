@@ -238,42 +238,43 @@
   - 常用于给线段添加箭头，写在`<defs>`中用于可复用图形
 
     - 线段设置css样式或者标签属性`marker-start/mid/end: url(#marker_id)`即可添加箭头
+      - `marker-mid`不同，它是在==线的转折点==添加，因此像`M 10 10 L 100 100`这种没有中间点的线，`marker-mid`属性无效
     - `overflow="visible"`一定要加，因为在线段首尾的箭头超出线段容器可视区域，会隐藏
-
+  
   - `markerWidth markerHeight` 设置标识大小
-
+  
   - `markerUnits="userSpaceOnUse"`一定要加，不然画的是`10x10`px大小的图标，会自动放大
-
+  
   - `refX refY`：表示吸附在线段==端点==的==基准点==
-
+  
     - ==图标原点==：`<marker>`内绘制图形的==起始点==为`0,0`点，也是==默认基准点==
-
+  
       - 如`<path d="M 0 0 L 8 -4 L 6 0 L 8 4 Z">`绘制的图标为
-
+  
         ![image-20231011161723332](C:/Users/admin/AppData/Roaming/Typora/typora-user-images/image-20231011161723332.png)
-
+  
         - 原点在箭头处，以原点为基准的坐标轴
-
+  
           ![image-20231011162153843](C:/Users/admin/AppData/Roaming/Typora/typora-user-images/image-20231011162153843.png)
-
+  
         - 使用`marker-end:url(#arrow)`配合`<marker id="arrow" orient="auto">`得到的图形结果
-
+  
           ![image-20231011162723903](C:/Users/admin/AppData/Roaming/Typora/typora-user-images/image-20231011162723903.png)
-
+  
         - 再`transform:rotate(180deg)`将图标旋转180°，既可得到，可以看到线段终点和箭尖重合
-
+  
           ![image-20231011163106782](C:/Users/admin/AppData/Roaming/Typora/typora-user-images/image-20231011163106782.png)
-
+  
         - `transform`旋转坐标轴不会跟着转，但是`<marker orient="45">`会使坐标轴跟着转
-
+  
           ![image-20231011163529766](C:/Users/admin/AppData/Roaming/Typora/typora-user-images/image-20231011163529766.png)
-
+  
         - 将旋转后的图标沿X坐标轴负向移动`<marker refX="-10">`10px，得到
-
+  
           ![image-20231011164320093](C:/Users/admin/AppData/Roaming/Typora/typora-user-images/image-20231011164320093.png)
-
+  
   - `orient`：绘制的方向(角度值或`auto`)
-
+  
     - `auto`表示以随线段方向自动变化
       - 如==线段==起始点`0,0`，终止点`100,100`斜率45，那么`<marker>`图标就要==以图标**原点**==顺时针转45°
 
