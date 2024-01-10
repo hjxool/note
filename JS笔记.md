@@ -1346,25 +1346,23 @@
 
 - 会在执行完父级的js后再执行iframe中内容
 
-- [vw]()和[vh]()是相对于视窗的，即是说是==相对于iframe==，而不是浏览器窗口
+- `vw`和`vh`是相对于视窗的，即是说是==相对于iframe==，而不是浏览器窗口
 
-- ==父获取子==iframe的window：[iframeElement.contentWindow]()
+- ==父获取子==iframe的window：`iframeElement.contentWindow`
+  - ==子获取父==的window：`window.parent`
 
-  - ==子获取父==的window：[window.parent]()
-
-- 通过[window.parent.父级方法]()调用、传参到父级
-
-  Tips：
+- 通过`window.parent.父级方法`调用、传参到父级
 
   - ==必须在服务器环境下！==
   - 可以通过函数传参，来获取父页面元素，但这种方法前提是，父页面也是自己编写
 
-- [window.parent.document.querySelector]()：通过==window.parent==获取到父==页面==document从而获取元素
+- `window.parent.document.querySelector`：通过==window.parent==获取到父==页面==document从而获取元素
 
-- 不同页面间通信[postMessage]()、[onmessage]()
+- 不同页面间通信`postMessage`、`onmessage`
 
   - 不是==多进程==独有的方法
   - window自带==postMessage==以及==onmessage==，`window.postMessage(数据)`是给==自身==发送消息，使用`window.onmessage = function(e){e.data}`即可接收到数据
+- `window.open`即使在`iframe`中调用，依然会在浏览器打开新页签
 
 
 ## 数据劫持/代理
@@ -1548,9 +1546,9 @@
 
   Tips：
 
-  - 当·**扩展运算符**·中的数据有·**引用类型**·就是浅拷贝，
+  - 当**扩展运算符**中的数据有**引用类型**就是浅拷贝，
 
--  [深拷贝]()：复制内存中存储的值，并开辟一块新内存空间用于存储。包括：ES6的·**Object.assign**·、·**扩展运算符{ ... }**·、迭代获取基本数据类型进行赋值
+-  [深拷贝]()：复制内存中存储的值，并开辟一块新内存空间用于存储。包括：ES6的**Object.assign**、**扩展运算符{ ... }**、迭代获取基本数据类型进行赋值
 
   Tips：
 
@@ -1559,7 +1557,7 @@
     - 最==简单==的：==`Json.parse(Json.stringify(obj))`==
       - 缺点：**无法拷贝**==函数==、和值为==undefined==的属性，==Date==对象会转变为==字符串==
 
-- “**传值和传址**”：·**基本**·数据类型的·**等号赋值**·是传值，而对象这种·**引用**·数据类型则是·**传址**·
+- “**传值和传址**”：**基本**数据类型的**等号赋值**是传值，而对象这种**引用**数据类型则是**传址**
 
 -  “**基本数据类型**”：undefined、number、string、null
 
@@ -1600,8 +1598,6 @@
   - `parentNode`：属性，返回==单个元素==
 
     - 获取==父元素==标签。最多到document层
-
-
     - 不要用此方法配合`offsetLeft`等方法获取边距，因为会获取到`document`，offset就应该用offset开头的方法
 
   - `offsetParent`：属性。获取上一级带有`position`属性的父级。最多到body层
