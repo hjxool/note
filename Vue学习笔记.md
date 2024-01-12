@@ -298,7 +298,45 @@ new Vue({
               arg: '传给指令的参数 如v-focus:foo中的foo',
               modifiers: '包含修饰符的对象 {foo: true}'
           }
-      }
+      },
+      // 示例
+      my_loading(dom, data) {
+  			// 判断页面中是否存在加载遮罩
+  			let load = document.querySelector('.my_loading');
+  			let { value } = data;
+  			if (load) {
+  				// 存在则修改位置和大小
+  				load.style.width = `${dom.clientWidth}px`;
+  				load.style.height = `${dom.clientHeight}px`;
+  				let p = dom.getBoundingClientRect();
+  				load.style.left = `${p.left}px`;
+  				load.style.top = `${p.top}px`;
+  				// 如果传入值为false则不显示
+  				load.style.display = `${value ? '' : 'none'}`;
+  			} else {
+  				// 不存在则创建
+  				load = document.createElement('div');
+  				// 设置样式
+  				load.className = 'my_loading';
+  				// 设置子节点
+  				load.innerHTML = `
+                      <div class="icon">
+                        <svg viewBox="25 25 50 50" class="box">
+                          <circle cx="50" cy="50" r="20" fill="none"></circle>
+                        </svg>
+                      </div>
+                  `;
+  				// 根据绑定元素设置大小
+  				load.style.width = `${dom.clientWidth}px`;
+  				load.style.height = `${dom.clientHeight}px`;
+  				// 根据绑定元素确定页面位置
+  				let p = dom.getBoundingClientRect();
+  				load.style.left = `${p.left}px`;
+  				load.style.top = `${p.top}px`;
+  				load.style.display = `${value ? '' : 'none'}`;
+  				document.body.appendChild(load);
+  			}
+  		},
   }
 
 #####     对象形式
