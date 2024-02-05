@@ -2082,3 +2082,102 @@
   - 音频语言切换
   - 动态控制视频加载
   - ...
+
+## 网页打开电脑软件
+
+- 方法是通过自定义URL协议，让网页调用本地安装的客户端
+
+- 自定义协议
+
+  - 格式：`xxx://参数`
+    - `xxx`是协议头，由注册表中`HKEY_CURRENT_USER\Software\Classes\xxx`项名称决定
+    - 参数可以更改`...\xxx\Shell\Open\command`的`默认`字符串值来更改
+
+- 如何注册自己编写的软件进注册表
+
+  1. 首先得有一个`.exe`文件
+
+  2. 创建`xx.txt`文件，填入下面内容
+
+     ```txt
+     Windows Registry Editor Version 5.00
+     
+     [HKEY_CURRENT_USER\Software\Classes\test]
+     "URL Protocol"=""
+     @=""
+     
+     [HKEY_CURRENT_USER\Software\Classes\test\Shell]
+     
+     [HKEY_CURRENT_USER\Software\Classes\test\Shell\Open]
+     
+     [HKEY_CURRENT_USER\Software\Classes\test\Shell\Open\command]
+     @="\"C:\\xx.exe\" \"%1\""
+     ```
+
+  3. 修改`.txt`文件后缀名为`.reg`。打开此文件，注册表编辑器会弹出对话框，询问是否确认添加
+
+  4. 测试地址栏打开桌面应用
+
+     - 地址栏输入`xxx://11`就会提示打开`xx.exe`
+
+- 安卓和IOS跳转应用原理
+
+  - IOS
+
+    - **URL Schemes**
+
+      - 类似HTTP 协议，是应用之间的通信协议
+      - 形如`appName://somepath?parameter=value`
+
+    - **openURL 方法**
+
+      - IOS提供了`UIApplication` 类，其中`openURL:` 方法，用于打开指定的 URL
+
+      - 例如
+
+        - 拨打电话
+
+          ```txt
+          NSURL *url = [NSURL URLWithString:@"tel://10086"];
+          [[UIApplication sharedApplication] openURL:url];
+          ```
+
+        - 发送短信
+
+          ```txt
+          NSURL *url = [NSURL URLWithString:@"sms://1383838438"];
+          [[UIApplication sharedApplication] openURL:url];
+          ```
+
+    - **应用间跳转**
+
+      - 创建两个示例应用，例如 `Test1`和 `Test2`
+
+      - 在`Test2`中实现一个跳转方法
+
+        ```js
+        NSURL *url = [NSURL URLWithString:@"myTest://"];
+        if ([[UIApplication sharedApplication] canOpenURL:url]) {
+            [[UIApplication sharedApplication] openURL:url];
+        } else {
+            NSLog(@"没有安装应用");
+        }
+        ```
+
+      - iOS 9.0 及更高版本，需要配置协议白名单（LSApplicationQueriesSchemes），以允许跳转到指定的应用
+
+    - **跳转到指定界面**
+
+      - 为了跳转到指定界面，我们需要在 URL 后面添加一些标记，用于告知被跳转的应用需要打开哪个界面。这涉及到两个应用之间的通信
+      - 在被跳转的应用的 `AppDelegate` 中监听代理方法，例如 `application:handleOpenURL:` 或 `application:openURL:options:`
+
+  - 安卓
+
+    - **URL Scheme**
+      - 安卓应用也可以注册一个 URL Scheme，用于从浏览器或其他应用中启动本应用。通过指定的 URL，可以让应用直接打开特定页面或执行指定动作
+    - **Schema 链接**
+      - 安卓应用可以通过 schema 链接来拉起其他应用。直接使用 `window.location.href` 跳转到 schema 链接即可。注意，每个手机应用都有独有的 schema，最好保持 iOS 和安卓的 schema 一致
+
+  - 总结
+
+    - 应用的跳转，通过配置URL Scheme和Schema 链接实现，而==通信==则依赖于==协议==
