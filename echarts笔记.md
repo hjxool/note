@@ -94,7 +94,7 @@
     ```js
     this.echartDom.setOption({
         series: [
-            data: newData
+            {data: newData}
         ]
     })
 
