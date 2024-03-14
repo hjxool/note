@@ -548,10 +548,7 @@
 
     - 实例对象是实例对象，函数对象是函数对象，实例对象的`_proto__`并不是函数对象，而是object空对象，里面有个属性==constructor==，指向实例对象的构造函数
 
-      Tips：
-
-      - `构造函数.prototype`和`实例对象.__proto__`是一个东西，指向同一个object空对象
-      - `let aaa = 'text' aaa.__proto__`和`Vue.prototype`并不是一个东西
+    - `构造函数.prototype`和`实例对象.__proto__`是一个东西，指向同一个object空对象
 
 - [原型链继承]()
 
