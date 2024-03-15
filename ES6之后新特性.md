@@ -362,6 +362,9 @@
 
 - class是function构造函数的==语法糖==，只是为了结构语法更清晰
 
+  - class类内方法开启局部的==严格模式==
+
+
   ```js
   // function构造函数
   function Person(name){
@@ -377,9 +380,18 @@
       constructor(name){	// 构造方法 名字不能修改
           this.name = name
       }
+      // 类里可以直接写赋值语句 表示给实例对象身上添加一个固定属性 等同写在构造器里
+      a = 1
+      // 公共方法是在类的原型身上添加 Person2.prototype.age = function(){}
+      // 所以类实例可以顺着原型链找到方法
       age(){	// 注意!只能用这种形式 不能用ES5的对象形式
           // 类中定义的方法可以访问到自身属性
           console.log(this.name)
+      }
+      age2(){
+          // 非static声明的函数放在类的原型对象 供实例使用
+          // 所以想要调用age必须使用this(实例)
+          this.age()
       }
       // 不想让实例使用的属性、方法 用static关键字 只有类才能看到、使用这些属性方法
       // 等同 Person2.fn = ()=>{}添加属性方法 其实例对象看不到
@@ -427,7 +439,7 @@
     }
     Phone.prototype.bbb2 = 123
     // 必须要用extends关键字
-    class SmartPhone extends fn{
+    class SmartPhone extends Phone{
         // 没写constructor时,extends会自动调用父类构造函数并传递赋值
         // 写了constructor时,必须 写super()调用父类构造函数并传参
         constructor(price,color){

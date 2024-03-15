@@ -534,15 +534,15 @@
 
 - [原型链]()：
 
-  - `函数.prototype(object空对象).__proto__(object原型对象).__proto__(null)`
+  - `函数.prototype(Object实例).__proto__(Object原型对象).__proto__(null)`
 
-  - `实例对象.__proto__(object空对象).__proto__(object原型对象).__proto__(null)`
+  - `实例对象.__proto__(Object实例).__proto__(Object原型对象).__proto__(null)`
 
   - `Object创建的对象.__proto__(原型对象).__proto__(null)`
 
-  - `函数.__proto__(Function对象).__proto__(object原型对象).__proto__(null)`
+  - `函数.__proto__(Object实例).__proto__(object原型对象).__proto__(null)`
 
-  - `Function.__proto__(Function对象).__proto__(object原型对象)`
+  - `Function.__proto__(Object实例).__proto__(object原型对象)`
 
   - 从上可以看出：
 
@@ -557,11 +557,8 @@
   - ==构造函数==及其==实例==也用到了原型链==继承==，他们的原型链比==Object==及实例对象的原型链==多一层==
 
   - **注意**，因为==子的原型==重新指向了父的==实例==，而实例和构造函数里是没有==constructor==属性的，又因为子的原型是实例，再去==原型==实例==的原型==去找，所以==子的constructor指向父的构造函数==
-
-    TIps：
-
-    - 因为==constructor==指向了改变了，所以就需要重新指向。`子函数.prototype.constructor = 子函数`，因为子函数的实例找`constructor`是从原型链上，因此需要给==父函数实例==身上加个同名属性
-
+  - 因为==constructor==指向了改变了，所以就需要重新指向。`子函数.prototype.constructor = 子函数`，因为子函数的实例找`constructor`是从原型链上，因此需要给==父函数实例==身上加个同名属性
+  
 - 访问一个对象时，会==先==在==自身==寻找，如果没有，则会去==原型对象==寻找
 
 - 当创建[构造函数]()时，可以将==实例身上共有==的属性和方法添加到==构造函数==的原型对象中，这样既可以每个对象都取到，也不会==影响全局作用域==
@@ -574,11 +571,9 @@
 
 - [原型对象]()是==一个类别==对象/函数的==公共区域==，用于存放==公用==的东西
 
-  Tips：
-
   - 原型对象都有[constructor]()
-  - `构造函数.prototype` = 原型对象，`原型对象.constructor` = 构造函数
-
+- `构造函数.prototype` = 原型对象，`原型对象.constructor` = 构造函数
+  
   ```js
   function xx(){
       this.a = 1
@@ -588,16 +583,14 @@
   console.log(a.__proto__.constructor == xx) //true
   console.log(a.__proto__ == xx.prototype) //true
   ```
-
+  
   - **只有**==读取属性==时才会在**原型链**中查找，当给实例==设置属性==时，是给当前实例对象上设置属性
 
 - ==实例对象==和==函数==的原型都指向==**空的Object实例**对象==，==Object空对象==的原型指向==Object原型对象==，注意，到原型对象之间都隔了一次==空对象==
 
-  Tips：
-
   - 在`function XX(){}`内部隐式加入了`xx(this).prototype = {}`，在`let aa = new xx()`时则是隐式`aa(this).__proto__ = xx.prototype`(这步是在==创建==实例对象时做的，后面不会再将新的显示原型地址值赋给实例的隐式原型)
   - 虽然`xx.prototype`是一个空对象，**但是**`xx.prototype`和`xx.prototype.函数.prototype`并不是同一个空对象
-
+  
 - `function xxx()`等于`let xxx = new Function()`，而又有`Function = new Function()`。所以，所有==函数==都是==Function==的实例对象，因此，函数同时具有`__proto__`和`prototype`，且他们的隐式原型都指向都相同
 
 - ```js
@@ -992,17 +985,17 @@
     ```js
     Function.prototype.newBind = function (obj, ...p){
         let that = this //关键点 返回的匿名函数 保存this
-        let fn = function (){
+        let cusfn = function (){
             // 关键点 bind返回的函数可以用 new关键字 只不过会丢失this
             // 而instanceof 可以判断是否是实例关系 利用这点可以判断是否使用了new
-            if(this instanceof fn){
+            if(this instanceof cusfn){
                 // 关键点 因为要判断是否使用了new即实例 所以必须用具名函数
                 that.call(this, ...p)
             }else{
                 that.call(obj, ...p)
             }
         }
-        return fn
+        return cusfn
     }
 
 
