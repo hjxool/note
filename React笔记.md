@@ -11,18 +11,19 @@
   <!--准备容器-->
   <div id="test"></div>
   
-  <!-- 引入react核心库 -->
+  <!-- 引入react核心库 React对象 -->
   <script type="text/javascript" src="../react.development.js"></script>
-  <!-- 引入react-dom 用于支持react操作DOM -->
+  <!-- ReactDOM对象 用于支持react操作DOM -->
   <script ... src="../react-dom.development.js"></script>
   <!-- 引入babel，用于将jsx转为js -->
   <script ... src="../babel.min.js"></script>
+  <!-- PropTypes对象 用于标签属性限制 -->
   <!-- html内写jsx一定要写type="text/babel" -->
   <script type="text/babel">
   	// 1.创建虚拟DOM 在jsx中不需要写引号 因为不是字符串
   	const dom = <h1>hello</h1>
   	// 2.渲染虚拟DOM到页面 render(虚拟DOM, 容器)
-  	ReactDom.render(dom, document.getElementById('test'))
+  	ReactDOM.render(dom, document.getElementById('test'))
   </script>
   ```
 
@@ -138,7 +139,7 @@
       return <h2>asdasd</h2>
   }
   // 2.渲染组件到页面 注意 标签必须闭合
-  ReactDom.render(<Demo/>, document.getElementById('test'))
+  ReactDOM.render(<Demo/>, document.getElementById('test'))
   ```
 
 - 类式组件
@@ -160,10 +161,13 @@
           }
       }
   }
-  ReactDom.render(<Demo/>, document.getElementById('test'))
+  ReactDOM.render(<Demo/>, document.getElementById('test'))
   ```
 
-  - 组件实例属性`state`(类似Vue的data)
+
+## 组件-state属性
+
+- 类似Vue的data
 
   ```jsx
   class Demo extends Component{
@@ -179,6 +183,73 @@
       }
   }
   ```
+
+## 组件-props属性
+
+- 类似Vue的props
+
+  ```jsx
+  import {Component} from 'react'
+  class Person extends Component{
+      render(){
+          return (
+          	<ul>
+              	<li>姓名：{this.props.name}</li>
+                  <li>年龄：{this.props.age}</li>
+              </ul>
+          )
+      }
+  }
+  // 通过标签传入的键值存在实例身上的props对象
+  ReactDOM.render(<Demo name="tom" age={15}/>, document.getElementById('test'))
+  ```
+
+- 批量传递键值
+
+  ```jsx
+  class Person extends Component{
+      render(){
+          return (
+          	<ul>
+              	<li>姓名：{this.props.name}</li>
+              </ul>
+          )
+      }
+  }
+  let p = {name:'tom', age:18, sex:'male'}
+  // 这是react特殊设置 {}是react的 正常情况是不能用...obj展开对象
+  ReactDOM.render(<Demo {...p}/>, document.getElementById('test'))
+  ```
+
+- `props`类型、必要性限制以及设置默认值
+
+  ```jsx
+  // 从react 16版本以后不再使用React.PropTypes
+  <script ... src="../prop-types.js"></script>
+  class Person extends Component{
+      render(){
+          return (
+          	<ul>
+              	<li>姓名：{this.props.name}</li>
+              </ul>
+          )
+      }
+  }
+  // propTypes是固定写法 写了propTypes后react就会识别给对应类加规则
+  // PropTypes.类型 isRequired表示必传
+  Person.propTypes = {
+      name: PropTypes.string.isRequired,
+      age: PropTypes.number,
+      sex: PropTypes.string,
+      speak: PropTypes.func, // 注：函数类型是func
+  }
+  // 设置未接收传参时的默认值 defaultProps固定写法
+  Person.defaultProps = {
+      age: 18,
+      sex: '不男不女'
+  }
+  function fn() {}
+  ReactDOM.render(<Person name="tom" age={18} speak={fn}/>)
 
 ## 事件绑定
 
