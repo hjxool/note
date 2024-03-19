@@ -142,6 +142,32 @@
   ReactDOM.render(<Demo/>, document.getElementById('test'))
   ```
 
+  - 函数式组件只能使用`props`
+
+  ```jsx
+  // 组件标签上传入的props会作为函数组件的参数传入
+  function Person(props){
+      let {name, age} = props
+      return (
+      	<ul>
+          	<li>姓名：{name}</li>
+              <li>年龄：{age}</li>
+          </ul>
+      )
+  }
+  // 函数式组件类型限制只能写在外层
+  Person.propTypes = {
+      name: PropTypes.string.isRequired,
+      age: PropTypes.number,
+      sex: PropTypes.string,
+      speak: PropTypes.func, // 注：函数类型是func
+  }
+  Person.defaultProps = {
+      age: 18,
+      sex: '不男不女'
+  }
+  ReactDOM.render(<Person name="tom" age={18}/>, document.getElementById('test'))
+
 - 类式组件
 
   - 适用于复杂组件
@@ -171,7 +197,6 @@
 
   ```jsx
   class Demo extends Component{
-      // state必须写在构造器内
       constructor(props){
        super(props)
        this.state = {
@@ -183,6 +208,19 @@
       }
   }
   ```
+
+- 简写`state`
+
+  ```jsx
+  class Demo extends Component{
+      // 初始固定参数 不需要构造器 直接使用赋值语句是往实例身上添加属性
+     	state = {
+          isHot: false
+      }
+      render(){
+          return <div>{this.state.isHot? '炎热': '凉爽'}</div>
+      }
+  }
 
 ## 组件-props属性
 
@@ -250,6 +288,65 @@
   }
   function fn() {}
   ReactDOM.render(<Person name="tom" age={18} speak={fn}/>)
+  ```
+
+- 利用`Class`特性简写`props`
+
+  ```jsx
+  class Person extends Component{
+      // Person.propTypes其实就是给类身上添加属性 用static关键字可简写
+      static propTypes = {
+          name: PropTypes.string.isRequired,
+          age: PropTypes.number,
+          sex: PropTypes.string,
+          speak: PropTypes.func, // 注：函数类型是func
+  	}
+      static defaultProps = {
+          age: 18,
+          sex: '不男不女'
+  	}
+      render(){
+          return (
+          	<ul>
+              	<li>姓名：{this.props.name}</li>
+              </ul>
+          )
+      }
+  }
+  ```
+
+- 构造器和`props`
+
+  ```jsx
+  // 如果希望在构造器中使用props 则必须调用super
+  class Person extends Component{
+      constructor(props){
+          super(props)
+          // 如果没有调用super 以及传入props 则 在构造器内 通过实例this访问props是undefined
+          console.log('构造器', this.props)
+      }
+  }
+  ```
+
+- `props`属性是==只读==的，不能修改
+
+## 组件-refs属性
+
+- 类似Vue的`$refs`属性
+
+  ```jsx
+  class Demo extends Component{
+      fn = () => {
+          console.log(this.refs.aaa.value)
+      }
+      render(){
+          return (
+          	<div>
+              	<input ref="aaa" onBlur={fn}>
+              </div>
+          )
+      }
+  }
 
 ## 事件绑定
 
@@ -278,11 +375,10 @@
   }
   ```
 
-- 事件绑定、`state`简写形式
+- 事件绑定简写
 
   ```jsx
   class Demo extends Component{
-      // 初始固定参数 不需要构造器 直接使用赋值语句
      	state = {
           isHot: false
       }
