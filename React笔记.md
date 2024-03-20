@@ -342,11 +342,74 @@
       render(){
           return (
           	<div>
+                  {/*字符串形式 过时版本 为了可能移除*/}
               	<input ref="aaa" onBlur={fn}>
               </div>
           )
       }
   }
+  ```
+
+- 回调形式的`ref`
+
+  ```jsx
+  class Demo extends Component{
+      fn = (c) => {
+          this.input1 = c
+      }
+      fn2 = () => {
+          console.log(this.input1.value)
+      }
+      render(){
+          return (
+          	<div>
+              	<input ref="{fn}" onBlur={fn2}>
+              </div>
+          )
+      }
+  }
+  ```
+
+- 通过API`createRef`创建
+
+  - 注！`createRef`创建的容器只能存一个节点，一个类组件下用同一个容器存多个`ref`标记节点，后一个会顶掉前一个
+
+  ```jsx
+  class Demo extends Component{
+      // React.createRef会返回一个容器 该容器存储被ref标识的节点
+      myRef = React.createRef()
+      fn = () => {
+          // 因为只能存一个节点 所以节点信息都在current下
+          console.log(this.myRef.current.value)
+      }
+      render(){
+          return (
+          	<div>
+              	<input ref="{this.myRef}" onBlur={fn}>
+              </div>
+          )
+      }
+  }
+  ```
+
+- Tips
+
+  - 勿过度使用`ref`，如**事件发生**的节点和要**操作的节点**是同一个，可以通过事件回调取得该节点的DOM
+
+    ```jsx
+    class Demo extends Component{
+        fn = (e) => {
+            console.log(e.target.value)
+        }
+        render(){
+            return (
+            	<div>
+                	<input onBlur={fn}>
+                </div>
+            )
+        }
+    }
+
 
 ## 事件绑定
 
@@ -392,6 +455,34 @@
       // 利用箭头函数的特性和类内声明实例固定参数
       change = () => {
           console.log(this) // this指向实例对象
+      }
+  }
+  ```
+
+- 事件绑定传参
+
+  - 函数柯里化的应用：多个函数接收到不同参数，最后组合在一起
+
+  ```jsx
+  class Demo extends Component{
+      state = {
+          name: '',
+          password: ''
+      }
+      save = (type) => {
+          // 因为事件绑定的是save返回的函数 因此event事件对象是在返回值函数中传入
+          return (event) =>{
+              this.setState({
+                  [type]: event.target.value
+              })
+          }
+      }
+      render(){
+          return (
+              {/*注意!这里为事件绑定的是save方法的返回值 而返回值是一个函数*/}
+          	用户名：<input onChange={save('name')}>
+              密码：<input onChange={save('password')}>
+          )
       }
   }
 

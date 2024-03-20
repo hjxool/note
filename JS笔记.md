@@ -1915,6 +1915,8 @@
 
 - 用嵌套函数闭包的形式将接收==多个参数==的函数变换成接收==单一==参数的函数
 
+  - 换言之，就是多个函数接收不同参数最后组合在一起使用
+
   ```js
   function fn1(p) {
       return function fn2(p2, p3) {
@@ -2024,7 +2026,7 @@
   list1.map(item => item.aaa)
   list2.map(item => item.ddd)
   ```
-  
+
 ## 拖拽
 
 - `dragover`和`drop`需要`e.preventDefault()`取消默认行为
