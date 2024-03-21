@@ -190,6 +190,27 @@
   ReactDOM.render(<Demo/>, document.getElementById('test'))
   ```
 
+  - 组件嵌套
+
+  ```jsx
+  class A extends Component{
+      render() {
+          return (
+          	<div>
+              	<div>A</div>
+                  <B/>
+              </div>
+          )
+      }
+  }
+  class B extends Component{
+      render() {
+          return (
+          	<div>B</div>
+          )
+      }
+  }
+
 
 ## 组件-state属性
 
@@ -485,6 +506,28 @@
           )
       }
   }
+  ```
+
+  - 不用柯里化的形式
+
+  ```jsx
+  class Demo extends Component{
+      state = {
+          name: '',
+          password: ''
+      }
+      save = (type, value) => {
+          this.setState({
+              [type]: value
+          })
+      }
+      render(){
+          return (
+              {/*标签内传入一个匿名函数做壳 用于传递*/}
+  			用户名：<input onChange={(event)=>{this.save('name', event.target.value)}}>
+          )
+      }
+  }
 
 ## 数据绑定
 
@@ -508,3 +551,142 @@
       }
   }
   ```
+
+## 生命周期
+
+- 示例
+
+  ```jsx
+  class Life extends React.Component{
+      state = {opacity:1}
+      disappear = () => {
+          // 卸载组件 将挂载在节点上的组件卸载
+          ReactDOM.unmountComponentAtNode(document.getElementById('test'))
+      }
+      // 初始化渲染(挂载)、数据更新时调用 等同Vue beforeMount 和 beforeUpdate
+      render() {
+          return (
+          	<div>
+              	<h2 style={opacity: this.state.opacity}>asdas</h2>
+                  <button onClick={this.disappear}>消失</button>
+              </div>
+          )
+      }
+      // 组件挂载完毕时调用 等同Vue mounted
+      // 常用 一般用于初始化 发送请求 订阅消息
+      componentDidMount() {
+          this.timer = setInterval(()=>{
+              let {opacity} = this.state
+              opacity -= 0.1
+              if (opacity <= 0) opacity = 1
+              this.setSate({opacity})
+          }, 200)
+      }
+      // 组件 将要 卸载时调用 等同Vue beforeDestroy
+      // 常用 一般用于收尾 关闭定时器 取消消息订阅
+      componentWillUnmount() {
+          clearInterval(this.timer)
+      }
+      
+  }
+  ```
+
+- 生命周期
+
+  - `constructor(props)`：构造器
+
+    - 接收父组件传入参数`props`
+
+  - `getDerivedStateFromProps`：`render`前调用，即初次渲染和更新渲染之前调用
+
+    - 获取`props`派生`state`
+    - 极少用，默认返回`null`，使用场景：组件内`state`纯由父组件传入的`props`决定
+
+  - `render`：初次渲染和更新时调用
+
+  - `componentDidMount`：组件挂载完成时调用
+
+  - `shouldComponentUpdate`：阀门，控制组件是否允许更新
+
+  - `getSnapshotBeforeUpdate`：更新前调用
+
+    - 类似Vue的`watch`监听器，可以获取到`state`和`props`值改变之前的`oldValue`
+    - ==返回值==将传递给`componentDidUpdate`
+
+    ```jsx
+    // 实现一个自动填入并滚动新闻列表
+    class Demo extends Component {
+        state = {list: []}
+        myRef = React.createRef()
+        componentDidMount() {
+            setInterval(()=>{
+                let {list} = this.state
+                // 生成
+                let t = '新闻' + (list.length + 1)
+                // 将新插入的放在最前面
+                this.setState({list: [t, ...list]})
+            },1000)
+        }
+        // 接收两个参数 更新前props 更新前state
+        getSnapshotBeforeUpdate(preProps, preState) {
+            return this.myRef.scrollHeight
+        }
+        // 更新后接收到getSnapshotBeforeUpdate返回值
+        componentDidUpdate(preProps, preState, height) {
+            // 向下滚动 用 当前内容高度 减去改变 更新前高度得到向下滚动距离
+            this.myRef.scrollTop += (this.myRef.scrollHeight - height)
+        }
+        render() {
+            return (
+            	<div id="list" ref="{this.myRef}">
+                	{
+                        this.state.list.map((e, index) => {
+                            return <div key={index}>{e}</div>
+                        })
+                    }
+                </div>
+            )
+        }
+    }
+
+  - `componentDidUpdate(preProps, preState)`：更新完成时调用
+
+    - 接收两个参数，更新前`props`、更新前`state`
+
+  - `componentWillUnmount`：组件卸载前调用
+
+## 列表渲染
+
+- `{}`中的表达式是**数组**，则会自动遍历渲染
+
+  ```jsx
+  class Demo extends Component{
+      state = {
+          list: [
+              {label:'11', value: 'aa'},
+              {label:'22', value: 'bb'},
+              {label:'33', value: 'cc'},
+          ]
+      }
+      render() {
+          return (
+          	<div>
+              	{
+                      this.state.list.map((e, index) => {
+                      	return <div key={e.value}>{e.label}</div>
+                  	})
+                  }
+              </div>
+          )
+      }
+  }
+
+## react脚手架
+
+- ==工程化==项目所必须
+  - 工程化：代码编译、检查等操作自动化执行
+- 步骤
+  1. `npm i -g create-react-app`全局安装
+     - 没有`-g`全局安装，会使得在每一处创建工程项目时都
+  2. 切换到想创建项目的文件目录，`create-react-app xxx项目名`
+  3. 进入项目文件夹，使用`npm start`运行项目
