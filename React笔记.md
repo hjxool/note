@@ -685,8 +685,27 @@
 
 - ==工程化==项目所必须
   - 工程化：代码编译、检查等操作自动化执行
+
 - 步骤
   1. `npm i -g create-react-app`全局安装
      - 没有`-g`全局安装，会使得在每一处创建工程项目时都
   2. 切换到想创建项目的文件目录，`create-react-app xxx项目名`
   3. 进入项目文件夹，使用`npm start`运行项目
+
+- 示例
+
+  - `public`下`index.html`
+
+  ```html
+  <head>
+      <!-- %PUBLIC_URL%代表publick文件夹路径 -->
+      <link rel="icon" href="%PUBLIC_URL%/favicon.ico"/>
+      <!-- 开启理想视口 用于做移动端适配 -->
+      <meta name="viewport" content="width=device-width, initial-scale=1"/>
+      <!-- 用于配置浏览器页签的颜色 只作用于安卓移动端 -->
+      <meta name="theme-color" content="#000"/>
+      <!-- 用于指定网页添加到手机主屏幕的图标 -->
+      <link rel="apple-touch-icon" href="%PUBLIC_URL%/logo.png"/>
+      <!-- 网页套壳做安卓、IOS软件时的配置文件 -->
+      <link rel="manifest" href="%PUBLIC_URL%/manifest.json"/>
+  </head>
