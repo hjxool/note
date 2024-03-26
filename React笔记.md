@@ -694,7 +694,9 @@
 
 - 示例
 
-  - `public`下`index.html`
+  - `public`下`index.html`(主界面)
+    - `index.html`不能改名，这是在`webpack`里配置好的，`index.js`绑定容器必会去`public`下寻找`index.html`文件
+
 
   ```html
   <head>
@@ -709,3 +711,61 @@
       <!-- 网页套壳做安卓、IOS软件时的配置文件 -->
       <link rel="manifest" href="%PUBLIC_URL%/manifest.json"/>
   </head>
+  <body>
+      <div id='root'></div>
+  </body>
+  ```
+
+  - `src`下`index.js`(入口文件)
+
+  ```jsx
+  // 在入口文件中引入react库文件
+  import React from 'react'
+  import ReactDOM from 'react-dom'
+  // 引入组件 .js文件可以省略后缀
+  import App from './App'
+  // 绑定到index.html的真实DOM节点
+  ReactDOM.render(<App/>, document.getElementById('root'))
+  // StrictMode标签是帮助审查其包含标签的代码 给出警告提示
+  ReactDOM.render(<React.StrictMode>
+                      <App/>
+                  </React.StrictMode>,
+                  document.getElementById('root'))
+  ```
+
+  - `src`下`App.js`(根组件)
+    - 每个模块化组件文件中都需要引入库文件，只要用的就要引入
+
+  ```jsx
+  // 任何东西包括图片都可以作为模块
+  import logo from './logo.svg'
+  // import导入的样式文件作用于组件及其子组件
+  import './App.css'
+  import React, {Component} from 'react'
+  import Hello from './components/hello/index'
+  // 根组件内容
+  // 作为模块暴露出去 在入口文件中引入
+  export default class App extends Component {
+      render() {
+          return (
+          	<div>
+              	<Hello/>
+              </div>
+          )
+      }
+  }
+  ```
+
+- `src/components/hello`下`index.js`(模块化组件)
+
+```jsx
+import React, {Component} from react
+import './index.css'
+export default class Hello extends Component {
+    render() {
+        return (
+        	<div>Hello</div>
+        )
+    }
+}
+```

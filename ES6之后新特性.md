@@ -663,6 +663,16 @@
 
 - ==引入Npm包==：`import 别名 from '包的名称'`即可使用，例：`import $ from 'jquery'`=>`$(body).css('color','red')`
 
+- `import`可以多次从同一个库中引入，只要不命名冲突
+
+  ```js
+  // 第一句引入总对象
+  import React from 'react'
+  // 第二句引入模块中其中一个属性
+  import {Component} from 'react'
+  // 其实等同于 逗号隔开就表示多个赋值语句
+  import React, {Component} from 'react'
+
 
 ## async、await
 
