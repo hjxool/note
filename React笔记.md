@@ -35,7 +35,7 @@
   const dom = <h1>hello</h1>
   // 如果是多层结构 用()表示一个整体
   const dom = (
-      <h1 class="title">
+      <h1 className="title">
           <span>hello</span>
       </h1>
   )
@@ -742,7 +742,8 @@
   // import导入的样式文件作用于组件及其子组件
   import './App.css'
   import React, {Component} from 'react'
-  import Hello from './components/hello/index'
+  // 如果引入的js文件以index命名 则可省略不写
+  import Hello from './components/Hello'
   // 根组件内容
   // 作为模块暴露出去 在入口文件中引入
   export default class App extends Component {
@@ -756,7 +757,9 @@
   }
   ```
 
-- `src/components/hello`下`index.js`(模块化组件)
+- `src/components/Hello`下`index.js`(模块化组件)
+  - 组件文件夹最好用大写首字母，表示这是一个组件
+
 
 ```jsx
 import React, {Component} from react
@@ -769,3 +772,66 @@ export default class Hello extends Component {
     }
 }
 ```
+
+## 样式模块化
+
+- 样式文件**虽然**是在**各自**组件中引入，**但是**最后汇总到`App.js`，样式会混杂在一块，后引入的组件样式会覆盖前面的组件同名样式
+
+  - 但是使用模块化样式类名只能平铺，如样式
+
+    ```less
+    .title{
+        > .text{
+            .icon {
+                ...
+            }  
+        }
+    }
+    .icon {}
+    ```
+
+    - 调用样式时
+
+    ```jsx
+    import hello from './index.module.css'
+    export default class Hello extends Component {
+        render() {
+            return (
+                {/* 当有同类名时就会出错 所以用模块化的样式任意层级不能有同名类名 */}
+            	<h2 className={hello.title}>
+                	<div className={hello.text}>
+                    	<img className={hello.icon}/>
+                    </div>
+                </h2>
+            )
+        }
+    }
+
+- 方法
+
+  1. `xxx.css`改名为`xxx.module.css`
+
+  2. `xxx.module.css`
+
+     ```css
+     .title{
+         color: red;
+         background: yellow;
+     }
+
+  3. 在`xxx.js`中引入
+
+     ```jsx
+     import React, {Component} from 'react'
+     // 引入xxx.css文件不能用别名
+     import './index.css'
+     // 但是改为xxx.module.css后 可以用别名
+     import hello from './index.module.css'
+     export default class Hello extends Component {
+         render() {
+             return (
+                 {/* 模块化样式后就需要用表达式来应用样式 */}
+             	<h2 className={hello.title}>hello</h2>
+             )
+         }
+     }
