@@ -2,6 +2,9 @@
 
 - [中文网](https://react.docschina.org)
 - 官方chrome浏览器插件`React Developer Tools`
+- vscode插件`ES7 React/Redux/GraphQL/React-Native snippets`
+  - 脚手架环境下在`xxx.jsx`文件中，使用`rcc`会自动生成组件结构片段
+
 
 ## 示例
 
@@ -263,7 +266,7 @@
   ReactDOM.render(<Demo name="tom" age={15}/>, document.getElementById('test'))
   ```
 
-- 批量传递键值
+- ==批量==传递键值
 
   ```jsx
   class Person extends Component{
@@ -431,6 +434,81 @@
         }
     }
 
+## 组件间传值
+
+- 父往子传数据
+
+  - 用`props`属性
+
+  ```jsx
+  // 父组件
+  import React, {Component} from 'react'
+  import Son from '../components/Son'
+  class Parent extends Component{
+      state = {
+          list: []
+      }
+      render() {
+          return (
+          	<Son list={list}/>
+          )
+      }
+  }
+  // components/Son下子组件
+  class Son extends Component{
+      render() {
+          let {list} = this.props
+          return (
+          	<div>
+              	{list.map(e => {
+                      return <div key={e}>{e}</div>
+                  })}
+              </div>
+          )
+      }
+  }
+  ```
+
+- 子往父传数据
+
+  - 在父组件定义函数传入子组件，子组件触发函数传递数据
+
+  ```jsx
+  // 父组件
+  import React, {Component} from 'react'
+  import Son from '../components/Son'
+  import Son2 from '../components/Son2'
+  class Parent extends Component{
+      state = {
+          list: []
+      }
+      son2ToParent = (data)=>{
+          this.setState({
+              list: data
+          })
+      }
+      render() {
+          return (
+          	<Son list={list}/>
+              <Son2 fn={this.son2ToParent}/>
+          )
+      }
+  }
+  // components/Son2下子组件
+  class Son2 extends Component{
+      passData = (newList)=>{
+          return () => {
+              this.props.fn(newList)
+          }
+      }
+      render() {
+          return (
+          	<button onClick={this.passData(this.newList)}>
+                  修改父组件传递给Son的list
+              </button>
+          )
+      }
+  }
 
 ## 事件绑定
 
@@ -835,3 +913,15 @@ export default class Hello extends Component {
              )
          }
      }
+     ```
+
+- **更建议**用`.less`将样式以组件分开划分
+
+  ```less
+  .hello{
+      >.title{
+          >.text{
+              .icon{...}
+          }
+      }
+  }

@@ -2168,3 +2168,22 @@
   - 总结
 
     - 应用的跳转，通过配置URL Scheme和Schema 链接实现，而==通信==则依赖于==协议==
+
+## DOM元素全屏
+
+- 注：因为全屏后元素内的弹窗等低于全屏层级，导致显示不出来
+
+- 示例
+
+  ```js
+  let ele = document.getElementById('reserve');
+  // 检测document中是否有正在全屏的元素
+  if (!document.fullscreenElement) {
+      // 如果没有 则调用 元素身上的方法放大
+      ele.requestFullscreen();
+  } else {
+      // 注: 退出放大时使用的是document身上的方法
+      if (document.exitFullscreen) {
+          document.exitFullscreen();
+      }
+  }
