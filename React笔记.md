@@ -185,9 +185,9 @@
       // 2.必须有render()
       render(){
           // 3.必须有返回值
-          return {
+          return (
               <div>{this.props.name}</div>
-          }
+          )
       }
   }
   ReactDOM.render(<Demo/>, document.getElementById('test'))
@@ -758,6 +758,39 @@
           )
       }
   }
+  ```
+
+## 条件渲染
+
+- React中没有Vue`v-if`、`v-show`这样的指令，要实现同样的效果
+
+  ```jsx
+  // 实现v-if效果
+  class A extends Component {
+      state = {
+          show: false
+      }
+      render() {
+          let {show} = this.state
+          if(show) {
+              return <h2>xxx1</h2>
+          }else {
+              return <h2>xxx2</h2>
+          }
+      }
+  }
+  // 实现v-show效果
+  class A extends Component {
+      state = {
+          show: false
+      }
+      render() {
+          let {show} = this.state
+          return (
+          	<h2 style={{ display: show ? '' : 'none' }}>xxx3</h2>
+          )
+      }
+  }
 
 ## react脚手架
 
@@ -925,3 +958,54 @@ export default class Hello extends Component {
           }
       }
   }
+
+## 消息订阅-发布
+
+- 通过工具库`PubSubJS`实现
+  1. 安装`npm i pubsub-js --save`
+  
+     - `--save`表示安装在==生产==环境
+  
+  2. 引入`import PubSub from 'pubsub-js'`
+  
+  3. 订阅消息`PubSub.subscribe('eventName', (msg, data) => {})`
+  
+     - 类似Vue的`$on`
+     - 注！与Vue不同的是，订阅消息的回调函数不止接收发布传来的数据，还有发布的消息名
+  
+     ```jsx
+     class A extends Compoenent {
+         componentDidMount() {
+             this.id = PubSub.subscribe('aaa', (msg, data) => {
+                 console.log(msg) // 'aaa'
+                 console.log(data) // '123'
+             })
+         }
+         componentWillUnmount() {
+             // 组件卸载时注销订阅
+             PubSub.unsubscribe(this.id)
+         }
+     }
+     class B extends Component {
+         fn = () => {
+             PubSub.publish('aaa', '123')
+         }
+         render() {
+             return (
+             	<button onClick={fn}>发送数据给A</button>
+             )
+         }
+     }
+  
+  4. 发布消息`PubSub.publish('eventName', data)`
+  
+     - 类似Vue的`$emit`
+     - 只能传一个参数`data`，**不能**`publish('eventName', data1, data2, ...)`
+  
+  5. 取消订阅`PubSub.unsubscribe(id)`
+  
+     ```jsx
+     let id = PubSub.subscribe('eventName', () => {})
+     // 在订阅消息时会获得订阅的id 就是根据这个id取消订阅
+     // 与Vue不同 Vue中是取消所有同名事件的订阅 使用this.$bus.$off('eventName')
+     PubSub.unsubscribe(id)
