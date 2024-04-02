@@ -252,7 +252,7 @@
 
   ```jsx
   import {Component} from 'react'
-  class Person extends Component{
+  class Demo extends Component{
       render(){
           return (
           	<ul>
@@ -269,7 +269,7 @@
 - ==批量==传递键值
 
   ```jsx
-  class Person extends Component{
+  class Demo extends Component{
       render(){
           return (
           	<ul>
@@ -353,6 +353,26 @@
   ```
 
 - `props`属性是==只读==的，不能修改
+
+- 标签体内容也在`props`中
+
+  - `children`是一种特殊标签属性，所以可以用批量传递键值的方式简写
+
+  ```jsx
+  import {Component} from 'react'
+  class A extends Component {
+      render() {
+          return <B>222</B>
+      }
+  }
+  class B extends Component {
+      render() {
+          let {children} = this.props // children为222
+          return <h2>{children}</h2>
+          // 简写
+          return <h2 {...this.props}></h2>
+      }
+  }
 
 ## 组件-refs属性
 
@@ -1009,3 +1029,147 @@ export default class Hello extends Component {
      // 在订阅消息时会获得订阅的id 就是根据这个id取消订阅
      // 与Vue不同 Vue中是取消所有同名事件的订阅 使用this.$bus.$off('eventName')
      PubSub.unsubscribe(id)
+
+## 路由react-router
+
+- react的一个==插件库==
+
+  - 有三种实现，分别给三个平台用
+    - Web：使用`react-router-dom`库，针对web使用
+      - 安装：`yarn add react-router-dom`
+    - react-native
+    - any
+
+- 示例
+
+  ```jsx
+  import React, {Component} from 'react'
+  // 引入路由组件
+  // 注: Link等都是 组件 所以引入时首字母大写
+  // 注: 不能在此处引入BrowserRouter 因为路由跳转必须由同一个路由器管理才能实现 如果东包一个BrowserRouter 西包一个BrowserRouter就无法跳转
+  import {Link, Route, NavLink} from 'react-router-dom'
+  // 引入路由分类显示组件
+  // 注: 用于路由的组件应该放在pages文件夹下 不与普通组件混用
+  import Aaa from './pages/Aaa'
+  import Bbb from './pages/Bbb'
+  export default class A extends Component {
+      render() {
+          return (
+          	<div id="index">
+              	<div className="left_nav">
+                      {/*注: to不识别大小写 编写路由链接*/}
+                      <Link className="xx" to="/aaa">跳转aaa</Link>
+                      <Link to="/bbb">跳转bbb</Link>
+                  </div>
+                  
+                  <div className="right_content">
+                  	{/*注册路由
+                  	path 匹配路径
+                  	component 对应组件*/}
+                      <Route path="/aaa" component="{Aaa}"/>
+                      <Route path="/bbb" component="{Bbb}"/>
+                  </div>
+              </div>
+          )
+      }
+  }
+  ```
+
+  - 在根目录`index.js`中引入`BrowserRouter`
+    - 所有==路由组件==需要用`xxxRouter`组件包裹才能使用
+      - 可包裹`<BrowserRouter>`或`<HashRouter>`
+        - 且路由跳转必须由同一个==路由器==管理才能实现
+      - 使用`<HashRouter>`地址栏路径会多出`#`，如`localhost:80/#/aaa`
+
+  ```jsx
+  import React from 'react'
+  import ReactDOM from 'react-dom'
+  import App from './App'
+  import {BrowserRouter} from 'react-router-dom'
+  ReactDOM.render(
+  	<BrowserRouter>
+      	<App/>
+      </BrowserRouter>,
+      document.getElementById('root')
+  )
+
+- 路由组件和一般组件的区别
+
+  - 写法不同
+    - 一般组件：`<Aaa/>`
+    - 路由组件：`<Route component="{Aaa}"/>`
+  - 存放位置不同
+    - 一般组件：`/components`
+    - 路由组件：`/pages`
+
+  - 接收到的`props`不同
+    - 一般组件：写组件时传什么就收什么
+    - 路由组件：接收固定属性
+      - `history`
+      - `location`
+      - `match`
+
+- 导航激活样式设置
+
+  - 可以在`<Link>`组件上添加动态样式，或者使用`<NavLink>`自动添加激活样式
+
+  ```jsx
+  import React, {Component} from 'react'
+  import {Route, NavLink} from 'react-router-dom'
+  import Aaa from './pages/Aaa'
+  import Bbb from './pages/Bbb'
+  export default class A extends Component {
+      render() {
+          return (
+          	<div id="index">
+              	<div className="left_nav">
+                      {/*自动实现激活样式需要使用NavLink
+                      激活的样式由activeClassName属性指定*/}
+                      <NavLink activeClassName="style1" className="xx" to="/aaa">
+                          跳转aaa
+                      </NavLink>
+                      <NavLink activeClassName="style1" to="/bbb">
+                          跳转bbb
+                      </NavLink>
+                  </div>
+              </div>
+          )
+      }
+  }
+  ```
+
+  - 为了更简便使用，对`<NavLink>`再进行一次封装
+
+  ```jsx
+  // /components/Mynavlink/index.js
+  import React, {Component} from 'react'
+  import {NavLink} from 'react-router-dom'
+  export default class Mynavlink extends Component {
+      render() {
+          let {to, content} = this.props
+          return (
+          	<NavLink activeClassName="style1" className="xx" to={to}>
+                  {content}
+              </NavLink>
+          )
+          // 利用props特性进行简写
+          return (
+          	<NavLink activeClassName="style1" className="xx" {...this.props}/>
+          )
+      }
+  }
+  // 在调用Mynavlink的组件内
+  import Mynavlink from '../components/Mynavlink'
+  export default class Demo extends Component {
+      render() {
+          return (
+          	<Mynavlink to={'/aaa'} content={'跳转aaa'}></Mynavlink>
+              <Mynavlink to={'/bbb'} content={'跳转bbb'}></Mynavlink>
+          )
+          // 利用props特性进行简写
+          return (
+              <Mynavlink to={'/aaa'}>跳转aaa</Mynavlink>
+              <Mynavlink to={'/bbb'}>跳转bbb</Mynavlink>
+          )
+      }
+  }
