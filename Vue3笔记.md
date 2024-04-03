@@ -173,6 +173,8 @@
   后代组件：
   	import {inject} from 'vue'
   	let xxx2 = inject('键名')
+      // 第二个参数是未接收到参数时的默认值
+      let xxx3 = inject('键名', '默认值')
       直接调用：xxx2.aaa
   ```
 

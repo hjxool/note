@@ -1112,7 +1112,8 @@ export default class Hello extends Component {
 - 导航激活样式设置
 
   - 可以在`<Link>`组件上添加动态样式，或者使用`<NavLink>`自动添加激活样式
-
+  - `<NavLink>`可以实现路由链接的高亮
+  
   ```jsx
   import React, {Component} from 'react'
   import {Route, NavLink} from 'react-router-dom'
@@ -1137,9 +1138,9 @@ export default class Hello extends Component {
       }
   }
   ```
-
+  
   - 为了更简便使用，对`<NavLink>`再进行一次封装
-
+  
   ```jsx
   // /components/Mynavlink/index.js
   import React, {Component} from 'react'
