@@ -1113,7 +1113,7 @@ export default class Hello extends Component {
 
   - 可以在`<Link>`组件上添加动态样式，或者使用`<NavLink>`自动添加激活样式
   - `<NavLink>`可以实现路由链接的高亮
-  
+
   ```jsx
   import React, {Component} from 'react'
   import {Route, NavLink} from 'react-router-dom'
@@ -1138,9 +1138,9 @@ export default class Hello extends Component {
       }
   }
   ```
-  
+
   - 为了更简便使用，对`<NavLink>`再进行一次封装
-  
+
   ```jsx
   // /components/Mynavlink/index.js
   import React, {Component} from 'react'
@@ -1174,3 +1174,43 @@ export default class Hello extends Component {
           )
       }
   }
+  ```
+
+- `switch`组件
+
+  - `<Route path="/xxx" />`组件匹配到对应路径后不会停止，而是继续往下匹配
+
+  ```jsx
+  // 引入switch组件
+  import {Route, Switch} from 'react-router-dom'
+  export default class A extends Component {
+      render() {
+          return (
+          	<div id="index">
+              	<div className="left_nav">
+                      <Link className="xx" to="/aaa">跳转aaa</Link>
+                      <Link to="/bbb">跳转bbb</Link>
+                  </div>
+                  
+                  <div className="right_content">
+                      {/* 用Switch组件包裹即可 */}
+                      <Switch>
+                          <Route path="/aaa" component="{Aaa}"/>
+                          <Route path="/bbb" component="{Bbb}"/>
+                      </Switch>
+                  </div>
+              </div>
+          )
+      }
+  }
+  ```
+
+- 样式丢失问题
+
+  - 现象：像`a/b`这样多级路径，在刷新页面时会以`http://x.x.x.x/a/b`这样的地址重新加载，所以会导致资源请求出错
+  - 解决方法
+    - `.html`中引入样式`./css/xxx.css`改为`/css/xxx.css`
+      - 表示从根路径找
+    - `.html`中引入样式`./css/xxx.css`改为`%PUBLIC_URL%/css/xxx.css`
+      - 表示从根路径`public`文件夹下寻找
+    - 使用`<HashRouter>`，地址栏后会有`#`，浏览器会忽略`#`后的路径，使得浏览器刷新不受地址影响
