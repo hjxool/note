@@ -1040,177 +1040,334 @@ export default class Hello extends Component {
     - react-native
     - any
 
-- 示例
 
-  ```jsx
-  import React, {Component} from 'react'
-  // 引入路由组件
-  // 注: Link等都是 组件 所以引入时首字母大写
-  // 注: 不能在此处引入BrowserRouter 因为路由跳转必须由同一个路由器管理才能实现 如果东包一个BrowserRouter 西包一个BrowserRouter就无法跳转
-  import {Link, Route, NavLink} from 'react-router-dom'
-  // 引入路由分类显示组件
-  // 注: 用于路由的组件应该放在pages文件夹下 不与普通组件混用
-  import Aaa from './pages/Aaa'
-  import Bbb from './pages/Bbb'
-  export default class A extends Component {
-      render() {
-          return (
-          	<div id="index">
-              	<div className="left_nav">
-                      {/*注: to不识别大小写 编写路由链接*/}
-                      <Link className="xx" to="/aaa">跳转aaa</Link>
-                      <Link to="/bbb">跳转bbb</Link>
-                  </div>
-                  
-                  <div className="right_content">
-                  	{/*注册路由
-                  	path 匹配路径
-                  	component 对应组件*/}
-                      <Route path="/aaa" component="{Aaa}"/>
-                      <Route path="/bbb" component="{Bbb}"/>
-                  </div>
-              </div>
-          )
-      }
-  }
-  ```
+### 示例
 
-  - 在根目录`index.js`中引入`BrowserRouter`
-    - 所有==路由组件==需要用`xxxRouter`组件包裹才能使用
-      - 可包裹`<BrowserRouter>`或`<HashRouter>`
-        - 且路由跳转必须由同一个==路由器==管理才能实现
-      - 使用`<HashRouter>`地址栏路径会多出`#`，如`localhost:80/#/aaa`
+```jsx
+import React, {Component} from 'react'
+// 引入路由组件
+// 注: Link等都是 组件 所以引入时首字母大写
+// 注: 不能在此处引入BrowserRouter 因为路由跳转必须由同一个路由器管理才能实现 如果东包一个BrowserRouter 西包一个BrowserRouter就无法跳转
+import {Link, Route, NavLink} from 'react-router-dom'
+// 引入路由分类显示组件
+// 注: 用于路由的组件应该放在pages文件夹下 不与普通组件混用
+import Aaa from './pages/Aaa'
+import Bbb from './pages/Bbb'
+export default class A extends Component {
+    render() {
+        return (
+        	<div id="index">
+            	<div className="left_nav">
+                    {/*注: to不识别大小写 编写路由链接*/}
+                    <Link className="xx" to="/aaa">跳转aaa</Link>
+                    <Link to="/bbb">跳转bbb</Link>
+                </div>
+                
+                <div className="right_content">
+                	{/*注册路由
+                	path 匹配路径
+                	component 对应组件*/}
+                    <Route path="/aaa" component="{Aaa}"/>
+                    <Route path="/bbb" component="{Bbb}"/>
+                </div>
+            </div>
+        )
+    }
+}
+```
 
-  ```jsx
-  import React from 'react'
-  import ReactDOM from 'react-dom'
-  import App from './App'
-  import {BrowserRouter} from 'react-router-dom'
-  ReactDOM.render(
-  	<BrowserRouter>
-      	<App/>
-      </BrowserRouter>,
-      document.getElementById('root')
-  )
+- 在根目录`index.js`中引入`BrowserRouter`
+  - 所有==路由组件==需要用`xxxRouter`组件包裹才能使用
+    - 可包裹`<BrowserRouter>`或`<HashRouter>`
+      - 且路由跳转必须由同一个==路由器==管理才能实现
+    - 使用`<HashRouter>`地址栏路径会多出`#`，如`localhost:80/#/aaa`
 
-- 路由组件和一般组件的区别
+```jsx
+import React from 'react'
+import ReactDOM from 'react-dom'
+import App from './App'
+import {BrowserRouter} from 'react-router-dom'
+ReactDOM.render(
+	<BrowserRouter>
+    	<App/>
+    </BrowserRouter>,
+    document.getElementById('root')
+)
+```
 
-  - 写法不同
-    - 一般组件：`<Aaa/>`
-    - 路由组件：`<Route component="{Aaa}"/>`
-  - 存放位置不同
-    - 一般组件：`/components`
-    - 路由组件：`/pages`
+### 路由组件和一般组件的区别
 
-  - 接收到的`props`不同
-    - 一般组件：写组件时传什么就收什么
-    - 路由组件：接收固定属性
-      - `history`
-      - `location`
-      - `match`
+- 写法不同
+  - 一般组件：`<Aaa/>`
+  - 路由组件：`<Route component="{Aaa}"/>`
+- 存放位置不同
+  - 一般组件：`/components`
+  - 路由组件：`/pages`
 
-- 导航激活样式设置
+- 接收到的`props`不同
+  - 一般组件：写组件时传什么就收什么
+  - 路由组件：接收固定属性
+    - `history`
+    - `location`
+    - `match`
 
-  - 可以在`<Link>`组件上添加动态样式，或者使用`<NavLink>`自动添加激活样式
-  - `<NavLink>`可以实现路由链接的高亮
+### 导航激活样式设置
 
-  ```jsx
-  import React, {Component} from 'react'
-  import {Route, NavLink} from 'react-router-dom'
-  import Aaa from './pages/Aaa'
-  import Bbb from './pages/Bbb'
-  export default class A extends Component {
-      render() {
-          return (
-          	<div id="index">
-              	<div className="left_nav">
-                      {/*自动实现激活样式需要使用NavLink
-                      激活的样式由activeClassName属性指定*/}
-                      <NavLink activeClassName="style1" className="xx" to="/aaa">
-                          跳转aaa
-                      </NavLink>
-                      <NavLink activeClassName="style1" to="/bbb">
-                          跳转bbb
-                      </NavLink>
-                  </div>
-              </div>
-          )
-      }
-  }
-  ```
+- 可以在`<Link>`组件上添加动态样式，或者使用`<NavLink>`自动添加激活样式
+- `<NavLink>`可以实现路由链接的高亮
 
-  - 为了更简便使用，对`<NavLink>`再进行一次封装
+```jsx
+import React, {Component} from 'react'
+import {Route, NavLink} from 'react-router-dom'
+import Aaa from './pages/Aaa'
+import Bbb from './pages/Bbb'
+export default class A extends Component {
+    render() {
+        return (
+        	<div id="index">
+            	<div className="left_nav">
+                    {/*自动实现激活样式需要使用NavLink
+                    激活的样式由activeClassName属性指定*/}
+                    <NavLink activeClassName="style1" className="xx" to="/aaa">
+                        跳转aaa
+                    </NavLink>
+                    <NavLink activeClassName="style1" to="/bbb">
+                        跳转bbb
+                    </NavLink>
+                </div>
+            </div>
+        )
+    }
+}
+```
 
-  ```jsx
-  // /components/Mynavlink/index.js
-  import React, {Component} from 'react'
-  import {NavLink} from 'react-router-dom'
-  export default class Mynavlink extends Component {
-      render() {
-          let {to, content} = this.props
-          return (
-          	<NavLink activeClassName="style1" className="xx" to={to}>
-                  {content}
-              </NavLink>
-          )
-          // 利用props特性进行简写
-          return (
-          	<NavLink activeClassName="style1" className="xx" {...this.props}/>
-          )
-      }
-  }
-  // 在调用Mynavlink的组件内
-  import Mynavlink from '../components/Mynavlink'
-  export default class Demo extends Component {
-      render() {
-          return (
-          	<Mynavlink to={'/aaa'} content={'跳转aaa'}></Mynavlink>
-              <Mynavlink to={'/bbb'} content={'跳转bbb'}></Mynavlink>
-          )
-          // 利用props特性进行简写
-          return (
-              <Mynavlink to={'/aaa'}>跳转aaa</Mynavlink>
-              <Mynavlink to={'/bbb'}>跳转bbb</Mynavlink>
-          )
-      }
-  }
-  ```
+- 为了更简便使用，对`<NavLink>`再进行一次封装
 
-- `switch`组件
+```jsx
+// /components/Mynavlink/index.js
+import React, {Component} from 'react'
+import {NavLink} from 'react-router-dom'
+export default class Mynavlink extends Component {
+    render() {
+        let {to, content} = this.props
+        return (
+        	<NavLink activeClassName="style1" className="xx" to={to}>
+                {content}
+            </NavLink>
+        )
+        // 利用props特性进行简写
+        return (
+        	<NavLink activeClassName="style1" className="xx" {...this.props}/>
+        )
+    }
+}
+// 在调用Mynavlink的组件内
+import Mynavlink from '../components/Mynavlink'
+export default class Demo extends Component {
+    render() {
+        return (
+        	<Mynavlink to={'/aaa'} content={'跳转aaa'}></Mynavlink>
+            <Mynavlink to={'/bbb'} content={'跳转bbb'}></Mynavlink>
+        )
+        // 利用props特性进行简写
+        return (
+            <Mynavlink to={'/aaa'}>跳转aaa</Mynavlink>
+            <Mynavlink to={'/bbb'}>跳转bbb</Mynavlink>
+        )
+    }
+}
+```
 
-  - `<Route path="/xxx" />`组件匹配到对应路径后不会停止，而是继续往下匹配
+### `switch`组件
 
-  ```jsx
-  // 引入switch组件
-  import {Route, Switch} from 'react-router-dom'
-  export default class A extends Component {
-      render() {
-          return (
-          	<div id="index">
-              	<div className="left_nav">
-                      <Link className="xx" to="/aaa">跳转aaa</Link>
-                      <Link to="/bbb">跳转bbb</Link>
-                  </div>
-                  
-                  <div className="right_content">
-                      {/* 用Switch组件包裹即可 */}
-                      <Switch>
-                          <Route path="/aaa" component="{Aaa}"/>
-                          <Route path="/bbb" component="{Bbb}"/>
-                      </Switch>
-                  </div>
-              </div>
-          )
-      }
-  }
-  ```
+- `<Route path="/xxx" />`组件匹配到对应路径后不会停止，而是继续往下匹配
 
-- 样式丢失问题
+```jsx
+// 引入switch组件
+import {Route, Switch} from 'react-router-dom'
+export default class A extends Component {
+    render() {
+        return (
+        	<div id="index">
+            	<div className="left_nav">
+                    <Link className="xx" to="/aaa">跳转aaa</Link>
+                    <Link to="/bbb">跳转bbb</Link>
+                </div>
+                
+                <div className="right_content">
+                    {/* 用Switch组件包裹即可 */}
+                    <Switch>
+                        <Route path="/aaa" component="{Aaa}"/>
+                        <Route path="/bbb" component="{Bbb}"/>
+                    </Switch>
+                </div>
+            </div>
+        )
+    }
+}
+```
 
-  - 现象：像`a/b`这样多级路径，在刷新页面时会以`http://x.x.x.x/a/b`这样的地址重新加载，所以会导致资源请求出错
-  - 解决方法
-    - `.html`中引入样式`./css/xxx.css`改为`/css/xxx.css`
-      - 表示从根路径找
-    - `.html`中引入样式`./css/xxx.css`改为`%PUBLIC_URL%/css/xxx.css`
-      - 表示从根路径`public`文件夹下寻找
-    - 使用`<HashRouter>`，地址栏后会有`#`，浏览器会忽略`#`后的路径，使得浏览器刷新不受地址影响
+### 样式丢失问题
+
+- 现象：像`a/b`这样多级路径，在刷新页面时会以`http://x.x.x.x/a/b`这样的地址重新加载，所以会导致资源请求出错
+- 解决方法
+  - `.html`中引入样式`./css/xxx.css`改为`/css/xxx.css`
+    - 表示从根路径找
+  - `.html`中引入样式`./css/xxx.css`改为`%PUBLIC_URL%/css/xxx.css`
+    - 表示从根路径`public`文件夹下寻找
+  - 使用`<HashRouter>`，地址栏后会有`#`，浏览器会忽略`#`后的路径，使得浏览器刷新不受地址影响
+
+### 模糊匹配
+
+- 用于`/xxx?aa=zz`地址栏传值
+- 在`<Route>`标签上使用`<Route exact={true}>`开启精准匹配，`path="/aa"`无法匹配`to="/aa/bb/cc"`
+
+```html
+<!-- 可以模糊匹配 -->
+<NavLink to="/aa/bb/cc"></NavLink>
+<switch>
+	<Route path="/aa"></Route>
+</switch>
+<!-- 匹配失败 -->
+<NavLink to="/aa"></NavLink>
+<switch>
+	<Route path="/aa/bb/cc"></Route>
+</switch>
+```
+
+### 重定向
+
+- 用于没有路由匹配时重新指向的路由
+
+```jsx
+// 需要引入Redirect组件
+import {Route, Switch, Redirect} from 'react-router-dom'
+// 当地址栏是 http(s)://IP:端口 不带路径时 兜底重新指向一个路由
+export default class A extends Component {
+    render() {
+        return (
+        	...
+            <Switch>
+            	<Route path="/aa" component={Aa}></Route>
+                <Route path="/bb" component={Bb}></Route>
+                {/*没有匹配到时 重新指向Aa路由*/}
+                <Redirect to="/aa"/>
+            </Switch>
+        )
+    }
+}
+```
+
+### 多级路由
+
+- 父页面
+
+```jsx
+// import引入
+import Home from './components/Home'
+import About from './components/About'
+export default class Demo extends Component {
+    render() {
+        return (
+        	<div>
+            	<div class="left">
+                	<NavLink to="/home"></NavLink>
+                    <NavLink to="/about"></NavLink>
+                </div>
+                <div class="right">
+                	<Switch>
+                    	<Route path="/home" component={Home}></Route>
+                        <Route path="/about" component={About}></Route>
+                    </Switch>
+                </div>
+            </div>
+        )
+    }
+}
+```
+
+- 子组件`Home`
+
+```jsx
+// import引入
+import Aa from './Aa'
+import Bb from './Bb'
+export default class Home extends Component {
+	render() {
+        return (
+        	<div>
+            	<div class="head">
+                    {/* 多级路由的子路由 必须拼写父级的路径
+                    地址栏/home/aa由模糊匹配进入父级路由/home
+                    再匹配到子路由/home/aa*/}
+                	<NavLink to="/home/aa"></NavLink>
+                    <NavLink to="/home/bb"></NavLink>
+                </div>
+                <div class="body">
+                	<Switch>
+                    	<Route path="/home/aa" component={Aa}></Route>
+                        <Route path="/home/bb" component={Bb}></Route>
+                        <Redirect to="/home/aa"/>
+                    </Switch>
+                </div>
+            </div>
+        )
+    }
+}
+```
+
+### 路由传参的方式
+
+#### params参数
+
+- 父级路由
+
+```jsx
+export default class Demo extends Component {
+    render() {
+        const list = [
+            {id:'1', name:'xx'},
+            {id:'2', name:'ss'},
+            {id:'3', name:'vv'},
+        ]
+        return (
+        	<div>
+            	<div class="left">
+                    {
+                        list.map(e => {
+                            return (
+                                {/*params用/xx的形式地址栏传参*/}
+                            	<NavLink to={`/home/${e.id}/${e.name}`}></NavLink>
+                            )
+                        })
+                    }
+                </div>
+                <div class="right">
+                	<Switch>
+                        {/*声明接收params参数 不然模糊匹配后面的就忽略了*/}
+                        {/*params匹配规则 只与顺序有关 与:命名无关*/}
+                    	<Route path="/home/:newid/:newname" component={Home}></Route>
+                    </Switch>
+                </div>
+            </div>
+        )
+    }
+}
+```
+
+- 子路由
+
+```jsx
+export default class Home extends Component {
+    render() {
+        // params参数存放在props属性
+        let {newid, newname} = this.props.match.params // newid:'1' newname:'xx'
+        return (
+        	<div>
+            	<div>id:{newid}</div>
+                <div>name:{newname}</div>
+            </div>
+        )
+    }
+}
+```
