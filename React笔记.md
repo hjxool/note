@@ -1355,7 +1355,7 @@ export default class Demo extends Component {
 }
 ```
 
-- 子路由
+- 子页面
 
 ```jsx
 export default class Home extends Component {
@@ -1366,6 +1366,64 @@ export default class Home extends Component {
         	<div>
             	<div>id:{newid}</div>
                 <div>name:{newname}</div>
+            </div>
+        )
+    }
+}
+```
+
+#### search参数
+
+- 父级路由
+
+```jsx
+export default class Demo extends Component {
+    render() {
+        const list = [
+            {id:'1', name:'xx'},
+            {id:'2', name:'ss'},
+            {id:'3', name:'vv'},
+        ]
+        return (
+        	<div>
+            	<div class="left">
+                    {
+                        list.map(e => {
+                            return (
+                                {/*search用?key=value&key2=value2的形式地址栏传参*/}
+                            	<NavLink to={`/home?id=${e.id}&name=${e.name}`}></NavLink>
+                            )
+                        })
+                    }
+                </div>
+                <div class="right">
+                	<Switch>
+                        {/*search参数 无需声明接收*/}
+                    	<Route path="/home" component={Home}></Route>
+                    </Switch>
+                </div>
+            </div>
+        )
+    }
+}
+```
+
+- 子页面
+  - `search`参数在`this.props.location.search`中，以`?key=val`字符串形式存储，所以需要自己进行解析
+
+```jsx
+// 安装create-react-app时已经集成了query参数解析工具
+import qs from 'querystring'
+export default class Home extends Component {
+    render() {
+        // search参数存放在props属性
+        let {search} = this.props.location // 开头?要去掉
+        // 解析成{id:'1', name:'xx'}
+        let {id, name} = qs.parse(search.slice(1))
+        return (
+        	<div>
+            	<div>id:{id}</div>
+                <div>name:{name}</div>
             </div>
         )
     }
