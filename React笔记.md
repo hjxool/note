@@ -1429,3 +1429,149 @@ export default class Home extends Component {
     }
 }
 ```
+
+#### state参数
+
+- 父级路由
+  - 用`state`传参，虽然不像`search`、`params`参数会在地址栏体现，但是保存在`history.location.state`下，刷新浏览器不会丢失参数
+
+```jsx
+export default class Demo extends Component {
+    render() {
+        const list = [
+            {id:'1', name:'xx'},
+            {id:'2', name:'ss'},
+            {id:'3', name:'vv'},
+        ]
+        return (
+        	<div>
+            	<div class="left">
+                    {
+                        list.map(e => {
+                            return (
+                                {/*state用对象配置项形式传参 用state就可以传对象等复杂数据*/}
+                            	<NavLink to={ {pathname:'/home', state:{data:e}} }></NavLink>
+                            )
+                        })
+                    }
+                </div>
+                <div class="right">
+                	<Switch>
+                        {/*state参数 无需声明接收*/}
+                    	<Route path="/home" component={Home}></Route>
+                    </Switch>
+                </div>
+            </div>
+        )
+    }
+}
+```
+
+- 子页面
+
+```jsx
+export default class Home extends Component {
+    render() {
+        // state参数存放在props属性
+        let {data} = this.props.location.state
+        return (
+        	<div>
+            	<div>id:{data.id}</div>
+                <div>name:{data.name}</div>
+            </div>
+        )
+    }
+}
+```
+
+### 路由push和replace
+
+- 路由跳转默认用`push`压栈，当点击浏览器后退键时，会一层一层出栈，显示效果就是：点击后退会返回上级路由内容
+
+- 使用`replace`可以替换，当前这级路由，使其返回时可以跳过当前级路由，直接显示父级内容
+
+  - 比如实现效果，页面回退直接返回前一个页面而不是一级一级路由回退
+  - 其实`replace`更常用一些，因为`push`会存储每次点击的路由记录，返回时只能一级一级回退，而不是页面回到前一页
+
+  ```jsx
+  export default class Demo extends Component {
+      render() {
+          return (
+          	<div>
+              	<div class="left">
+                      {/* 标签加replace属性开启 */}
+                      <NavLink replace to='/home'></NavLink>
+                  </div>
+                  <div class="right">
+                  	<Switch>
+                      	<Route path="/home" component={Home}></Route>
+                      </Switch>
+                  </div>
+              </div>
+          )
+      }
+  }
+
+### 编程式路由
+
+- 调用==路由组件==的API进行跳转
+
+  - `replace(path, state)`
+  - `push(path, state)`
+  - 回退`props.history.goBack()`
+  - 前进`props.history.goForward()`
+
+  ```jsx
+  export default class Demo extends Component {
+      replaceShow = (id, name) => {
+          // params参数形式
+          this.props.history.replace(`/home/${id}/${name}`)
+          // search参数形式
+          this.props.history.replace(`/home?id=${id}&name=${name}`)
+          // state参数形式
+          this.props.history.replace('/home',{id, name})
+      }
+      pushShow = (obj) => {
+          // 除了方法不同 所有形式相同
+          this.props.history.push('/home',{data: obj})
+      }
+      goback = () => {
+          this.props.history.goBack()
+      }
+      forward = () => {
+          this.props.history.goForward()
+      }
+      render() {
+          const list = [
+              {id:'1', name:'xx'},
+              {id:'2', name:'ss'},
+              {id:'3', name:'vv'},
+          ]
+          return (
+          	<div>
+              	<div class="left">
+                      <button onClick={()=>{this.replaceShow('1', 'xx')}}>
+                          点我replace跳转
+                      </button>
+                      <button onClick={()=>{this.pushShow(list[0])}}>
+                          点我push跳转
+                      </button>
+                      <button onClick={ ()=>{ this.goback() }}>
+                          点我后退
+                      </button>
+                      <button onClick={()=>{ this.forward() }}>
+                          点我前进
+                      </button>
+                  </div>
+                  <div class="right">
+                  	<Switch>
+                          {/*params参数形式*/}
+                      	<Route path="/home/:id/:name" component={Home}></Route>
+                          {/*search及state参数形式*/}
+                          <Route path="/home" component={Home}></Route>
+                      </Switch>
+                  </div>
+              </div>
+          )
+      }
+  }

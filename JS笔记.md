@@ -1232,68 +1232,79 @@
   - 会随滚动而变化，不是元素在页面的固定边距！
   - 不是距离祖、父元素的绝对距离！
 
-- ==懒加载==
 
-  - 方法一：触发频繁不推荐
+### 懒加载
 
-    - 通过`data-`自定义属性，使得既保留图片地址，又不会自动加载
+- 方法一：触发频繁不推荐
 
-      ```html
-      <img data-src="1.png">
-      <img data-src="2.png">
-      <img data-src="3.png">
+  - 通过`data-`自定义属性，使得既保留图片地址，又不会自动加载
 
-    - 判断距离视窗顶部距离是否小于视窗高度，如果小于则将自定义属性取出添加到`<img src>`属性上
+    ```html
+    <img data-src="1.png">
+    <img data-src="2.png">
+    <img data-src="3.png">
 
-      ```js
-      let img_list = document.querySelectorAll('img')
-      // 监听滚动事件
-      window.addEventListener('scroll', e => {
-          for(let val of img_list){
-              let img_top = val.getBoundingClientRect().top
-              if(img_top < window.innerHeight){
-                  let src = val.getAttribute('data-src')
-                  val.setAttribute('src', src)
-              }
-          }
-      })
-      ```
-
-  - 方法二：浏览器提供的构造函数`intersectionObserver`(推荐)
-
-    - 只有节点进入和离开==可见区域==时才触发，对比方法一是滚动时一直触发。其次触发一次后取消观察即可，后续不会再重复执行，触发频率低
-    - `intersectionObserver`是==构造函数==，因此要创建实例`const observer = new IntersectionObserver(callback)`，传入回调函数作为参数
-    - 实例身上的方法
-      - `observer.observe(DOM节点)`观察目标节点，当目标节点出现和消失在可见区域内时触发回调函数
-      - `observer.unobserve(DOM节点)`==取消==观察目标节点
+  - 判断距离视窗顶部距离是否小于视窗高度，如果小于则将自定义属性取出添加到`<img src>`属性上
 
     ```js
-    // HTML部分和方法一相同
-    
-    // 获取节点
     let img_list = document.querySelectorAll('img')
-    // 此回调函数会在看见时和看不见时触发
-    const callback = (entries) => {
-        // 传入的形参是 所有观察对象组成的数组
-        entries.forEach(item => {
-            // 每项的isIntersecting属性值为boolean 表示是否交叉 即是否在可见区域内
-            if(item.isIntersecting){
-                // target属性即观察对象节点
-                let dom = item.target
-                // 将自定义属性值取出放到src属性上
-                let src = dom.getAttribute('data-src')
-                dom.setAttribute('src', src)
-                // 触发后已经将src赋值加载到页面了不再需要观察
-                observer.unobserve(dom)
+    // 监听滚动事件
+    window.addEventListener('scroll', e => {
+        for(let val of img_list){
+            let img_top = val.getBoundingClientRect().top
+            if(img_top < window.innerHeight){
+                let src = val.getAttribute('data-src')
+                val.setAttribute('src', src)
             }
-        })
-    }
-    // 创建实例
-    const observer = new IntersectionObserver(callback)
-    // 对每个图片节点都进行观察
-    img_list.forEach(dom => {
-        observer.observe(dom)
+        }
     })
+    ```
+
+- 方法二：浏览器提供的构造函数`intersectionObserver`(推荐)
+
+  - 只有节点进入和离开==可见区域==时才触发，对比方法一是滚动时一直触发。其次触发一次后取消观察即可，后续不会再重复执行，触发频率低
+  - `intersectionObserver`是==构造函数==，因此要创建实例`const observer = new IntersectionObserver(callback)`，传入回调函数作为参数
+  - 实例身上的方法
+    - `observer.observe(DOM节点)`观察目标节点，当目标节点出现和消失在可见区域内时触发回调函数
+    - `observer.unobserve(DOM节点)`==取消==观察目标节点
+
+  ```js
+  // HTML部分和方法一相同
+  
+  // 获取节点
+  let img_list = document.querySelectorAll('img')
+  // 此回调函数会在看见时和看不见时触发
+  const callback = (entries, observer) => {
+      // 传入的形参是 所有观察对象组成的数组
+      entries.forEach(item => {
+          // 每项的isIntersecting属性值为boolean 表示是否交叉 即是否在可见区域内
+          if(item.isIntersecting){
+              // target属性即观察对象节点
+              let dom = item.target
+              // 将自定义属性值取出放到src属性上
+              let src = dom.getAttribute('data-src')
+              dom.setAttribute('src', src)
+              // 触发后已经将src赋值加载到页面了不再需要观察
+              observer.unobserve(dom)
+          }
+      })
+  }
+  // 创建实例
+  const observer = new IntersectionObserver(callback)
+  // IntersectionObserver可以传入options指定作为视口的元素
+  const options = {
+      // 如果为null或者没有传入options则 默认使用浏览器视口
+      root: document.getElementById('xx'),
+      rootMargin, // 扩展或缩小root边界 默认0px
+      // 指定观察者的回调函数在元素的可见比例 穿过这些值时被执行 值是数字或数字组成的数组
+      // 默认为0 目标元素一出现在视口中就会触发回调
+      threshold,
+  }
+  const observer = new IntersectionObserver(callback, options)
+  // 对每个图片节点都进行观察
+  img_list.forEach(dom => {
+      observer.observe(dom)
+  })
 
 - Tips
 
