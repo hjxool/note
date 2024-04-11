@@ -1550,18 +1550,32 @@ export default class Home extends Component {
           return (
           	<div>
               	<div class="left">
-                      <button onClick={()=>{this.replaceShow('1', 'xx')}}>
-                          点我replace跳转
-                      </button>
-                      <button onClick={()=>{this.pushShow(list[0])}}>
-                          点我push跳转
-                      </button>
-                      <button onClick={ ()=>{ this.goback() }}>
-                          点我后退
-                      </button>
-                      <button onClick={()=>{ this.forward() }}>
-                          点我前进
-                      </button>
+                      {/*注:必须用路由组件包裹才能使用这些方法*/}
+                      <NavLink>
+                          <button onClick={()=>{this.replaceShow('1', 'xx')}}>
+                              点我replace跳转
+                          </button>
+                      </NavLink>
+                      <NavLink>
+                  		<button onClick={()=>{this.replaceShow('1', 'xx')}}>
+                          	点我replace跳转
+                      	</button>
+                  	</NavLink>
+                      <NavLink>
+                      	<button onClick={()=>{this.pushShow(list[0])}}>
+                          	点我push跳转
+                      	</button>
+                      </NavLink>
+                      <NavLink>
+                      	<button onClick={ ()=>{ this.goback() }}>
+                          	点我后退
+                      	</button>
+                      </NavLink>
+                      <NavLink>
+                      	<button onClick={()=>{ this.forward() }}>
+                          	点我前进
+                      	</button>
+                      </NavLink>
                   </div>
                   <div class="right">
                   	<Switch>
@@ -1575,3 +1589,50 @@ export default class Home extends Component {
           )
       }
   }
+
+- 一般组件使用编程式路由
+
+  - `props.history`等属性方法只在路由组件身上有，需要使用`withRouter`方法加工普通组件使其拥有路由组件API
+
+  ```jsx
+  // 父页面
+  import React, {Component} from 'react'
+  import Header from './components/Header'
+  import {Route, Switch} from 'react-router-dom'
+  export default class Demo extends Component {
+      render() {
+          return (
+          	<div>
+              	<Header/>
+                  <Switch>
+                  	...
+                  </Switch>
+              </div>
+          )
+      }
+  }
+  // 头部返回控制组件
+  // 引入withRouter方法
+  import {withRouter} from 'react-router-dom'
+  class Header extends Component {
+      goback = () => {
+          this.props.history.goBack()
+      }
+      forward = () => {
+          this.props.history.goForward()
+      }
+      render() {
+          return (
+          	<div>
+              	<button onClick={this.goback()}>
+                      点我后退
+                  </button>
+                  <button onClick={this.forward()}>
+                      点我前进
+                  </button>
+              </div>
+          )
+      }
+  }
+  // 需要经过withRouter加工后再返回
+  export default withRouter(Header)

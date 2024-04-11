@@ -880,7 +880,7 @@
 - **history**.pushState/**replaceState**(state,title,url)可以在**不跳转页面**的情况下**改写**当前页面的url
 - **跳转页面**：window.location.**href** = "地址?键值对"，跳转页面后使用`**location.search**`获取到`？`之后的内容，对获取的内容进行字符串分割，创建对象obj = { }，使用**obj['key'] = '值'**，将分割好的键值对装入对象
 - [sessionStroage]()：会话存储
-  - 使用`sessionStroage.自定义变量名 = 值`，就可以将**值**存入**自定义变量**名，取用的时候直接用**sessionStroage.自定义变量名**就可以获取值
+  - 使用`sessionStroage.自定义变量名 = 值`，就可以将**值**存入**自定义变量**名，取用的时候直接用`sessionStroage.自定义变量名`就可以获取值
   - ==删除==的时候使用`sessionStroage.removeItem("自定义变量名")`
 - [localStorage]()：本地存储
   - 保存：`localStorage.setItem('key', 'value')`
