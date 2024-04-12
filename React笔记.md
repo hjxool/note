@@ -1636,3 +1636,84 @@ export default class Home extends Component {
   }
   // 需要经过withRouter加工后再返回
   export default withRouter(Header)
+
+## redux状态管理
+
+- 当大部分组件需要共享数据时，就是用`redux`进行全局的状态管理
+
+  - `redux`只是进行共享数据处理，不负责更新到页面
+
+- 示例
+
+  - 自定义数据处理方法
+
+  ```js
+  // 作为redux的事件处理函数 会接收到2个参数
+  export default function count(preValue = 0, action) {
+      // preValue之前的值 action传入的自定义参数(对象形式)
+      let {type, num} = action
+      switch(type) {
+          case 'add':
+            return preValue + num
+          case 'reduce':
+            return preValue - num
+          default:
+            // 没有之前的值时 默认进行初始化操作
+            // 没有初始值preValue就是undefined
+            return preValue
+      }
+  }
+  ```
+
+  - 创建仓库`store`
+
+  ```jsx
+  // 引入createStore 专门用于创建store对象
+  import {createStore} from 'redux'
+  // 引入自定义函数方法
+  import count from './count'
+  // 传入自定义方法创建store
+  export default createStore(count)
+  ```
+
+  - 取用共享数据的组件
+
+  ```jsx
+  // 使用store就要引入
+  import store from '../redux/store.js'
+  // 引入其他库
+  ...
+  export default class Demo extends Component {
+      add = () => {
+         // 通知redux执行增加方法 传入的是action参数
+         store.dispatch({type: 'add', num: 3})
+      }
+  	reduce = () => {
+          store.dispatch({type: 'reduce', num: 2})
+      }
+      render() {
+          return (
+          	<div>
+                  {/*getState()获取当前共享数据值*/}
+              	<div>计算结果:{store.getState()}</div>
+                  <button onClick={this.add}>加3</button>
+                  <button onClick={this.reduce}>减2</button>
+              </div>
+          )
+      }
+  }
+  ```
+
+  - 根目录入口文件`index.js`
+
+  ```jsx
+  // 检测到
+  // 引入store
+  import store from './redux/store'
+  // 引入其他库
+  ...
+  // subscribe方法监测store中共享值发生变化
+  store.subscribe(()=>{
+      // 值变化后重新渲染变化的节点
+      ReactDom.render(<App/>, document.getElementById('root'))
+  })
