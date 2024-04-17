@@ -145,3 +145,40 @@
 
 - 不能与Vue`v-show`搭配使用
   - 因为`display: none`时，隐藏的元素不进行渲染，高度就是0，即使切换显示出来，iframe里嵌的页面在挂载时执行的代码也不会再次执行，因此显示会异常
+
+## 页面缩放
+
+- 默认情况下使用触控板或者手机端两指控制屏幕，可以缩放页面，使用以下方法可以禁止缩放
+
+  - 使用`<meta>`标签
+
+  ```html
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+  ```
+
+  - 用`css`
+
+  ```css
+  body{
+      touch-action: none;
+  }
+  ```
+
+  - 用`js`
+
+  ```js
+  // 禁止双指放大
+  document.documentElement.addEventListener('touchstart', (e) => {
+      if(e.touches.length > 1) {
+          e.preventDefault()
+      }
+  }, false)
+  // 禁止双击放大
+  let end = 0
+  document.documentElement.addEventListener('touchend', (e) => {
+      let now = Date.now()
+      if(now - end <= 300){
+          e.preventDefault()
+      }
+      end = now
+  })

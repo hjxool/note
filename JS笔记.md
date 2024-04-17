@@ -1163,6 +1163,7 @@
 - `Math.sqrt(num)`：开方运算
 - `Math.max/min(a，b，c，...)`：返回最大/最小值
 - `Math.abs(num)`：绝对值。传入一个数字
+- `Math.hypot(num1, num2)`：求平方根。先计算所有参数的平方和，再返回和的平方根
 
 ## 定时器
 
