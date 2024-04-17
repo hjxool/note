@@ -2199,3 +2199,63 @@
           document.exitFullscreen();
       }
   }
+
+## 预览文件缩放
+
+- 示例使用pdf.js
+
+  - `html`页面
+
+  ```js
+  <div id="file_box" class="body" @touchstart="zoom_start" @touchmove="zoom"></div>
+  ```
+
+  - `js`文件
+
+  ```js
+  // 记录两指位置
+  zoom_start(e) {
+      if (e.touches.length != 2) {
+          // 只允许两指控制
+          return;
+      }
+      // 第一根手指坐标
+      let touch1 = e.touches[0];
+      // 第二根手指坐标
+      let touch2 = e.touches[1];
+      // 计算初始间距
+      this.init_dis = Math.hypot(touch2.clientX - touch1.clientX, touch2.clientY - touch2.clientY);
+  },
+  // 根据两指移动距离 缩放
+  zoom(e) {
+      // // 节流
+      // if (this.zoom_timer) {
+      // 	return;
+      // }
+      // this.zoom_timer = true;
+      // setTimeout(() => {
+      // 	this.zoom_timer = false;
+      // }, 500);
+      if (e.touches.length != 2) {
+          // 只允许两指控制
+          return;
+      }
+      let touch1 = e.touches[0];
+      let touch2 = e.touches[1];
+      // 计算当前间距
+      let cur_dis = Math.hypot(touch2.clientX - touch1.clientX, touch2.clientY - touch2.clientY);
+      // 计算缩放比例
+      // this.scale = Math.round((cur_dis / this.init_dis) * 100) / 100;
+      if (cur_dis > this.init_dis) {
+          if (this.scale >= 2) {
+              return;
+          }
+          this.scale = this.scale + 0.1;
+      } else if (cur_dis < this.init_dis) {
+          if (this.scale <= 0.3) {
+              return;
+          }
+          this.scale = this.scale - 0.1;
+      }
+      this.render_file();
+  },
