@@ -358,7 +358,28 @@ new Vue({
 
 - ==计算属性==
 
-  - 计算属性的值是==只读==的！不能通过`this.name = 'sss'`的方式赋值
+  - 计算属性简写形式的值是==只读==的！不能赋值
+  
+    ```js
+    computed:{
+        // 简写形式相当于getter 不能赋值
+        fullName() {
+            return this.firstName + ' ' + this.lastName
+        },
+        // 要具备赋值功能需要写完整形式
+        fullName:{
+            get() {
+                // getter中的this本身指向的是windows 但是vue把this指向改为了vue实例
+                return this.firstName + ' ' + this.lastName
+            },
+            set(newValue) {
+                let name = newValue.split(' ')
+                // 注意 此处修改的是getter方法所依赖的变量
+                this.firstName = name[0]
+                this.lastName = name[1]
+            }
+        }
+    }
   
   - computed计算属性和methods是不同的，computed是基于响应式的，data中的值没有发生改变，不论刷新多少次都不会重新计算（缓存），会返回之前的结果，所以**computed适合双向绑定**时使用，这样在检测到数值改变的时候才会调用。
   
@@ -372,14 +393,6 @@ new Vue({
   
   - 侦听器虽然可以监控数据变动，但是书写比计算属性更麻烦，需要将改变的属性先声明再监听，但是计算属性可以省略声明
   
-    ![img](https://upload-images.jianshu.io/upload_images/6322775-a57846b8a587abaf.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
-  
-  - 计算属性**“简写形式”**默认是getter，想要使用setter，就**不能**用**简写**形式，需要将监听属性写成对象，把里面的get和set写成function，set里默认接收监听属性的值，在set里就可以更改其他属性值
-  
-  
-    - set函数
-      - 接收的**默认值**是**string类型**，要做大小比较先转换
-      - set的原理就是：引起计算所依赖的属性变化，从而使vue重新响应修改
   
   
     - get函数中使用“this”，本身的指向应该是windows，但是这里vue帮你做了一件事，就是把“this”的指向改成“vue实例”，所以在这类vue给定的特殊函数中，可以用this

@@ -6,6 +6,7 @@
 - 注意！使用VSCode安装Flutter SDK时，必须使用编辑器中打开的文件目录，如当前打开的是`D:\test`文件夹，就不能安装到`E:\`下
 - 注意！官方文档没有写要安装JDK，但是实际运行项目必须要安装JDK，flutter`3.19.6`版本需要JDK 11版本
 - 注意！如果使用真机调试，必须安装对应ADK，在AndroidStudio中打开`Virtual Device Manager`查看当前连接设备的`API Level`，即表示所需ADK相关所有`platform tool`都得是对应版本
+- 在命令行中通过`dart --version`检查
 
 - 创建项目，以`VSCode`为例
 
@@ -132,3 +133,11 @@
 
           - 在Android Studio 的`SDK Tools`中安装
 
+       4. 运行Android项目时，需要运行Android SDK中的`adb(Android Debug Bridge)`命令行工具
+
+          - 如果安装过Android SDK，配置环境变量，在`Path`中添加`%ANDROID_HOME%\platform-tools`和`%ANDROID_HOME%\tools`
+            - 注意！不要用网上`path1;paht2`的形式在window11中配置环境变量，会导致无法识别`adb`命令
+
+       5. 执行`Installing ...apk`时报错
+
+          - 这是因为真机调试时手机USB调试权限未全部开启，导致apk应用无法安装到手机
