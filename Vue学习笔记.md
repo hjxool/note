@@ -443,13 +443,6 @@ new Vue({
 
 ## 生命周期
 
-- 函数书写格式
-
-```javascript
-created:function(){
-    调用函数;
-}
-```
 - 生命周期：给用户不同阶段添加自己代码的机会
 
 - beforeCreate：vue**对象创建后**，规则制定完毕

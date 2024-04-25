@@ -22,3 +22,34 @@ void main() {
     fn1(num2);
 }
 ```
+
+- 命令行中运行`dart .\base1.dart`
+
+### 注释
+
+- 单行注释`// xxx`
+- 多行注释`/* xxx */`
+- 文档注释`/// xxx`
+  - 文档注释支持`markdown`语法，可通过`dartdoc`转成文档
+
+### 变量
+
+- Dart所有都是对象，变量存储的是对象的引用
+- 声明变量
+  - 明确类型：`int age = 18`
+  - 不明确类型：`var age = 18`或`dynamic age = 18`
+- 同JS，变量名大小写敏感
+  - 如`age`和`Age`是两个变量
+- 变量默认值是`null`
+  - JS中变量默认值是`undefined`
+- 变量不会隐式转换
+  - 如`null`不会自动转换成`false`
+
+### 常量
+
+- 声明常量
+  - `const`
+    - 无法将运行时的值赋值给`const`常量，如`const time = Date.now()`会报错
+    - 只能赋值==编译==时能取到的值，如`const age = 18`
+  - `final`
+    - 可以将运行时的值赋值`final`常量，如`final time = Date.now()`成功
