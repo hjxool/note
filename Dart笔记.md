@@ -42,7 +42,7 @@ void main() {
   - 如`age`和`Age`是两个变量
 - 变量默认值是`null`
   - JS中变量默认值是`undefined`
-- 变量不会隐式转换
+- 变量不会==隐式转换==
   - 如`null`不会自动转换成`false`
 
 ### 常量
@@ -53,3 +53,39 @@ void main() {
     - 只能赋值==编译==时能取到的值，如`const age = 18`
   - `final`
     - 可以将运行时的值赋值`final`常量，如`final time = Date.now()`成功
+
+## 数据类型
+
+### number
+
+- 关键字
+
+  - `num`
+    - 可以表示整数和小数
+    - `num age = 18`
+  - `int`
+    - 必须是整数
+  - `double`
+    - 表示浮点数，可以是整数和小数，但是整数会带小数位
+    - 如`double age = 18`输出`age`为`18.0`
+
+- API
+
+  - [API文档](https://api.dart.cn/stable/3.3.4/dart-core/num-class.html)
+
+  ```dart
+  void main(){
+      // JS中通过Math.ceil()等调用的API dart中是用数字变量调用
+      num n1 = -3.7;
+      print(n1.ceil()); // 向上取整 -3
+      print(n1.abs()); // 绝对值 3.7
+      print(n1.round()); // 四舍五入 -4
+      print(10.remainder(4)); // 取余数 2
+      
+      // 转成字符串 toString 用法和JS一样
+      print(n1.toString());
+      
+      print(n1.toInt()); // 转换成整数 3
+      // 不同于JS 可以用数字直接调用API
+      print(3.8.toInt()) // 向下取整 3
+  }
