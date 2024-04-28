@@ -81,11 +81,44 @@ void main() {
       print(n1.abs()); // 绝对值 3.7
       print(n1.round()); // 四舍五入 -4
       print(10.remainder(4)); // 取余数 2
+      print(10.compareTo(12)); // 比大小 0相同 1大于 -1小于
+      print(12.gcd(18)); // 最大公约数 6
       
       // 转成字符串 toString 用法和JS一样
       print(n1.toString());
       
       print(n1.toInt()); // 转换成整数 3
       // 不同于JS 可以用数字直接调用API
-      print(3.8.toInt()) // 向下取整 3
+      print(3.8.toInt()); // 向下取整 3
+  }
+  ```
+
+### String
+
+- 关键字
+
+  - `String`
+
+- API
+
+  ```dart
+  vodi main() {
+      // 声明字符串
+      var str1 = 'ssss';
+      String str2 = 'ssss';
+      
+      // 三引号声明 需要换行的字符串
+      String str3 = '''
+      Hello
+      World
+      '''; 
+      // 输出
+      // Hello
+      // World
+      
+      // 字符串拼接
+      print(str1 + str2);
+      // 字符串分隔
+      print(str2.split(''));
+      print('qwre'.split(''));
   }
