@@ -123,7 +123,7 @@ void main() {
 
 ## 数据类型
 
-### number
+### number数字
 
 - 关键字
 
@@ -160,7 +160,7 @@ void main() {
   }
   ```
 
-### String
+### String字符串
 
 - 关键字
 
@@ -202,7 +202,7 @@ void main() {
   }
   ```
 
-### Boolean
+### Boolean布尔值
 
 - 关键字
 
@@ -301,7 +301,7 @@ void main() {
   
   // forEach方法同JS
   
-  // map方法 不同于JS 返回的是可迭代对象
+  // map方法 遍历处理数据 返回新列表 不同于JS 返回的是可迭代对象
   arr = [1, 2, 3];
   // 注1: 只能 包含单个表达式
   var b = arr.map((e) => e + 1);
@@ -331,3 +331,56 @@ void main() {
   bool isOdd(n) => n % 2 == 1; // 箭头函数
   var b = arr.where((e) => isOdd(e));
   print(b); // (1, 3)
+  
+  // any 只要有一项满足条件 返回true
+  // 用法规则同map
+  // 注1: 传入箭头函数时 return返回判断条件
+  print(arr.any(item => item == 2)); // true 说明有2
+  print(arr.any(item => item == 5)); // false 说明没5
+  // 传入函数时 不能写() 会自动调用传入的函数
+  print(arr.any(isOdd)); // true 说明有奇数
+  
+  // every 判断每一项是否满足条件 都满足返回true
+  // 用法规则同any
+  print(arr.every(isOdd)); // false 其中有不是奇数的
+  
+  // expand 对数组降维
+  arr = [[1, 2], [3, 4]];
+  arr.expand((e) => e).toList(); // [1, 2, 3, 4]
+  
+  // fold(初始值, (preValue, current) => 计算表达式) 累计 类似JS中reduce
+  arr = [1, 2, 3];
+  var result = arr.fold(2, (preValue, current) => preValue * current);
+  print(result); // 2 * 1 * 2 * 3 = 12
+
+### Set集合
+
+- 特点
+
+  - Set类似JS中的`Symbol`，是一个无序，元素唯一的集合
+    - 重复元素会自动过滤
+  - 无法通过下标取值
+  - 有一些特有操作
+    - 如：求交集、并集、差集等
+
+- API
+
+  ```dart
+  // 字面量方式声明 没有关键字 用{}声明
+  var nums = <int>{1, 2, 3}; // 元素为整数的集合
+  // 元素唯一 如下例 有重复元素
+  var nums = <int>{1, 2, 2, 3};
+  // 重复元素会被自动去掉
+  print(nums); // {1, 2, 3}
+  
+  // 构造函数方式声明
+  var arr = new Set();
+  // 添加元素
+  arr.add('aaa');
+  arr.add('bbb');
+  print(arr); // {'aaa', 'bbb'}
+  
+  // 数组转换为集合
+  List arr = [1, 2, 3];
+  var r = arr.toSet();
+  print(r); // {1, 2, 3}
