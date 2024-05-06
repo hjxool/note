@@ -379,8 +379,75 @@ void main() {
   arr.add('aaa');
   arr.add('bbb');
   print(arr); // {'aaa', 'bbb'}
+  // 添加多个元素
+  arr.addAll(['aaa', 'bbb']); // {'aaa', 'bbb'}
   
   // 数组转换为集合
+  // 不改变原数组
   List arr = [1, 2, 3];
   var r = arr.toSet();
   print(r); // {1, 2, 3}
+  
+  // 求交集
+  arr = [1, 2, 3];
+  var set1 = arr.toSet();
+  arr = [2, 4, 5];
+  var set2 = arr.toSet();
+  print(set1.intersection(set2)); // {2}
+  
+  // 求并集
+  print(set1.union(set2)); // {1, 2, 3, 4, 5}
+  
+  // 求差集
+  print(set2.difference(set1)); // {4, 5}
+  
+  // 返回第一个元素
+  print(set1.first); // 1
+  
+  // 返回最后一个元素
+  print(set1.last); // 3
+  ```
+
+### Map字典
+
+- 特点
+
+  - 无序的键值对`key-value`映射
+
+- API
+
+  ```dart
+  // 字面量方式声明 没有关键字 用{}声明
+  // 注: 与JS的对象不同的是 key只能用字符串
+  var map = {
+    'name': 'xxx',
+    'age': 18
+  };
+  
+  // 构造函数方式声明
+  var map = new Map();
+  // 新版Dart可以省略new关键字
+  var map = Map();
+  map['name'] = 'xxx';
+  map['age'] = 18;
+  
+  // 访问属性
+  print(map['age']); // 18
+  // 修改
+  map['name'] = 'sss';
+  
+  // 判断Map中的key是否存在
+  print(map.containsKey('name')); // true
+  // 判断Map中的value是否存在
+  print(map.containsValue(18)); // true
+  
+  // 赋值
+  // putIfAbsent 如果 key 不存在才 赋值
+  map.putIfAbsent('gender', () => '男');
+  print(map); // {'name': 'sss', 'age': 18, 'gender': '男'}
+  // 已经存在不进行赋值
+  map.putIfAbsent('gender', () => '女');
+  print(map); // {'name': 'sss', 'age': 18, 'gender': '男'}
+  
+  // 获取map中所有的 key
+  print(map.keys); // (name, age, gender)
