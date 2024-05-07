@@ -366,12 +366,17 @@ void main() {
 - API
 
   ```dart
-  // 字面量方式声明 没有关键字 用{}声明
+  // 字面量方式声明1
   var nums = <int>{1, 2, 3}; // 元素为整数的集合
+  // 字面量方式声明2
+  Set nums = <int>{1, 2, 3};
   // 元素唯一 如下例 有重复元素
   var nums = <int>{1, 2, 2, 3};
   // 重复元素会被自动去掉
   print(nums); // {1, 2, 3}
+  
+  // 特点 有length属性
+  print(nums.length); // 3
   
   // 构造函数方式声明
   var arr = new Set();
@@ -381,6 +386,8 @@ void main() {
   print(arr); // {'aaa', 'bbb'}
   // 添加多个元素
   arr.addAll(['aaa', 'bbb']); // {'aaa', 'bbb'}
+  // 移除元素
+  arr.remove('bbb');
   
   // 数组转换为集合
   // 不改变原数组
@@ -424,6 +431,9 @@ void main() {
     'age': 18
   };
   
+  // 特点 有length属性
+  print(map.length); // 2
+  
   // 构造函数方式声明
   var map = new Map();
   // 新版Dart可以省略new关键字
@@ -451,3 +461,178 @@ void main() {
   
   // 获取map中所有的 key
   print(map.keys); // (name, age, gender)
+  // 获取map中所有value
+  print(map.values); // ('sss', 18, '男')
+  
+  // 根据条件删除 removeWhere((key, value) => 条件)
+  // 改变原值
+  map.removeWhere((key, value) => key == 'gender');
+  print(map); // {'name': 'sss', 'age': 18}
+  ```
+
+### 其他类型
+
+#### Runes符文
+
+- Runes对象是一个32位字符对象，可以把文字转换成==符号表情==
+  - 例：`print('\u{1f44d}')`
+  - 用`str.runes.length`可以**正确**表示符号表情的==字符长度==
+- [可转换符号字典](https://copychar.cc)
+
+#### Symbol
+
+- 不同于JS中表示==唯一标识==，Dart中是使用`#`开头的标识符
+
+  ```dart
+  // 字面量形式
+  var a = #abc;
+  // 构造函数形式
+  var a = new Symbol('abc');
+  print(a); // Symbol('abc')
+  
+  // Dart中不具有唯一性
+  print(a == new Symbol('abc')); // true
+
+#### dynamic
+
+- 关键字，用其声明的变量是==动态数据类型==
+
+  ```dart
+  dynamic a = 'sss';
+  a = 789;
+  print(a); // 789 不会报错
+  ```
+
+## 运算符
+
+- Dart特有运算符
+
+  - 地板除`~/`
+
+    - 对除法运算结果进行向下取整
+
+    ```dart
+    print(7 ~/ 4); // 1
+
+  - 类型判断运算符`is`、`is!`
+
+    - 类似JS中`instance`
+
+    ```dart
+    List arr = [];
+    print(arr is List); // true
+    print(arr is! List); // false
+
+  - 避空运算符`??`、`??=`
+
+    - `??`类似JS中`a || b`
+
+    ```dart
+    print(1 ?? 3); // 1 因为1不为空
+    print(null ?? 3); // 3
+    // 0不算空
+    print(0 ?? 1); // 0 且会警告
+    
+    // ??=等同if赋值语句
+    var a;
+    if(a == null) {
+        a = 3;
+    }
+    // 等同
+    a ??= 3;
+    print(a); // 3
+    // 此时a已经有值
+    a ??= 6;
+    print(a); // 3 不会进行赋值
+
+  - 条件属性访问`?.`
+
+    - 同ES6
+
+  - 级联运算符`..`
+
+    - 书写形式类似JS中`Promise`
+
+    ```dart
+    myObject.myMethod(); // 返回 myMethod 的返回值
+    myObject..myMethod(); // 返回 myObject 对象的引用
+    
+    // 示例
+    Set s = new Set();
+    s.add(1);
+    s.add(2);
+    s.add(3);
+    s.remove(2);
+    print(s); // {1, 3}
+    // 用 .. 重写
+    Set s = new Set();
+    // 因为每步执行返回的是调用者 因此可以 链式书写
+    s..add(1)
+     ..add(2)
+     ..add(3)
+     ..remove(2); // 只用在末尾写;号
+    print(s); // {1, 3}
+    ```
+
+## 函数
+
+### 声明函数
+
+#### 直接声明
+
+- 形如JS，但是不需要`function`关键字，且需要指定返回类型
+- 没有函数声明提升
+
+```dart
+void main() {
+    // 声明和调用
+    void fn() {}
+    fn();
+    
+    // 没有函数声明提升
+    // 报错
+    fn();
+    void fn() {}
+}
+```
+
+#### 箭头函数
+
+- 形如JS，**但是**==函数体只能写**一行**且不能带有结束的;号==
+- 只是作为==普通函数==的简写形式，没有JS中那样特殊的用法
+
+```dart
+List arr = [1, 2, 3];
+// 只能写一行
+// 形式1 用{}包裹 但是只写一句
+arr.forEach((item) => {
+    print(item) // 不能写;号
+});
+// 形式2 return的简写形式
+arr.forEach((item) => print(item));
+```
+
+#### 匿名函数
+
+- 同JS
+
+```dart
+var fn = (a) {
+    print(a);
+}; // 注1 因为是赋值语句 声明的匿名函数 语句末尾要加;号
+
+// 示例
+List arr = [1, 2, 3];
+arr.forEach(fn);
+```
+
+#### 立即执行函数
+
+- 同JS
+
+```dart
+// 不用写返回函数类型
+((int n){
+    print(n);
+})(17);
+```
