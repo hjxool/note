@@ -636,3 +636,57 @@ arr.forEach(fn);
     print(n);
 })(17);
 ```
+
+### 函数参数
+
+- 必填参数
+
+  - `参数类型 参数名`
+
+  ```dart
+  String fn(String name) {
+      return `你好: $name`;
+  }
+  String res = fn('张三');
+
+- 可选参数
+
+  - 放在必选参数后
+  - 用`[]`包裹
+  - 如果是指定类型的可选参数必须设置默认值
+
+  ```dart
+  String fn(String name, [int age = 1]) {
+      return `你好: $name, 年龄: $age`;
+  }
+  print(fn('张三', 20));
+
+- 命名参数
+
+  - 用`{}`包裹
+
+  ```dart
+  String fn(String name, {int age = 1}) {
+      return '你好: $name, 年龄: $age';
+  }
+  // 注意 传命名参数 时 要以 key: value的形式
+  print(fn('张三', age: 20));
+
+- 函数参数
+
+  - 将函数作为参数传入
+  - 同JS
+
+  ```dart
+  var fn = (value) {
+      print(value);
+  }
+  List arr = [1, 2, 3];
+  arr.forEach(fn);
+
+### 异步函数
+
+- JS中异步通过`Promise`实现
+  - `async`函数返回一个`Promise`。`await`用于等待`Promise`
+- Dart中通过`Future`实现
+  - `async`函数返回一个`Future`，`await`用于等待`Future`
