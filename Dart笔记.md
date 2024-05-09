@@ -1,3 +1,8 @@
+## 文档
+
+- [dart生态依赖包](https://www.pub.dev)
+  - `pubspec.yaml`类似JS项目中的`package.json`
+
 ## 基础
 
 ```dart
@@ -120,6 +125,25 @@ void main() {
       var match4 = print(p4.firstMatch(text4));
       print(match4?.group(0)); // Parse
   }
+
+### import
+
+- 虽然关键字都是`import`但是书写不同于JS
+
+  - `package`是固定写法，表示第三方库
+    - 如果是Dart核心库，使用`dart`表示
+  - `package:包名/包中运行的具体文件`
+    - `dart:包名`
+  - `as 别名`
+
+  ```dart
+  // 引入安装的第三方库
+  import 'package:http:http.dart' as http;
+  
+  // 引入Dart核心库 不需要别名 直接调用
+  import 'dart:convert';
+  // 调用核心库中的方法
+  jsonDecode(JSON字符串);
 
 ## 数据类型
 
@@ -688,5 +712,98 @@ arr.forEach(fn);
 
 - JS中异步通过`Promise`实现
   - `async`函数返回一个`Promise`。`await`用于等待`Promise`
+
 - Dart中通过`Future`实现
   - `async`函数返回一个`Future`，`await`用于等待`Future`
+
+  ```dart
+  // 安装 引入 http库
+  import 'package:http/http.dart' as http;
+  
+  // 引入Dart核心库
+  import 'dart:convert';
+  
+  // 声明 返回值 为 Future类型 的函数
+  Future fn() {
+      return http.get(url);
+  }
+  void main() {
+      // 同JS一样链式调用
+      fn()
+       // 请求回来的结果在body中 以JSON字符串形式存储
+       // 将JSON转换为对象 需要用 Dart核心库中的方法
+       .then((res) {
+           var data = jsonDecode(res.body);
+           print(data);
+       })
+       // 注: Future中不是catch而是catchError
+       .catchError((error) => print(error));
+  }
+  
+  // 声明 async函数
+  // 注: async关键字放后面
+  Future fn() async {
+      final res = await http.get(url);
+      return res
+  }
+  void main() async {
+      try {
+          final data = await fn().then((res) => jsonDecode(res.body))
+          print(data);
+      } catch(err) {
+          print(err);
+      }
+  }
+
+## 类与对象
+
+### 类
+
+- 概念同ES6
+
+- JS中多是用一个个函数调用处理逻辑，即==面向过程编程==
+  - JS中的`class`完全是语法糖，和Dart中的类是两个不同的概念
+  - 而Dart更像Java，是基于==类和对象==的编程方式
+
+- 示例
+
+  - 类不能定义在函数中，如`main`函数
+
+  ```dart
+  // 声明类
+  class Person {
+      // 定义属性
+      String name = '张三';
+      // 定义方法
+      void getName() {
+          // 注: 类方法中可直接访问类中定义的属性
+          print('我是 $name');
+      }
+  }
+  void main() {
+      Person p = new Person();
+      // 访问实例属性
+      print(p.name); // '张三'
+      // 调用实例方法
+      p.getName();
+  }
+  ```
+
+### 构造函数
+
+- 构造函数有多种形式
+
+  - 默认构造函数
+    - 构造函数名和类名相同，会在==实例化==时，==第一个被调用==
+
+  ```dart
+  class Point {
+      num x = 0;
+      num y = 0;
+      Point() {
+          // 有两种形式
+          // 1、
+      }
+  }
+
+### 
