@@ -690,6 +690,29 @@ arr.forEach(fn);
   - 用`{}`包裹
 
   ```dart
+  // 通常形式 指定参数类型 就必须赋初值
+  String fn({String name = '张三'}) {
+      return '你好: $name';
+  }
+  print(fn()); // 你好: 张三
+  print(fn(name: '李四')); // 你好: 李四
+  
+  // 不指定类型 就可以不赋初值 而且可以传入不同类型的值
+  // 但是不建议这样用
+  String fn({name}) {
+      return '你好: $name';
+  }
+  print(fn()); // 你好: null
+  print(fn(name: '张三')); // 你好: 张三
+  print(fn(name: 111)); // 你好: 111
+  
+  // 不指定类型 赋初值 不会指定形参类型
+  String fn({name = '张三'}) {
+      return '你好: $name';
+  }
+  print(fn(name: 111)); // 你好: 111 不会报错
+  
+  //当有其他参数时
   String fn(String name, {int age = 1}) {
       return '你好: $name, 年龄: $age';
   }
@@ -791,19 +814,63 @@ arr.forEach(fn);
 
 ### 构造函数
 
-- 构造函数有多种形式
+#### 默认构造函数
 
-  - 默认构造函数
-    - 构造函数名和类名相同，会在==实例化==时，==第一个被调用==
+- 用`类名()`作为构造函数，会在==实例化==时，==第一个被调用==
 
   ```dart
   class Point {
       num x = 0;
       num y = 0;
-      Point() {
+      Point(num a, num b) {
           // 有两种形式
-          // 1、
+          // 1、用this.形式
+          // 使用场景 构造函数的形参命名和实例身上的属性命名冲突时 必须用this. 所以更推荐用这种形式
+          this.x = a;
+          this.y = b;
+          // 2、直接赋值
+          x = a;
+          y = b;
       }
+      // 构造函数简写 接收参数的同时赋值
+      Point(this.x, this.y);
+  }
+  void main() {
+      var p = new Point(1, 1);
+      print(p.x); // 1
   }
 
-### 
+#### 命名构造函数
+
+- 用`类名.函数名()`形式，可以存在多个命名构造函数，提供额外清晰度
+
+- 任意类型的构造函数都可以存在，一个类中不是只能写一种类型构造函数
+
+  ```dart
+  class Point {
+      num x = 0;
+      num y = 0;
+      // 书写形式和普通构造函数相同
+      Point.first(num x, num y) {
+          this.x = x;
+          this.y = y;
+      }
+      
+      // 用 命名参数 给形参赋 默认值
+      Point.second({int x = 1, int y = 1}) {
+          this.x = x;
+          this.y = y;
+      }
+  }
+  void main() {
+      var p1 = new Point.first(1, 1);
+      print(p1.x); // 1
+      
+      var p2 = new Point.second(x: 10);
+      print(p2.x); // 10
+      print(p2.y); // 1
+  }
+
+#### 常量构造函数
+
+- 使用场景：类生成的对象不会改变时
