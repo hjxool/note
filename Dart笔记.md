@@ -54,16 +54,26 @@ void main() {
 
   - 不明确类型：`var age = 18`或`dynamic age = 18`
 
+    - ==不明确类型可以不赋初值==
+    
     ```dart
     // 未赋初值时 可以随时改变值
     var a;
     a = 1;
     a = 'asd';
+    dynamic b;
+    b = 1;
+    b = 'qwe';
     
-    // 赋了初始值 类型就已经确定 不能再改变
+    // var 赋了初始值 类型就已经确定 不能再改变
     var a = 1;
     a = 'asd'; // error
-
+    
+    // dynamic 赋了初值 也可以改变后续赋值类型
+    dynamic a = 1;
+    a = 'asd'; // 可以运行
+    
+  
 - 同JS，变量名大小写敏感
   - 如`age`和`Age`是两个变量
 
@@ -81,8 +91,29 @@ void main() {
   - `const`
     - 无法将运行时的值赋值给`const`常量，如`const time = Date.now()`会报错
     - 只能赋值==编译==时能取到的值，如`const age = 18`
+    - 用`const`声明时，**必须**==赋初值==
   - `final`
     - 可以将运行时的值赋值`final`常量，如`final time = Date.now()`成功
+    - `final`声明时，可以不赋初值，**但是**赋过值后都不能再修改
+
+- 声明常量，可以和变量类型一起使用
+
+  ```dart
+  // 声明数字类型常量
+  final num x = 1;
+  
+  // 不能和var一起使用 但是可以和 dynamic 一起用
+  const var x = 1; // 报错
+  final var x = 1; // 报错
+  const dynamic x = 1; // 可以使用
+  final dynamic x = 1; // 可以使用
+  
+  // final 可以不赋初值
+  final x;
+  final num x;
+  // const 必须赋初值
+  const x; // error
+  const String x; // error
 
 ### 正则
 
@@ -675,7 +706,7 @@ arr.forEach(fn);
 
 - 可选参数
 
-  - 放在必选参数后
+  - 放在必传参数后
   - 用`[]`包裹
   - 如果是指定类型的可选参数必须设置默认值
 
@@ -791,7 +822,8 @@ arr.forEach(fn);
 - 示例
 
   - 类不能定义在函数中，如`main`函数
-
+  - Dart中类可以省略`new`，也能创建实例对象
+  
   ```dart
   // 声明类
   class Person {
@@ -809,6 +841,8 @@ arr.forEach(fn);
       print(p.name); // '张三'
       // 调用实例方法
       p.getName();
+      // 可以省略new
+      Person p = Person();
   }
   ```
 
@@ -874,3 +908,100 @@ arr.forEach(fn);
 #### 常量构造函数
 
 - 使用场景：类生成的对象不会改变时
+
+  ```dart
+  class Point {
+      // 属性 必须 用 final 声明
+      // 用final声明可以不用赋初值
+      final num x;
+      final num y;
+      
+      // 常量构造函数 必须通过 const 声明
+      const Point(this.x, this.y);
+      
+      // 注: 常量构造函数 不能有函数体!
+      // 以下形式 会报错
+      const Point(num x, num y) {
+          this.x = x;
+          this.y = y;
+      }
+  }
+  void main() {
+      // 常量构造函数 可以 当作普通构造函数使用 但是就失去了其原本的意义
+      var p1 = new Point(1, 2); // 正常运行
+      var p2 = new Point(1, 2);
+      print(p1 == p2); // false
+      
+      // 声明不可变对象 必须 通过 const 关键字
+      var p3 = const Point(1, 2);
+      var p4 = const Point(1, 2);
+      print(p3 == p4); // true
+  }
+  ```
+
+#### 工厂构造函数
+
+- 不能进行实例化，因此不能使用`this`
+
+  ```dart
+  class Person {
+      String name;
+      // 静态 Person类型 的变量
+      static Person instance;
+      // 工厂构造函数
+      factory Person([String name = '张三']) {
+          // 不能用this
+          print(this.name); // error
+      }
+  }
+  void main() {
+      // 不能做实例化操作
+      Person p1 = new Person('李四');
+      print(p1.name); // error
+  }
+  ```
+
+- 示例
+
+  - `mapObj.putIfAbsent(key, () => value)`方法
+    - 返回值：Map中的`value`值
+    - 用法：根据传入的`key`，查询`mapObj`中是否有`key`
+      - 如果有，则直接返回`key`对应的`value`
+      - 如果不存在，则**先**在`mapObj`中创建对应的`key: value`,**再**返回`() => value`的`value`
+
+  ```dart
+  class Person {
+      String name = '';
+      // 作用类似 单例模式 的 全局变量
+      static final Map instances = {};
+      
+      factory Person(String name) {
+          // 不能实例化 因此没有this 用 类.属性/方法 的形式调用
+          // 工厂构造函数 必须 有return 不然会报错
+          return Person.instances.putIfAbsent('first_instance',() => new Person.createInstance(name));
+      }
+      
+      // 可以有多个工厂函数
+      // factory是关键字 可以加在其他构造函数前 使其变为工厂函数
+      factory Person.createInstanceByMap(Map obj) {
+          return new Person(obj['person_name']);
+      }
+      
+      // 定义用于 实例化 的 命名构造函数
+      Person.createInstance(this.name);
+  }
+  void main() {
+      // 实例化操作
+      Person p1 = new Person('张三');
+      print(p1.name); // 张三
+      
+      Person p2 = new Person('李四');
+      // 因为实例唯一(单例模式) 读取的还是旧实例
+      print(p2.name); // 张三
+      
+      print(p1 == p2); // true
+      
+      // 用另一个工厂构造函数创建实例
+      Person p1 = new Person.createInstanceByMap({'person_name': '张三'});
+      print(p1.name); // 张三
+  }
