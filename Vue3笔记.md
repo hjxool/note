@@ -342,3 +342,75 @@
   <template>
     <button @click="count++">{{ count }}</button>
   </template>
+
+## 简介
+
+- ==单文件组件==(`.vue`)是Vue特色，JS、HTML、CSS都封装在一个文件，结构如
+
+  ```vue
+  <script setup>
+      import { ref } from 'vue'
+      const count = ref(0)
+  </script>
+  
+  <template>
+    <button @click="count++">Count is: {{ count }}</button>
+  </template>
+  
+  <style scoped>
+      button {
+        font-weight: bold;
+      }
+  </style>
+  ```
+
+- API风格
+
+  - 选项式
+
+    - Vue2的配置项形式，如`data`、`methods`、`mounted`等
+    - 选项式本质是基于组合式实现的
+    - 更易上手
+
+    ```vue
+    <script>
+    export default {
+      data() {
+        return {
+          count: 0
+        }
+      },
+      methods: {
+        increment() {
+          this.count++
+        }
+      },
+      mounted() {}
+    }
+    </script>
+    
+    <template>
+      <button @click="increment">Count is: {{ count }}</button>
+    </template>
+
+  - 组合式
+
+    - 组合式 通常会与 `<script setup>`搭配使用
+    - 形式更自由、灵活，需要较深的理解
+
+    ```vue
+    <script setup>
+    // 注: 生命周期等钩子函数都需要引入再用
+    import { ref, onMounted } from 'vue'
+    const count = ref(0)
+    function increment() {
+      count.value++
+    }
+    onMounted(() => {
+      console.log(`The initial count is ${count.value}.`)
+    })
+    </script>
+    
+    <template>
+      <button @click="increment">Count is: {{ count }}</button>
+    </template>

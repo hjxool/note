@@ -28,7 +28,7 @@
     - `npx webpack serve(可选) --config ./folder/webpack.dev.js`
       - `--config`表示指定配置文件路径，且应用配置文件可以==自定义名称==
 
-- 在`package.json`文件中，配置项`scripts`下像`dev`等运行指令`webpack --config ./webpack.dev.js`不需要`npx`，因为这里`webpack `等指令都是全局的
+- 在`package.json`文件中，配置项`scripts`下像`dev`等运行指令`webpack --config ./webpack.dev.js`不需要`npx`，因为这里`webpack`等指令都是全局的
   - 可以理解为`scripts`下的配置`'xxx': 'webpack'`，在命令行运行`npm run xxx`等同于`npx webpack`
 
 - 如果用`loader`就可以把`options`写同级

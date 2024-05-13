@@ -1005,3 +1005,36 @@ arr.forEach(fn);
       Person p1 = new Person.createInstanceByMap({'person_name': '张三'});
       print(p1.name); // 张三
   }
+
+### 访问修饰符
+
+- Dart不同于TS，没有访问修饰符`public`、`private`等，而是用==属性==或==方法名==表示与访问修饰符同样的意思
+  - `public`：默认就是`public`
+  - `private`：==属性==或==方法名==以下划线`_`开头
+    - Dart的私有属性不同于TS等语言，它的==私有是对文件而言==，即==当前文件内都可以访问到类内的私有属性==、方法。要==真正私有==，得将类放到另一个文件
+      - 例：在目录下创建`lib/Person.dart`，再在需要用的地方`import 'lib/Person.dart'`引入类文件
+
+  ```dart
+  class Person {
+      // 公有属性
+      String name = '';
+      // 私有属性
+      num _money = 100;
+      // 读取私有属性
+      num getMoney() {
+          return this._money;
+      }
+      // 私有方法
+      void _myName() {
+          print('我是 $name');
+      }
+      // 字符串内$ 同样可以获取私有属性
+      String fn() {
+          return '$name 有 $_money 元';
+      }
+  }
+  void main() {
+      var p = new Person('张三');
+      print(p.getMoney()); // 100
+      print(p.fn()); // 张三 有 100 元
+  }
