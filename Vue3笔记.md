@@ -1,31 +1,15 @@
 ## 变化
 
-- vue3中`<template>`下不再需要==根元素==
-
 - vue3中data、methods配置项，可以声明在`setup(){}`函数中
-  - `setup(){}`必须有==返回值==，可以写成两种形式，==对象形式==、==渲染函数==
-    - 对象形式：`return { name，function }`。对象形式中包含的属性和方法均可直接使用，比如`{{name}}`、`@click="function"`
-    - 渲染函数：`return () => {return h('元素', 内容)}`，想要使用还需要`import {h} from 'vue'`
-  
   - setup函数有两个默认参数——==props==、==context==
     - ==props==用来接收从父级传入的参数，同以前的props配置项
-  
+
     - ==context==有三个主要的属性
       - ==attrs==：用来兜底，当传入的参数没有用props声明接收，就可以在==attrs==中找到
-  
-      - ==**emit**==：触发==父级绑定到子==组件的事件，使用方法同vue2中的**$emit**
-  
-      - ==**slot**==：接收父级传入的插槽内容，**注！**vue3中插槽必须用`<template v-slot:name/>`的形式，name才能接收到插槽内容
-  
-  - setup作为一个**配置项**，那生命周期等**平级**配置项中如何调用setup中的数据呢？答案是——用==**this**==，因为==setup==执行顺序在==beforeCreate==**之前**，因此，在==setup内部==**this还没有指向vue实例对象**，而是用JS原生作用域的原理取值。但除了==setup==，其他配置项this都指向vue实例。注：经过实验，==setup==中的==this==指向**window**对象，**生命周期钩子**中this指向==vm实例对象==，且==拥有setup==中暴露出来的**变量**和**函数**，直接用`this.xx`即可调用
 
-- vue3中==自己声明==的属性变量不再具有==响应性==，而是要通过一个==ref函数==去加工成==RefImpl对象==，即引用实例对象
-  - 不推荐用`ref()`处理==非基本类型==数据。ref在处理==对象类型数据==时，只会把对象本身用数据劫持绑定get和set方法，其下的属性都是用==ES6中新语法proxy==处理，因此在取对象第一层数据时需要`obj.value.xxx`，其后的层级数据直接取用
-  - ==对象类型数据==用`reactive`函数处理
-  - `ref`使用方法：
-    - 使用前必须要`import { ref } from 'vue'`，引入ref组件
-    - `let xxx = ref( '张三' )`，使用ref函数处理赋值的变量
-    - ==修改==时使用`xxx.value = '李四'`，此处vue3为value属性做了个数据劫持。**※但是**，页面引用时不需要用`.value`，vue自动进行了一个`.value`取值操作
+      - ==**emit**==：触发==父级绑定到子==组件的事件，使用方法同vue2中的**$emit**
+
+      - ==**slot**==：接收父级传入的插槽内容，**注！**vue3中插槽必须用`<template v-slot:name/>`的形式，name才能接收到插槽内容
 
 - 父级给子组件绑定的==自定义**事件**==，==子组件==可以用一个全新的配置项`emits:[ 'event' ]`来声明接收
 
@@ -99,54 +83,6 @@
 
     ![img](https://upload-images.jianshu.io/upload_images/6322775-98fc500bb756ae16.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
 
-- 使用外部组件库
-  1. 创建实例对象`const app = Vue.CreateApp(...)`
-  2. 注册组件`app.use(xxx)`
-  3. 挂载页面`app.mount('#app')`
-
-## 创建根实例对象
-
-- vue3方法创建的实例对象，不能直接使用，只有在 `mount()` 挂载后所赋值的变量，才能取到里面的值，等同于Vue2中的`let vm = new Vue`
-
-  ![img](https://upload-images.jianshu.io/upload_images/6322775-67f17ff8c53c9978.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
-
-- 挂载vue实例：
-
-  ```html
-  <!-- 通过CDN使用，Vue大写 -->
-  <script src=""https://unpkg.com/vue@3/dist/vue.esm-browser.js></script>
-  <script>
-  	let vm = {...}
-  	Vue.createApp(vm).mount('所要挂载的html元素ID或者class')
-      或者
-      let { createApp } = Vue
-  </script>
-  
-  <!-- 通过ES模块，因为export {...}，所以必须是路径 -->
-  <script type="module">
-  	import { createApp } from 'https://unpkg.com/vue@3/dist/vue.esm-browser.js'
-      createApp(vm).mount('#app')
-  </script>
-  
-  <!-- 通过Import maps，自定义名 -->
-  <script type="importmap">
-  	{
-  	  "imports":{
-  	    "hhh": "https://unpkg.com/vue@3/dist/vue.esm-browser.js"
-  	  }
-  	}
-  </script>
-  <script type="module">
-  	import { createApp } from 'hhh'
-      createApp(vm).mount('#app')
-  </script>
-
-## 常用修饰符
-
-![img](https://upload-images.jianshu.io/upload_images/6322775-c175112bac13a75b.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
-
-- `keydown.13`等数字形式的修饰符被废弃
-
 ## vue2组件传值进化
 
 - vue2.x中的`provide/inject`在vue3中进化了，更增加了**响应性**
@@ -178,26 +114,6 @@
       直接调用：xxx2.aaa
   ```
 
-## reactive
-
-- 加工==对象类型==的数据，使用==reactive函数==，加工成==proxy对象==
-
-- reactive**不能**处理==基础数据类型==
-
-- 使用方法：
-
-  ```js
-  import {reactive, createApp} from 'vue'
-  createApp({
-      setup(){
-          let obj = reactive({ xxx:'李白'，age：18 })
-          return {obj}
-      }
-  }).mount('#app')
-  ```
-
-- 用==扩展运算符==展开`reactive`加工的对象，其属性不再具有==响应式==！
-
 
 ## toRef/toRefs
 
@@ -210,8 +126,6 @@
   - 返回值是==对象==`{key1:..., key2:...}`
   - 在`setup()`返回值中`return {...toRefs(对象)}`，在HTML模板中用`{{对象中第一层的基础类型数据}}`，直接取用，而不需要`object.key`这样来使用，但是里层的属性依然需要`{{ key1.key2... }}`
 - `toRefs`与`reactive`区别
-  - `reactive`加工的对象使用==扩展运算符==展开后不具有响应式
-    - 这是由于ES6`proxy`数据代理特性所致，`proxy`只能代理对象，修改代理对象身上的属性可以监听到，但是没有对基本类型的属性监听，所以`reactive`只是对对象本身及子对象属性代理，展开后浅拷贝的基本类型属性会丢失响应式
   - `toRefs`专门批量生产响应式变量，加工后的对象展开后，属性依然具有响应式
 
 ## computed计算属性
@@ -371,7 +285,8 @@
     - Vue2的配置项形式，如`data`、`methods`、`mounted`等
     - 选项式本质是基于组合式实现的
     - 更易上手
-
+    - setup作为一个**配置项**，在生命周期中执行顺序在`beforeCreate`**之前**
+  
     ```vue
     <script>
     export default {
@@ -392,12 +307,12 @@
     <template>
       <button @click="increment">Count is: {{ count }}</button>
     </template>
-
+  
   - 组合式
-
+  
     - 组合式 通常会与 `<script setup>`搭配使用
     - 形式更自由、灵活，需要较深的理解
-
+  
     ```vue
     <script setup>
     // 注: 生命周期等钩子函数都需要引入再用
@@ -414,3 +329,407 @@
     <template>
       <button @click="increment">Count is: {{ count }}</button>
     </template>
+
+## 创建根实例
+
+- 入口页面`index.html`
+
+  - 作为容器的app元素**不会**视为应用的一部分，即不会在应用逻辑中被获取到
+
+  ```html
+  <body>
+      <div id="app"></div>
+      <script type="module" src="/src/main.js"></script>
+  </body>
+
+- 入口文件`main.js`
+
+  - `mount`可接收==实际DOM元素==或==CSS选择器==作为参数
+
+  ```js
+  import { createApp } from 'vue'
+  // 引入 App.vue 根组件
+  import App from './App.vue'
+  // 传入根组件创建应用
+  const app = createApp(App)
+  // 将应用绑定到 入口文件 index.html 页面元素上
+  app.mount('#app')
+  
+  // 应用实例app 身上有 .config 对象 可以配置应用级选项
+  // 例: 定义应用级错误处理器 捕获所有子组件上的错误
+  app.config.errorHandler = (err) => {
+      /*处理异常*/
+  }
+  
+  // 全局注册组件
+  import MyComponent from './path/MyComponent.vue'
+  app.component('MyComponent', MyComponent)
+  
+  // 如果是多应用实例 则分开传入根组件 绑定 不同 的dom元素
+  const app1 = createApp({
+    /* ... */
+  })
+  app1.mount('#container-1')
+  const app2 = createApp({
+    /* ... */
+  })
+  app2.mount('#container-2')
+  ```
+
+- 根组件`App.vue`
+
+  ```vue
+  <template>
+  	<!-- 登陆页面等入口组件 -->
+      <Login />
+  </template>
+  <script setup>
+      import {ref, provide, onMounted} from "vue";
+  	import Login from "./views/其他页面/登录.vue";
+      const token = localStorage.token;
+      // 调用引入的生命周期函数
+      onMounted(()=>{
+          // 往 根组件 下的 子组件 传值
+          provide('全局token', token)
+  	})
+  </script>
+
+## 基础
+
+### 模板语法
+
+- vue3中`<template>`下不再需要==根元素==
+
+```vue
+<template>
+	<!--元素内显示文本-->
+	<span>Message: {{ msg }}</span>
+	<!--可以写表达式-->
+	<span>Message: {{ ok ? 'YES' : 'NO' }}</span>
+    <!--可以写函数-->
+    <span>Message: {{ msgFn() }}</span>
+
+	<!--插入原始HTML元素 使用v-html指令 将当前span元素的 innerHTML 替换为 html-->
+	<span v-html="html"></span>
+
+	<!--属性绑定 v-bind指令-->
+	<!--注: 如果绑定值为 null 或 undefined 属性 会从元素上移除-->
+    <!--注: 如果绑定值为 布尔值 或 空字符串 属性不会从元素上移除-->
+	<div v-bind:id="myId"></div>
+	<!--简写形式-->
+	<div :id="myId"></div>
+	<!--也可以绑定对象-->
+	<div :style="myStyle"></div>
+	<!--可以绑定函数-->
+	<div :style="myStyleFn()"></div>
+	<!--绑定函数 传入 动态参数-->
+    <div :style="myStyleFn(myId)"></div>
+	<!--动态绑定 属性-->
+	<a :[attributeName]="myId"> ... </a>
+    <!--可以绑定表达式-->
+	<button @click="num++">{{ num }}</button>
+
+	<!--修饰符 以.xxx 形式-->
+    <!--下例等同于 onSubmit 中 event.preventDefault() -->
+	<form @submit.prevent="onSubmit">...</form>
+</template>
+<script setup>
+    import {ref} from 'vue'
+	let html = ref('<span style="color: red">This should be red.</span>')
+    let myId = ref('1234565')
+    let myStyle = ref({
+        width: '0px',
+    })
+    let ok = ref(true)
+    function myStyleFn() {
+        return {}
+    }
+    function msgFn(){
+        return 'sss'
+    }
+    let attributeName = ref('hhh')
+    let num = ref(1)
+</script>
+```
+
+### 响应式基础
+
+#### ref
+
+```vue
+<template>
+    <!--模板中使用 ref 不需要加 .value vue会自动解包-->
+	<span>Message: {{ num }}</span>
+	<!--改变值-->
+	<button @click="num++">{{ num }}</button>
+</template>
+<script>
+    // 用 ref()函数 来声明响应式状态
+    import { ref } from 'vue'
+    // setup 是一个特殊的钩子 专门用于组合式API
+    setup() {
+        let num = ref(1)
+        // ref() 接收参数，并将其包裹在一个带有 .value 属性的 ref 对象中返回
+        console.log(num) // {value: 1}
+        num.value++
+        console.log(num) // {value: 2}
+        // 将 ref变量 暴露给模板
+		return {
+          num
+        }
+    }
+</script>
+```
+
+- `<script setup>`作用
+
+  - 不用手动暴露变量、方法
+
+  ```vue
+  <template>
+  	<span>Message: {{ num }}</span>
+  	<button @click="num++">{{ num }}</button>
+  </template>
+  <script setup>
+      import { ref } from 'vue'
+      let num = ref(1)
+  </script>
+  ```
+
+- `ref`变量在传递给函数时，依然可以保留响应式
+
+- `ref()`函数可以传入任意类型的值
+
+  ```vue
+  <script setup>
+  	import { ref } from 'vue'
+      const obj = ref({
+        nested: { count: 0 },
+        arr: ['foo', 'bar']
+      })
+      function mutateDeeply() {
+        // 以下都会按照期望工作
+        obj.value.nested.count++
+        obj.value.arr.push('baz')
+      }
+  </script>
+
+#### DOM更新时机
+
+- 当修改了响应式变量时，DOM元素显示内容也会自动更新
+
+  - **但是**更新DOM是==异步==的，会在函数执行完，再更新到页面
+  - 要等到更新到页面后再执行额外代码，可以使用`nextTick()`方法
+
+  ```vue
+  <template>
+  	<div class="item" v-for="item in list">{{item}}</div>
+  </template>
+  <script setup>
+  	import { nextTick, onMounted } from 'vue'
+      let list = []
+      // 例 在数组更新到页面生成列表后 再获取列表元素
+      onMounted(async ()=>{
+          list = [1,2,3,4]
+          // 回调函数写法
+          nextTick(()=>{
+              console.log(document.querySelector('.item')[1].innerHTML) // 1
+          })
+          // Vue3中 nextTick 变成了 Promise
+          // await nextTick() 后数据就已经更新到页面上了
+          await nextTick()
+          // Vue2中回调方法的内容可以写在这后面
+          console.log(document.querySelector('.item')[1].innerHTML) // 1
+      })
+  </script>
+
+#### reactive
+
+- 声明响应式状态
+
+  ```vue
+  <template>
+  	<!--在html中使用与ref无异-->
+  	<button @click="state.count++">
+        {{ state.count }}
+      </button>
+  </template>
+  <script setup>
+  	import { reactive } from 'vue'
+      // reactive示例
+      const state = reactive({ count: 0 })
+  </script>
+  ```
+
+- 与`ref`的不同
+
+  - `ref`
+
+    - `ref()`返回的是带有`.value`属性的`ref`对象，`.value`里才是`proxy`的对象
+    - 可接收==任意类型==值
+
+  - `reactive`
+
+    - `reactive()`返回的是`proxy`对象，不需要`.value`
+
+    - 只能接收==对象类型(对象、Map、Set等)==作为参数，不能对基本类型数据进行处理
+
+    - 不能替换对象
+
+      ```js
+      let state = reactive({ count: 0 })
+      // 传入新对象后 { count: 0 } 引用将失去响应式
+      state = reactive({ count: 1 })
+      ```
+
+    - 不能进行解构操作，会丢失响应性
+
+      - 这是由`proxy`数据代理特性所致，`proxy`只能代理对象，是对对象本身及子对象属性代理，修改代理对象身上的属性可以监听到
+
+      ```js
+      const state = reactive({ count: 0 })
+      // 当解构时，count 已经与 state.count 断开连接
+      let { count } = state
+      // 不会影响原始的 state
+      count++
+      // 该函数接收到的是一个普通的数字 并且无法追踪 state.count 的变化
+      fn(count)
+      // 必须传入整个对象以保持响应性
+      fn(state.count)
+
+- `ref`细节
+
+  - `ref`对象作为`reactive`对象的属性被访问和修改时，会自动解包
+
+  ```js
+  const num = ref(0)
+  const state = reactive({
+    // 将ref赋值给reactive不需要加.value
+    count: num
+  })
+  console.log(state.count) // 0
+  // 修改reactive属性值
+  state.count = 1
+  // ref值也变了
+  console.log(num.value) // 1
+  ```
+
+  - `ref`作为数组或集合类型中的元素被访问时，**不会**自动解包，需要加`.value`
+
+  ```js
+  const arr = reactive([ref('aaa'),ref('bbb')])
+  // 这里需要 .value
+  console.log(arr[0].value) // 'aaa'
+  
+  const map = reactive(new Map([['count', ref(0)]]))
+  // 这里需要 .value
+  console.log(map.get('count').value)
+  ```
+
+  - 只有最外层` ref` 属性才会被解包
+
+  ```vue
+  <template>
+  	<!--仅作为 文本插值 不需要加.value-->
+  	<div>{{ obj.num }}</div>
+      <!--如果是表达式 需要加.value-->
+  	<div>{{ obj.num.value + 1 }}</div>
+  	<!--解构赋值为最外层属性后 会自动.value-->
+  	<div>{{ num + 1 }}</div>
+  </template>
+  <script setup>
+      import { ref } from 'vue'
+  	let obj = {num: ref(1)}
+      // 用解构赋值将其变为最外层属性
+      let { num } = obj
+  </script>
+
+### 计算属性
+
+- 简化嵌套结构
+
+  - 返回值是一个`ref`对象
+  - 计算属性依赖于源数据，源数据改变，计算属性会跟着变
+
+  ```vue
+  <template>
+      <span>{{ author.books.length > 0 ? 'Yes' : 'No' }}</span>
+  	<!--简化后-->
+  	<span>{{ msg }}</span>
+  </template>
+  <script setup>
+      import { reactive, computed } from 'vue'
+      // 例
+  	const author = reactive({
+        name: 'John Doe',
+        books: [
+          'Vue 2 - Advanced Guide',
+          'Vue 3 - Basic Guide',
+          'Vue 4 - The Mystery'
+        ]
+      })
+      
+      // 使用计算属性简化
+      const msg = computed(() => {
+        // author.books改变时msg会跟着变
+        return author.books.length > 0 ? 'Yes' : 'No'
+      })
+  </script>
+
+#### 计算属性和方法的区别
+
+- 计算属性有缓存
+
+  - 只会在依赖的数据更新时才重新计算，不会重复执行
+
+  ```vue
+  <template>
+  	<!--可以得到和计算属性同样的结果-->
+  	<span>{{ fn() }}</span>
+      <span>{{ msg }}</span>
+  </template>
+  <script setup>
+      import { reactive, computed } from 'vue'
+  	const author = reactive({
+        name: 'John Doe',
+        books: [
+          'Vue 2 - Advanced Guide',
+          'Vue 3 - Basic Guide',
+          'Vue 4 - The Mystery'
+        ]
+      })
+      const msg = computed(() => {
+        return author.books.length > 0 ? 'Yes' : 'No'
+      })
+      function fn() {
+          return author.books.length > 0 ? 'Yes' : 'No'
+      }
+  </script>
+
+#### 修改计算属性
+
+- 计算属性默认是==只读==的
+
+  - 因为默认形式只有`getter`回调方法
+  - 通过设置`setter`使其==可修改==
+  - 计算属性是派生值，**不要**在`getter`中做==异步操作或修改DOM==
+  - 计算属性的派生特性，可以将其看作==临时快照==，每当源数据发生变化，会生成新的快照，尽量避免修改`快照`
+
+  ```js
+  import { ref, computed } from 'vue'
+  const firstName = ref('John')
+  const lastName = ref('Doe')
+  
+  const fullName = computed({
+    // getter
+    get() {
+      return firstName.value + ' ' + lastName.value
+    },
+    // setter 对fullName进行修改时触发
+    set(newValue, oldValue) {
+      // newValue是要修改的值 oldValue是修改前的值
+      // 将修改后的值 分割成数组 取第一个元素修改firstName 第二个元素修改lastName
+      [firstName.value, lastName.value] = newValue.split(' ')
+    }
+  })
+  ```
