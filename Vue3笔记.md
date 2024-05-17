@@ -10,23 +10,10 @@
       - ==**emit**==：触发==父级绑定到子==组件的事件，使用方法同vue2中的**$emit**
 
       - ==**slot**==：接收父级传入的插槽内容，**注！**vue3中插槽必须用`<template v-slot:name/>`的形式，name才能接收到插槽内容
-
 - 父级给子组件绑定的==自定义**事件**==，==子组件==可以用一个全新的配置项`emits:[ 'event' ]`来声明接收
-
 - vue2中[全局方法]()的==Vue.component/directive/...==，现在使用实例对象==vm.directive/...==就可以实现
-
 - vue2中==安装全局事件总线==的`Vue.prototype.xxx`变为了`vm.config.globalProperties`
-
 - vue3中==data选项==必须写为==函数形式==
-
-- 在单文件组件(SFC)中，可以使用`<script setup>`简化，无需使用`setup(){ return {...} }`省去了手动暴露
-
-  ```vue
-  <script setup>
-  	import {ref} from 'vue'
-      let n = ref(123)
-      fn(){...}
-  </script>
 
 ## 组件
 
