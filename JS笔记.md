@@ -882,6 +882,11 @@
 - [sessionStroage]()：会话存储
   - 使用`sessionStroage.自定义变量名 = 值`，就可以将**值**存入**自定义变量**名，取用的时候直接用`sessionStroage.自定义变量名`就可以获取值
   - ==删除==的时候使用`sessionStroage.removeItem("自定义变量名")`
+  - `session`存储是==快照==！
+    - A页面往`sessionStroage`中写入数据，然后==新页签==中打开同域名B页面
+    - B页面中`sessionStroage`与A页面相同
+    - A页面再次往`sessionStroage`中写入数据，然后打开B页面
+    - B页面没关闭，所以会进行刷新，然后再次读取`sessionStroage`，此时`sessionStroage`中依旧是旧数据，没有A页面新写的数据
 - [localStorage]()：本地存储
   - 保存：`localStorage.setItem('key', 'value')`
   - 读取：`localStorage.getItem('key')`
