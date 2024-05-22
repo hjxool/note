@@ -720,3 +720,116 @@
     }
   })
   ```
+
+### class与style绑定
+
+#### class绑定对象
+
+- 可以给`:class`传递对象
+
+  ```vue
+  <template>
+      <div :class="{ active: isActive }"></div>
+      <!--渲染结果-->
+      <div class="active"></div>
+  
+      <!--可以跟一般的 class 共存-->
+      <div
+        class="static"
+        :class="{ active: isActive, 'text-danger': isActive }"
+      ></div>
+      <!--渲染结果-->
+      <div class="static active text-danger"></div>
+  
+  	<!--可以直接绑定对象-->
+  	<div :class="classObject"></div>
+      <!--渲染结果-->
+      <div class="static active"></div>
+  </template>
+  <script setup>
+      import {ref, reactive} from 'vue'
+  	const isActive = ref(true)
+      const classObject = reactive({
+        active: true,
+        'text-danger': false
+      })
+  </script>
+
+#### class绑定数组
+
+- 给`:class`绑定数组来渲染多个`css`
+
+  ```vue
+  <template>
+      <div :class="[activeClass, errorClass]"></div>
+      <!--渲染结果-->
+      <div class="active text-danger"></div>
+  
+  	<!--条件渲染-->
+  	<div :class="[isActive ? activeClass : '', errorClass]"></div>
+  	<!--用嵌套对象简化-->
+  	<div :class="[{ activeClass: isActive }, errorClass]"></div>
+  	<!--渲染结果-->
+      <div class="active text-danger"></div>
+  </template>
+  <script setup>
+      import {ref} from 'vue'
+      const activeClass = ref('active')
+      const errorClass = ref('text-danger')
+      const isActive = ref(true)
+  </script>
+
+#### 组件绑定class样式
+
+- 通常，组件样式会根据外层和模板层组合
+
+  ```html
+  <!-- 子组件模板 -->
+  <p class="foo bar">Hi!</p>
+  <!-- 在使用组件时 -->
+  <MyComponent class="baz boo" />
+  <!-- 渲染结果 -->
+  <p class="foo bar baz boo">Hi!</p>
+  ```
+
+- `:class`也是同样
+
+  ```html
+  <!-- 子组件模板 -->
+  <p class="foo bar">Hi!</p>
+  <!-- 在使用组件时 -->
+  <MyComponent :class="{ active: isActive }" />
+  <!-- 渲染结果 -->
+  <p class="foo bar active">Hi!</p>
+  ```
+
+- 如果是有**多个**==根元素==，且需要**指定**哪个根元素来接收这个class，通过组件的 `$attrs` 属性来指定接收的元素
+
+  ```html
+  <!-- 子组件模板 -->
+  <!-- MyComponent 使用 $attrs 时 -->
+  <p :class="$attrs.class">Hi!</p>
+  <span>This is a child component</span>
+  <!-- 在使用组件时 -->
+  <MyComponent class="baz" />
+  <!-- 渲染结果 -->
+  <p class="baz">Hi!</p>
+  <span>This is a child component</span>
+
+#### style绑定对象
+
+```vue
+<template>
+    <div :style="{ color: activeColor, fontSize: fontSize + 'px' }"></div>
+    <!--渲染结果-->
+    <div style="color: red;font-size: 30px;"></div>
+
+	<!--不同于Vue2 Vue3支持 font-size 这样的写法-->
+	
+</template>
+<script setup>
+    import {ref} from 'vue'
+    const activeColor = ref('red')
+    const fontSize = ref(30)
+</script>
+```
