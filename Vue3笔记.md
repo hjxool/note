@@ -821,15 +821,21 @@
 ```vue
 <template>
     <div :style="{ color: activeColor, fontSize: fontSize + 'px' }"></div>
+	<!--或-->
+	<div :style="styleObject"></div>
     <!--渲染结果-->
     <div style="color: red;font-size: 30px;"></div>
 
 	<!--不同于Vue2 Vue3支持 font-size 这样的写法-->
-	
+	<div :style="{ 'font-size': fontSize + 'px' }"></div>
 </template>
 <script setup>
-    import {ref} from 'vue'
+    import {ref, reactive} from 'vue'
     const activeColor = ref('red')
     const fontSize = ref(30)
+    const styleObject = reactive({
+      color: 'red',
+      fontSize: '30px'
+    })
 </script>
 ```
