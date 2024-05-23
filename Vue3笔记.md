@@ -839,3 +839,15 @@
     })
 </script>
 ```
+
+#### style绑定数组
+
+```vue
+<template>
+    
+</template>
+<script setup>
+    import {ref, reactive} from 'vue'
+    
+</script>
+```
