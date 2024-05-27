@@ -842,12 +842,129 @@
 
 #### style绑定数组
 
-```vue
-<template>
-    
-</template>
-<script setup>
-    import {ref, reactive} from 'vue'
-    
-</script>
-```
+- 数组元素是==样式对象==，渲染时会将这些样式对象合并
+
+  ```vue
+  <template>
+      <div :style="[baseStyle, otherStyle]"></div>
+      <!--渲染结果-->
+  	<div style="font-size: 16px;background: red;"></div>
+  </template>
+  <script setup>
+      import {reactive} from 'vue'
+      const baseStyle = reactive({
+          fontSize: '16px'0
+      })
+      const otherStyle = reactive({
+          background: 'red'
+      })
+  </script>
+
+#### style多值
+
+- 可以对同一样式属性提供多个值，浏览器仅会渲染支持的最后一个值(兼容性写法)
+
+  ```html
+  <div :style="{ display: ['-webkit-box', '-ms-flexbox', 'flex'] }"></div>
+
+### 条件渲染
+
+#### v-if
+
+- `v-if`如果条件为假，从一开始就不会渲染到页面，在dom节点找不到
+
+- `v-else`
+
+  - `v-else`元素必须紧跟在`v-if`或者`v-else-if`元素的后面，**否则**它将==不会被识别==
+
+  ```html
+  <h1 v-if="awesome">Vue is awesome!</h1>
+  <h1 v-else>Oh no 😢</h1>
+  
+  <!--v-else-if 类似else if 可连续多次使用-->
+  <div v-if="type === 'A'">
+    A
+  </div>
+  <div v-else-if="type === 'B'">
+    B
+  </div>
+  <div v-else-if="type === 'C'">
+    C
+  </div>
+  <div v-else>
+    Not A/B/C
+  </div>
+  ```
+
+- `<template>`上的`v-if`
+
+  - `template`搭配`v-if`，可以实现==包裹一串标签==的同时，不改变标签层次结构，因为`<template>`不会被渲染出来，但可以用`v-if`来条件渲染
+  - 注：不能配合`v-show`，会将`template`包裹的全部节点显示出来
+
+  ```html
+  <div class="box">
+      <template v-if="isShow">
+  		<div>aaa</div>
+          <div>bbb</div>
+      </template>
+  </div>
+  <!--渲染结果-->
+  <div class="box">
+      <div>aaa</div>
+      <div>bbb</div>
+  </div>
+  ```
+
+- **不要**在`v-if`渲染时**立即**去获取节点，使用`this.$nextTick()`，在加载完毕时再获取
+
+#### v-show
+
+- 无论是否显示，在DOM渲染中都会保留该元素，`v-show`仅切换元素的`display`样式
+- `v-show` 不支持在 `<template>` 元素上使用，也不能和 `v-else` 搭配使用
+
+#### v-if和v-show
+
+- 涉及到**节点计算**时，**一定**要用`v-if`，因为`v-show`会将节点放入页面**但隐藏**，**隐藏**的节点其宽高等属性为==0或者null==，究其原因是因为`mounted`等生命周期函数只执行一次
+- `v-if`是==真实的==按照条件渲染，因为要**确保**条件区块内的事件监听、子组件等都会被==销毁和重建==
+- `v-show`要简单得多，无论初始条件，始终会渲染，只有`display`样式属性会切换
+- 所以`v-if` 有更高的切换开销，而 `v-show` 有更高的初始渲染开销。因此，如果需要频繁切换，则使用 `v-show` 较好；如果在运行时绑定条件很少改变，则 `v-if` 会更合适
+
+#### v-if和v-for
+
+- **不推荐**同时使用 `v-if` 和 `v-for`，当 `v-if` 和 `v-for` 同时存在于一个元素上的时候，`v-if` 会==首先被执行==
+
+### 列表渲染
+
+#### v-for
+
+- `v-for` 指令基于一个数组、对象、字符串、数字来渲染一个列表，需要使用 `item in items` **形式**的特殊语法
+
+  - 其中 `items` 是源数据的数组，而 `item` 是迭代项的**别名**
+
+  ```vue
+  <template>
+  	<li v-for="value in arr">
+        {{ item.message }}
+      </li>
+  </template>
+  <script setup>
+  	const arr = ref([{ message: 'Foo' }, { message: 'Bar' }])
+  </script>
+
+- `v-for` 块中可以完整地访问父作用域内的属性和变量
+
+  - `v-for` 也支持使用可选的第二个参数表示当前项的位置索引
+
+  ```vue
+  <template>
+  	<li v-for="value,index in arr">
+        {{ parentMessage }} - {{ index }} - {{ item.message }}
+      </li>
+  	<!--渲染结果-->
+  	<li>Parent - 0 - Foo</li>
+      <li>Parent - 1 - Bar</li>
+  </template>
+  <script setup>
+  	const parentMessage = ref('Parent')
+      const arr = ref([{ message: 'Foo' }, { message: 'Bar' }])
+  </script>
