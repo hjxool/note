@@ -935,7 +935,7 @@
 
 ### 列表渲染
 
-#### v-for
+#### v-for遍历数组
 
 - `v-for` 指令基于一个数组、对象、字符串、数字来渲染一个列表，需要使用 `item in items` **形式**的特殊语法
 
@@ -968,3 +968,123 @@
   	const parentMessage = ref('Parent')
       const arr = ref([{ message: 'Foo' }, { message: 'Bar' }])
   </script>
+  ```
+
+- `v-for`可以使用解构赋值
+
+  ```html
+  <li v-for="{ message } in items">
+    {{ message }}
+  </li>
+  
+  <!-- 有 index 索引时 -->
+  <li v-for="({ message }, index) in items">
+    {{ message }} {{ index }}
+  </li>
+  ```
+
+- 对于多层嵌套的`v-for`可以访问到==父级作用域==
+
+  ```html
+  <li v-for="item in items">
+    <span v-for="childItem in item.children">
+      {{ item.message }} {{ childItem }}
+    </span>
+  </li>
+  ```
+
+- 可以使用`of`这种更接近JS中`for`语句的语法
+
+  ```html
+  <div v-for="item of items"></div>
+  ```
+
+- 对于数组中单个或多个，而非全部更新的高性能模式，应当给每一个遍历元素上绑定唯一值`key`
+
+  - 组件因其自身特性，使用`v-for`遍历时，**必需要**绑定`key`
+
+  ```html
+  <div v-for="item in items" :key="item.id"></div>
+  ```
+
+- 使用`push`等方法能够触发更新
+
+  - 当不用这些方法时，需要将==旧数组替换为新数组==才能触发更新
+
+#### v-for遍历对象
+
+- **第一个**参数表示==属性值==
+
+  ```vue
+  <template>
+  	<ul>
+        <li v-for="value in myObject">
+          {{ value }}
+        </li>
+      </ul>
+  </template>
+  <script setup>
+  	const myObject = reactive({
+        title: 'How to do lists in Vue',
+        author: 'Jane Doe',
+        publishedAt: '2016-04-10'
+      })
+  </script>
+  ```
+
+- 也可以通过**第二个**参数表示==属性名==
+
+  ```html
+  <li v-for="(value, key) in myObject">
+    {{ key }}: {{ value }}
+  </li>
+  ```
+
+- 而**第三个**参数才表示==位置索引==
+
+  ```html
+  <li v-for="(value, key, index) in myObject">
+    {{ index }}. {{ key }}: {{ value }}
+  </li>
+  ```
+
+#### v-for遍历整数
+
+- 取值范围是`1...n`
+
+  ```html
+  <!--渲染结果 1 2 3 4-->
+  <span v-for="n in 4">{{ n }}</span>
+  ```
+
+#### template与v-for
+
+- 可以在 `<template>` 标签上使用 `v-for` 渲染多个元素块
+
+  ```html
+  <ul>
+    <template v-for="item in items">
+      <li>{{ item.msg }}</li>
+      <li class="divider" role="presentation"></li>
+    </template>
+  </ul>
+  ```
+
+#### v-if与v-for
+
+- `v-if` 比 `v-for` 的优先级更高。意味着 `v-if` 无法访问到 `v-for` 内的变量
+
+  ```html
+  <!--
+   这会抛出一个错误，因为属性 todo 此时
+   没有在该实例上定义
+  -->
+  <li v-for="todo in todos" v-if="!todo.isComplete">
+    {{ todo.name }}
+  </li>
+  <!--解决方案 v-if和v-for放到不同层级-->
+  <template v-for="todo in todos">
+    <li v-if="!todo.isComplete">
+      {{ todo.name }}
+    </li>
+  </template>
