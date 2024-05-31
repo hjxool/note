@@ -514,3 +514,11 @@ video::-webkit-media-controls-enclosure {
 	display: none;
 }
 ```
+
+## 首行加缩进
+
+```css
+p::first-letter {
+    margin-left: 20px;
+}
+```
