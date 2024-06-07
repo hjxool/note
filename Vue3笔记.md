@@ -447,6 +447,7 @@
 <template>
     <!--模板中使用 ref 不需要加 .value vue会自动解包-->
 	<span>Message: {{ num }}</span>
+    <span>Message: {{ num2.a.b }}</span>
 	<!--改变值-->
 	<button @click="num++">{{ num }}</button>
 </template>
@@ -460,9 +461,17 @@
         console.log(num) // {value: 1}
         num.value++
         console.log(num) // {value: 2}
+        
+        const num2 = ref({
+            a:{
+                b: 2
+            }
+        })
+        
         // 将 ref变量 暴露给模板
 		return {
-          num
+          num,
+          num2
         }
     }
 </script>
@@ -476,10 +485,17 @@
   <template>
   	<span>Message: {{ num }}</span>
   	<button @click="num++">{{ num }}</button>
+  	<!--无法显示-->
+  	<span>{{ num2 }}</span>
   </template>
   <script setup>
-      import { ref } from 'vue'
+      import { ref, onMounted } from 'vue'
       let num = ref(1)
+      // setup关键字只能自动暴露最外层的变量
+      // 如生命周期中声明响应式变量是不行的
+      onMounted(()=>{
+          const num2 = ref(1)
+      })
   </script>
   ```
 
