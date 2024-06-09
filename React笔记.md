@@ -453,12 +453,55 @@
             )
         }
     }
+    ```
+
+## 函数组件-hooks
+
+- `hooks`允许函数组件中使用`state`等React特性
+
+  ```jsx
+  function Person(props) {
+      // useState固定书写形式 第一个是声明的state变量 第二个是该变量更新方法
+      const [age, addAge] = useState(18)
+      const add_age = () => {
+          let t = age + 1
+          // 相当于setState addAge不由自己写内部逻辑 是React自动生成的更新函数
+          addAge(t)
+      }
+      
+      const [loading, setLoading] = useState(true)
+      const [personData, setData] = useState(null) // 没有初始值传null
+      const get_data = async () => {
+          setLoading(true)
+          let res = await fetch('...')
+          let json = await res.json()
+          setData(json)
+          setLoading(false)
+      }
+      // useEffect副作用钩子 用于发送网络请求、DOM操作等
+      // 在组件渲染后执行也可以在组件卸载时清理资源
+      useEffect(() => {
+          // 执行副作用操作
+          get_data()
+          return () => {
+              // 组件卸载时的清理操作
+          }
+      }, [依赖]) // 依赖项数组 控制何时触发副作用
+      
+      return (
+      	<div>
+          	<span>年龄：{age}</span>
+              <button onClick={add_age}></button>
+              <div>获取服务器数据：{personData}</div>
+          </div>
+      )
+  }
 
 ## 组件间传值
 
-- 父往子传数据
+### 父往子传数据
 
-  - 用`props`属性
+- 用`props`属性
 
   ```jsx
   // 父组件
@@ -487,11 +530,10 @@
           )
       }
   }
-  ```
 
-- 子往父传数据
+### 子往父传数据
 
-  - 在父组件定义函数传入子组件，子组件触发函数传递数据
+- 在父组件定义函数传入子组件，子组件触发函数传递数据
 
   ```jsx
   // 父组件
@@ -529,6 +571,55 @@
           )
       }
   }
+
+### 父组件到后代组件的跨组件通信
+
+- 用`<BatteryContext.Provider>`创建一个大容器，将其中的数据共享给==组件树==，对于==组件树==而言是==全局变量==
+
+  - 如果不用，就是`props`一层层传递下去
+
+  ```jsx
+  // 父组件
+  class Parent extends Component {
+      state = {
+          color: 'red'
+      }
+      render() {
+          return (
+              // 创造共享参数容器 要用Provider
+          	<BatteryContext.Provider value={this.state.color}>
+              	<Child></Child>
+              </BatteryContext.Provider>
+          )
+      }
+  }
+  
+  // 子组件 因为只演示过度 形式简单 用函数组件形式
+  const Child = (props) => {
+      return (
+      	<GrandChild></GrandChild>
+      )
+  }
+  
+  // 后代组件
+  class GrandChild extends Component {
+      fromParent = (share_color) => {
+          return (
+              // style接收一个对象 不是Vue的{{}}
+          	<h1 style={ {color: share_color} }>红色</h1>
+          )
+      }
+      render() {
+          return (
+              // 取用共享参数 用Consumer
+          	<BatteryContext.Consumer>{this.fromParent}</BatteryContext.Consumer>
+          )
+      }
+  }
+
+### 任意组件通信
+
+- 详见==消息订阅-发布==
 
 ## 事件绑定
 
@@ -650,6 +741,46 @@
   }
   ```
 
+- `setState`在**React事件**中==异步==，即React会将更新操作放入更新队列，但不是立即执行，使得批量处理多个更新，提高性能
+
+  - **但是**在`setTimeout`或`DOM`事件中是==同步==执行！
+  - 标签上驼峰式写法的事件如`onClick`是React事件，不是DOM原生事件
+
+  ```jsx
+  class Demo extends Component {
+      state = {
+          count: 0
+      }
+      render() {
+          return (
+          	<div>
+              	<span>count:{count}</span>
+                  <button onClick={this.btn}>增加</button>
+                  <button id="btn2">增加2</button>
+              </div>
+          )
+      }
+      btn = () => {
+          // setTimeout 同步执行
+          setTimeout(() => {
+              this.setState({
+                  count: this.state.count + 1
+              })
+              console.log(this.state.count) // 1 说明立即更新了
+          })
+      }
+      
+      componentDidMount() {
+          // DOM事件 同步执行
+          document.querySelector('#btn2').addEventListener('click', () => {
+              this.setState({
+                  count: this.state.count + 2
+              })
+              console.log(this.state.count) // 2 说明立即更新了
+          })
+      }
+  }
+
 ## 生命周期
 
 - 示例
@@ -752,6 +883,25 @@
     - 接收两个参数，更新前`props`、更新前`state`
 
   - `componentWillUnmount`：组件卸载前调用
+
+- 生命周期**执行顺序**
+
+  ```jsx
+  // 组件创建时
+  constructor()
+  static getDerivedStateFromProps()
+  render()
+  componentDidMount()
+  
+  // 更新中
+  static getDerivedStateFromProps()
+  shouldComponentUpdate()
+  render()
+  getSnapshotBeforeUpdate()
+  componentDidUpdate()
+  
+  // 组件卸载时
+  componentWillUnmount()
 
 ## 列表渲染
 
