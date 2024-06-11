@@ -480,6 +480,7 @@
 - `<script setup>`作用
 
   - 不用手动暴露变量、方法
+  - `this`是`undefined`，将原先的`this.xxx`取值方式改成`xxx`直接取值
 
   ```vue
   <template>
