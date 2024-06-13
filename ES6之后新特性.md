@@ -723,8 +723,7 @@
     }
     request(async ()=>{}) // 箭头函数也可使用async关键字
     request(async function(){}) // 匿名函数
-    request(async )
-
+  
 - await==表达式==
 
   - ==必须==写在async函数**里**
@@ -1207,3 +1206,27 @@
 ## 幂运算符
 
 - 用`底数 ** 指数`代替`Math.pow(底数, 指数)`
+
+## new URL
+
+- 获取脚手架中静态资源==绝对路径==
+
+  - `import.meta.url`：表示当前文件路径
+  - `new URL`会组合相对路径和当前文件路径创建出URL对象，再通过`href`获取绝对路径
+
+  ```js
+  // 在xxx.js文件中封装获取静态资源路径
+  export function getAssetsFiles(url) {
+      return new URL(`../assets/images/${url}`, import.meta.url).href
+  }
+  
+  // 在单文件中动态切换资源
+  import {getAssetsFiles} from '../../api.js'
+  function switch_img(tag){
+      switch(tag){
+        case '1':
+          return getAssetsFiles('/home/home_icon.png')
+        case '2':
+          return getAssetsFiles('/home2/icon1.png')
+      }
+  }
