@@ -386,7 +386,7 @@
       render(){
           return (
           	<div>
-                  {/*字符串形式 过时版本 为了可能移除*/}
+                  {/*字符串形式 过时版本 未来可能移除*/}
               	<input ref="aaa" onBlur={fn}>
               </div>
           )
@@ -960,6 +960,104 @@
           	<h2 style={{ display: show ? '' : 'none' }}>xxx3</h2>
           )
       }
+  }
+
+## 子元素分组
+
+- 一个组件只能有**一个根节点**，使用`<Fragment>`可以将多个元素组合，==作为一个元素返回==
+
+  - 缩写形式`<>...</>`
+    - 缩写时不能添加任何标签属性
+    - 循环渲染时，不能用简写形式，必须用`<Fragment>`，且每一个元素分配一个 `key`，以确保正确渲染
+  - ==不会添加额外的DOM节点==，毕竟那样会影响HTML结构及样式布局
+
+  ```jsx
+  function Parent() {
+      return (
+          {/*相当于Fragment作为根节点*/}
+      	<>
+  			<Child1 />
+        		<Child2 />
+          </>
+      )
+  }
+
+## Loading状态、替换模板
+
+- 可以用在任何位置，作为内容加载时的后备方案，实现类似Vue的`v-loading`效果
+
+  - 数据加载完成会自动切换渲染实际内容
+
+  ```jsx
+  import React from 'react';
+  // 使用时需要引入
+  import { Suspense } from 'react'
+  
+  function ArtistPage({ artist }) {
+    return (
+      <>
+        <h1>{artist.name}</h1>
+        {/*fallback传入加载时 代替显示的组件*/}
+        <Suspense fallback={<Loading />}>
+          <Albums artistId={artist.id} />
+        </Suspense>
+      </>
+    );
+  }
+  
+  function Loading() {
+    return <h2>⏳ Loading...</h2>;
+  }
+
+## 组件懒加载
+
+- 将较大的组件拆分成单独的文件，在需要渲染时加载
+
+  ```jsx
+  // 懒加载需要引入后使用
+  import { lazy } from 'react'
+  // 传入回调函数
+  const ChildComponent = lazy(() => import('./child1'))
+  function Parent() {
+      return (
+      	<>
+          	{/*接收lazy返回值的变量 直接 用作组件标签使用*/}
+          	<ChildComponent />
+          </>
+      )
+  }
+  ```
+
+- 一般搭配`<Suspense>`加载状态使用
+
+  ```jsx
+  import { Suspense, lazy } from 'react'
+  
+  const ChildComponent = lazy(() => import('./child1'))
+  
+  function Parent() {
+    const [show, setShow] = useState(false)
+    return (
+      <>
+        <label>
+          <input
+            type="checkbox"
+            checked={show}
+            // 用show对应的set方法将show改为传入的值
+            onChange={e => setShow(e.target.checked)}
+          />
+          Show preview
+        </label>
+        {show && (
+    		 <Suspense fallback={<Loading />}>
+          	<ChildComponent />
+           </Suspense>
+    	  )}
+      </>
+    );
+  }
+  function Loading() {
+    return <h2>⏳ Loading...</h2>;
   }
 
 ## react脚手架

@@ -466,6 +466,9 @@
 
 - ==存取器==，class的==getter==和==setter==
 
+  - 注！**必须**同时设置`getter`和`setter`，否则会有异常
+
+
   ```js
   class tt{
       // constructor不是必须的 有get和set同样可以读取、设置属性
@@ -479,6 +482,17 @@
       set aa(newVal){
           console.log('设置')
           this._aa = newVal
+      }
+  }
+  
+  // 只有getter 没有setter constructor就不能赋值
+  class tt {
+      constructor(aa) {
+          // aa没有setter 无法赋值 会报错
+          this.aa = aa
+      }
+      get aa(){
+          return 99
       }
   }
   ```
