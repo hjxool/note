@@ -496,6 +496,36 @@
           </div>
       )
   }
+  ```
+
+- `useEffect`
+
+  - 通过传入不同参数，用一个函数实现不同生命周期，`componentDidUpdate`、`componentDidMount`、`componentWillUnmount`
+
+  ```jsx
+  // componentDidMount
+  useEffect(() => { })
+  
+  // componentDidUpdate
+  // 第二个参数为要观察的依赖,依赖变化则执行副作用函数
+  useEffect(() => { }, [dependency])
+  
+  // componentWillUnmount
+  // 在useEffect Hook 的 回调函数 中 返回一个函数
+  useEffect(() => {
+      // 之前的Hook中创建了监听事件window.addEventListener("mousemove", () => {})
+      // Unmount前就要卸载事件 卸载的方式是返回一个函数
+      return () => { window.removeEventListener("mousemove", () => {}) } 
+  }, [] )
+  ```
+
+  - `useEffect`与`useLayoutEffect`异同
+    - 相同点
+      - 用法相同
+    - 不同点
+      - `useEffect`的执行时机是浏览器完成渲染之后
+      - `useEffect`是异步执行的，而`useLayoutEffect`是同步执行的
+      - `useLayoutEffect`的执行时机是浏览器把内容真正渲染到界面之前，和`componentDidMount`等价
 
 ## 组件间传值
 
@@ -881,6 +911,7 @@
   - `componentDidUpdate(preProps, preState)`：更新完成时调用
 
     - 接收两个参数，更新前`props`、更新前`state`
+    -  可以直接调用`setState()`，但==必须放在条件语句里==
 
   - `componentWillUnmount`：组件卸载前调用
 
@@ -1059,6 +1090,13 @@
   function Loading() {
     return <h2>⏳ Loading...</h2>;
   }
+
+## 卸载组件
+
+- `ReactDOM.unmountComponentAtNode`
+  - React18中已用`root.unmount()`取代
+  - 成功移除组件返回`true`
+  - 没有要移除的组件返回`false`
 
 ## react脚手架
 

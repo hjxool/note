@@ -551,6 +551,51 @@ methods中方法互相调用：通过this.$options.methods.方法名查找method
 
   - `Vue.use(xxx)`即可
 
+- ==自定义组件==上使用`v-model`
+
+  - `v-model`本身就是`v-bind:value`和`v-on:input`的语法糖，所以自定义组件身上只要复现这两者，就可以用`v-model`
+
+  ```vue
+  // 子组件
+  <template>
+    <!--子组件上实现语法糖内容-->
+    <input
+      :value="value"
+      @input="$emit('input', $event.target.value)"
+    />
+  </template>
+  
+  <script>
+  export default {
+    props: {
+      value: String, // 接收父组件传递的值
+    },
+  };
+  </script>
+  
+  // 父组件
+  <template>
+    <div>
+      <!--这里就可以用v-model-->
+      <CustomInput v-model="message" />
+      <p>输入的内容是：{{ message }}</p>
+    </div>
+  </template>
+  <script>
+  import CustomInput from './CustomInput.vue';
+  
+  export default {
+    components: {
+      CustomInput,
+    },
+    data() {
+      return {
+        message: '', // 父组件的数据
+      };
+    },
+  };
+  </script>
+
 - Tips
 
   - 注册使用组件`components:{xxx:component1}`的位置**必须**在==组件声明之后==！
