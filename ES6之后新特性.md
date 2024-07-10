@@ -302,7 +302,7 @@
 
 - 一种新的数据结构，类似于==数组==，**但是**集合中==每个值都唯一==(仅限于==对象地址值/基本数据类型==)
 
-- ==不能==用`for(let i=0;i<l;i++)`方法遍历，因为
+- ==不能==用`for(let i=0;i<l;i++)`方法遍历，因为是用`Symbol`实现的迭代器，不能用下标取值
 
 - 属性方法
 
@@ -320,7 +320,8 @@
     ```js
     let a = [1,2,3,4,5,4,3,2,1]
     let a2 = [4,5,5,6,5]
-    let result = [...new Set(a)].filter(item => return new Set(a2).has(item)) 输出[4,5]
+    // Set虽然可迭代 但是没有数组身上的filter方法 因此要转成数组
+    let result = [...new Set(a)].filter(item => new Set(a2).has(item)) //[4,5]
     ```
 
 - 并集：`let t = new Set([...a,...a2])`
@@ -358,6 +359,12 @@
   for(let val of t2){
       val => ['a',111]
   }
+  ```
+
+- `Set`和`Map`区别
+
+  - `Set`只能存放`key`，不能存`value`，而`Map`可以用任意类型数据作`key`，并且可以存`key`对应的`value`
+
 
 
 ## Class类
