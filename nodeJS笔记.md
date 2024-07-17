@@ -1006,6 +1006,82 @@ function middleware(req,res,next){
 
   - 模板中可以写 js 语句，如：`<%= title || 'title为false' %>`
 
+### 创建websocket服务
+
+- 用`express`框架方式
+
+  1. 首先要安装相应模块`express-ws`
+
+
+  2. 创建服务
+
+     ```js
+     const express = require('express')
+     // 引入模块
+     const expressWs = require('express-ws')
+     const app = express()
+     // 可以配置其他路由和中间件
+     
+     // 添加websocket支持
+     expressWs(app)
+     //如果是 https 服务
+     const https = require('https')
+     const httpsServer = https.createServer(options, app)
+     httpsServer.listen(80, callback)
+     // 则要将https服务对象放在app后传入
+     expressWs(app, httpsServer)
+     
+     // 设置websocket服务
+     // app.ws 第一个参数是路由名 如客户端连接时new WebSocket('ws://localhost:80/test')
+     app.ws('/test', (ws, req) => {
+         console.log('WebSocket connected')
+         // 监听客户端发送消息
+         ws.on('message', (message) => {
+             console.log(`收到客户端发来的消息: ${message}`)
+             
+             // 如果要将收到的消息广播给其他客户端
+             // 需要先获取到连接当前服务的客户端 然后遍历发消息
+             expressWs.getWss().clients.forEach((client) => {
+                 // 给 不是当前发消息的客户端
+                 // 且 其他连接到当前服务状态正常的客户端 发消息
+                 if(client !== ws && client.readyState === WebSocket.OPEN){
+                     client.send(message)
+                 }
+             })
+         })
+     })
+     
+     // 启动express服务器
+     app.listen(80, () => {
+         console.log(`WebSocket在监听80端口`)
+     })
+     ```
+
+- 不使用`express`框架，用`ws`库实现方式
+
+  1. 安装`ws`库，`npm i ws`
+
+  2. 创建服务
+
+     ```js
+     // 引入库文件
+     const websocket = require('ws')
+     // Server 中传入端口等配置项
+     const wss = new websocket.Server({port: 80})
+     // 设置服务
+     wss.on('connection', (ws) => {
+         ws.on('message', (message) => {
+             console.log(`收到客户端发来的消息: ${message}`)
+             // 如果要将收到的消息广播给其他客户端
+             wss.clients.forEach((client) => {
+                 if(client !== ws && client.readyState === websocket.OPEN){
+                     client.send(message)
+                 }
+             })
+         })
+     })
+     ```
+
 ## Mongodb
 
 - 三个重要概念
@@ -1809,13 +1885,16 @@ function middleware(req,res,next){
        const express = require('express')
        const app = express()
        // 创建https服务 应用express对象
-       https.createServer({
-           // 证书存放路径 注意因为是反斜线需要转义\
-           key: fs.readFileSync('C:\\Certbot\\live\\www.custom.com\\privkey.pem','utf8'),
-           cert: fs.readFileSync('C:\\Certbot\\live\\www.custom.com\\cert.pem','utf8'),
-           ca: fs.readFileSync('C:\\Certbot\\live\\www.custom.com\\chain.pem','utf8'),
-       },	// 在http或https.createServer中配置express对象
-           app).listen(443,()=>{
+       const httpsServer = https.createServer({
+       // 证书存放路径 注意因为是反斜线需要转义\
+       key:fs.readFileSync('C:\\Certbot\\live\\www.custom.com\\privkey.pem','utf8'),
+       cert: fs.readFileSync('C:\\Certbot\\live\\www.custom.com\\cert.pem','utf8'),
+       ca: fs.readFileSync('C:\\Certbot\\live\\www.custom.com\\chain.pem','utf8'),
+       },
+       // 在http或https.createServer中配置express对象
+       app)
+       // 启动https服务
+       httpsServer.listen(443,()=>{
            // https默认端口号443
            console.log('443端口监听中')
        })
