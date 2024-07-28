@@ -634,7 +634,7 @@
 
 ### Array方法：
 
-- `push() `数组末尾**添加**元素，并**返回新**的**数组长度**
+- `push()`数组末尾**添加**元素，并**返回新**的**数组长度**
 
   - 可以传入多个元素，在数组中的顺序以传入的顺序排列
 
@@ -704,58 +704,65 @@
 - `list.reduce((pre，current, currentIndex, array) => {return 计算}，init)`
 
 
-  - `pre`：上一次调用回调函数的结果
+    - `pre`：上一次调用回调函数的结果
+        - ==第一次调用时==，如果指定了初始值`init`，则`pre`等于初始值，否则为`list[0]`的值
+        
 
-      - ==第一次调用时==，如果指定了初始值`init`，则`pre`等于初始值，否则为`list[0]`的值
 
-  - `current`：当前元素值
+    - `current`：当前元素值
+        - ==第一次调用时==，如果指定了初始值`init`，则为`list[0]`的值，否则为`list[1]`
+        
 
-      - ==第一次调用时==，如果指定了初始值`init`，则为`list[0]`的值，否则为`list[1]`
 
-  - `currentIndex`：当前元素值在数组中的索引位置
+    - `currentIndex`：当前元素值在数组中的索引位置
+        - ==第一次调用时==，如果指定了初始值`init`，则为`0`，否则为`1`
+        
 
-      - ==第一次调用时==，如果指定了初始值`init`，则为`0`，否则为`1`
 
-  - `array`：调用`reduce`的数组本身
-  - `init`：初始值，可选
-  - 返回最后一次回调函数执行结果
+    - `array`：调用`reduce`的数组本身
 
-  ```js
-  // 计算1+2+3+4
-  let list = [1,2,3,4]
-  let res = list.reduce((pre, cur) => {
-      return pre + cur
-  })
-  console.log(res) // 10
-  // 取对象里的值
-  let obj = {
-      a: {
-          b: [1, 2, 3]
-      }
-  }
-  let str = 'a.b[2]'
-  let list = str.split('.')//将先按.拆成数组 [a, b[2]]
-  for(let i in list){
-      let val = list[i]
-      // 找到带[的元素
-      if(val.indexOf('[') !== -1){
-          // 将其以[拆成数组 ['b', '2]']
-          let array = val.split('[')
-          let t = []
-          // 遍历 将]剔除 组成新的数组 因为用splice方法必须知道]位置索引
-          // 而replace又不能修改原数组 只能将替换生成的新元素组成新数组再替换[a, b[2]]中的b[2]
-          for(let k in array){
-              let t2 = array[k].replace(']', '')
-              t.push(t2)
-          }
-          list.splice(Number(i), 1, ...t)
-      }
-  }
-  // 设置初始值为obj obj.a.b[2]本质是结果累加 所以用reduce方法
-  let result = list.reduce((total, current) => {
-      return total[current]
-  }, obj)
-  ```
+
+    - `init`：初始值，可选
+
+
+    - 返回最后一次回调函数执行结果
+
+        ```js
+        // 计算1+2+3+4
+        let list = [1,2,3,4]
+        let res = list.reduce((pre, cur) => {
+            return pre + cur
+        })
+        console.log(res) // 10
+        // 取对象里的值
+        let obj = {
+            a: {
+                b: [1, 2, 3]
+            }
+        }
+        let str = 'a.b[2]'
+        let list = str.split('.')//将先按.拆成数组 [a, b[2]]
+        for(let i in list){
+            let val = list[i]
+            // 找到带[的元素
+            if(val.indexOf('[') !== -1){
+                // 将其以[拆成数组 ['b', '2]']
+                let array = val.split('[')
+                let t = []
+                // 遍历 将]剔除 组成新的数组 因为用splice方法必须知道]位置索引
+                // 而replace又不能修改原数组 只能将替换生成的新元素组成新数组再替换[a, b[2]]中的b[2]
+                for(let k in array){
+                    let t2 = array[k].replace(']', '')
+                    t.push(t2)
+                }
+                list.splice(Number(i), 1, ...t)
+            }
+        }
+        // 设置初始值为obj obj.a.b[2]本质是结果累加 所以用reduce方法
+        let result = list.reduce((total, current) => {
+            return total[current]
+        }, obj)
+
 
 - `for(let i of array)`遍历数组
 
@@ -799,7 +806,19 @@
 - `Array.from(可迭代对象/数组/字符串)`
 
 
-  - 返回一个新数组，里面每一项由遍历传入的参数获得
+    - 返回一个新数组，里面每一项由遍历传入的参数获得
+
+- 仅数组，修改其长度`list.length = num`，可以直接==扩展==或==裁剪==数组
+
+  ```js
+  // 扩展
+  let t = [1,2,3]
+  t.length = 5
+  console.log(t) // [1,2,3,undefined,undefined]
+  // 裁剪
+  t = [1,2,3,4]
+  t.length = 2
+  console.log(t) // [1,2]
 
 ###   string方法：
 
