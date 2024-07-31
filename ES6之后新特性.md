@@ -365,8 +365,6 @@
 
   - `Set`只能存放`key`，不能存`value`，而`Map`可以用任意类型数据作`key`，并且可以存`key`对应的`value`
 
-
-
 ## Class类
 
 - class是function构造函数的==语法糖==，只是为了结构语法更清晰
