@@ -599,3 +599,122 @@
         xxx2: string
     }
     let a: A = {xxx2: 'qqq'}
+
+## 函数参数
+
+### 基本传参方式
+
+```ts
+function add(a: number, b: number): number {
+    return a+ b
+}
+```
+
+### 可选参数
+
+- 使用?号标记
+
+```ts
+function fn(name: string, age?: number): string {
+    return age? `${name}的年龄为${age}` : `hello,${name}`
+}
+```
+
+### 默认参数
+
+- 参数的默认值，如果调用时未传递该参数，则使用默认值
+
+```ts
+function fn(name: string, age: number = 30): string {
+    return `${name}的年龄为${age}`
+}
+```
+
+### 剩余参数
+
+- 用`...`接收不定数量的参数，参数会被收集到一个数组里
+
+```ts
+// 声明一个数组 元素类型为number
+function sum(...list: number[]): number {
+    // 从0开始累加
+    retrun list.reduce((pre, cur) => pre + cur, 0)
+}
+```
+
+### 命名参数
+
+- 通过对象解构来传递参数，使代码更加清晰和易于维护
+- 用`{}`包裹参数
+- 不同于Dart，TS中参数指定类型不是必须赋初值
+
+```ts
+// 方式1
+function fn(name: string, {age: number = 30}): string {}
+// 也可以结合其他传参方式 如可选参数
+function fn(name: stirng, {age?: number})
+fn('张三', age: 18)
+
+// 方式2 用接口
+interface Address {
+    city: string
+}
+interface Person {
+    age: number;
+    address: Address; // 可以嵌套
+}
+function fn(name: string, {age, address: {city}}: Person): string {}
+```
+
+### 函数重载
+
+- 定义多个函数签名，以处理不同类型或数量的参数
+
+```ts
+// 方式1
+function fn(name: string): string
+function fn(age: number): string
+function fn(value: string | number): string {
+    if (typeof value === "string") {
+        return `Name: ${value}`;
+    } else {
+        return `Age: ${value}`;
+    }
+}
+
+// 方式2 用接口
+interface GetInfo {
+    (name: string): string;
+    (age: number): string;
+}
+// 用这种方式必须用变量来接收函数 因为要声明类型
+let fn: GetInfo = function (value: string | age): string {}
+// 箭头函数形式
+let fn: GetInfo = (value: string | number): string => {}
+// 对象中 必须再用一个接口来声明
+interface Obj {
+  fn: GetInfo;
+}
+let obj: Obj = {
+  // 简写形式
+  fn(value: string | number): string {
+    return ''
+  },
+  // 箭头函数形式
+  fn: (value: string | number): string => {
+    return ''
+  },
+  // 匿名函数形式
+  fn: function (value: string | number): string {
+    return ''
+  }
+}
+// 不能在对象中声明的同时创建函数 如
+let obj = {
+    // 会报错 因为:号已经被占用了
+    fn: GetInfo: (value: string | number): string => {
+        return ''
+    }
+}
+```
+
