@@ -65,9 +65,21 @@
 
     ```ts
     // 表示name属性必须有
-    // 其他属性，属性名类型为string，值类型未知
+    // [key: string]: unknown是索引签名
+    // 表示除了name 其他属性 属性名类型为string 值类型未知
     // 可以添加满足条件的任意属性
     let a: {name: string, [key: string]: unknown}
+    
+    // 一般用接口定义对象属性类型
+    interface A {
+        name: string;
+        [key: string]: unknown;
+    }
+    // 然后再声明对象类型为A 并赋值
+    let a: A = {
+        name: '张三',
+        age: 18
+    }
     ```
 
   - 类存取器声明的属性符合`object`结构类型。即只有`public`、`get xx`声明的属性才能用作`object`结构类型
