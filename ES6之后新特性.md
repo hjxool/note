@@ -282,6 +282,8 @@
 - `promise`算法实现
 
   ```js
+  // 为便于理解 没有提取函数复用
+  
   function MyPromise(executor) {
       this.status = 'pending' // 设置初始状态为pending
       this.value = null // 保存执行结果
@@ -294,29 +296,29 @@
       // 注意！这里 一定 要用箭头函数用其特性取到外层this 否则要在外层保存this再里面调用
       // 成功方法回调
       const resolve = (value) => {
-          // 成功或失败方法只能执行一次
-          // 所以这里要条件判断
-          if(this.status !== 'pending') return
-          // 成功回调执行 将promise对象状态改为成功
-          this.status = 'fulfilled'
-          this.value = value // 修改promise对象属性值
-          // 回调方法为异步执行 所以用setTimeout包裹
-          // setTimeout(() => {for(...)}) 或 for(...){setTimeout()}均可
+          // resolve 和 reject整体都是异步 所以用setTimeout包裹
           // 只要是异步执行就行 setTimeout不写第二个参数 默认0延迟 但是会进入事件循环队列
           setTimeout(() => {
-              for(let fn of this.fulfilledCallback) {
+              // 成功或失败方法只能执行一次
+              // 所以这里要条件判断
+              if (this.status !== 'pending') return
+              // 成功回调执行 将promise对象状态改为成功
+              this.status = 'fulfilled'
+              this.value = value // 修改promise对象属性值
+              for (let fn of this.fulfilledCallback) {
                   fn()
               }
           })
+  
       }
       // 失败方法回调
       const reject = (err) => {
-          if(this.status !== 'pending') return
-          this.status = 'rejected'
-          // 注意！这里修改的是error属性不是value
-          this.error = err
           setTimeout(() => {
-              for(let fn of this.rejectedCallback) {
+              if (this.status !== 'pending') return
+              this.status = 'rejected'
+              // 注意！这里修改的是error属性不是value
+              this.error = err
+              for (let fn of this.rejectedCallback) {
                   fn()
               }
           })
@@ -326,7 +328,7 @@
       // 捕获executor抛出的异常
       try {
           executor(resolve, reject)
-      } catch(error) {
+      } catch (error) {
           reject(error)
       }
   }
@@ -335,12 +337,12 @@
   // 注意！这里 不能 用箭头函数 因为要用this操作promise对象
   MyPromise.prototype.then = function (onFulfilled, onReject) {
       // 处理没有传入成功和失败回调的情况 设置默认函数
-      if(typeof onFulfilled !== 'function') {
+      if (typeof onFulfilled !== 'function') {
           onFulfilled = (value) => {
               return value
           }
       }
-      if(typeof onReject !== 'function') {
+      if (typeof onReject !== 'function') {
           onReject = (err) => {
               // 注意区分reject和onReject！
               // 只有then方法默认失败回调onReject才会抛出异常
@@ -355,10 +357,10 @@
       return new MyPromise((resolve, reject) => {
           // 为了便于理解 总结一下这里面做了什么
           // 读取的是pre_obj的属性状态 修改的是new_obj
-          
+  
           // 注意！这里resolve reject修改的是new_obj身上的属性
           // 处理pre_obj状态为成功的情况
-          if(this.status === 'fulfilled') {
+          if (this.status === 'fulfilled') {
               // 同样需要异步执行 用setTimeout包裹
               setTimeout(() => {
                   // 注意捕获异常 因为promise任意阶段异常不会导致整个程序的崩溃
@@ -368,7 +370,7 @@
                       // 实参为pre_obj的value属性
                       let result = onFulfilled(this.value)
                       // 这里还要特殊处理一下result为promise对象的情况
-                      if(result instanceof MyPromise) {
+                      if (result instanceof MyPromise) {
                           // onFulfilled或onReject返回值为promise对象时
                           // 调用返回结果的then方法 将其值取出放到new_obj身上的属性
                           result.then(value => {
@@ -385,18 +387,18 @@
                           // 修改new_obj属性状态
                           resolve(result)
                       }
-                  } catch(err) {
+                  } catch (err) {
                       // 回调执行异常 用reject接收 而不影响后续程序执行
                       reject(err)
                   }
               })
-          } else if(this.status === 'rejected') {
+          } else if (this.status === 'rejected') {
               // 处理pre_obj状态为失败的情况
               setTimeout(() => {
                   try {
                       // 实参为pre_obj的error属性
                       let result = onReject(this.error)
-                      if(result instanceof MyPromise) {
+                      if (result instanceof MyPromise) {
                           result.then(value => {
                               resolve(value)
                           }, err => {
@@ -405,46 +407,51 @@
                       } else {
                           resolve(result)
                       }
-                  } catch(err) {
+                  } catch (err) {
                       reject(err)
                   }
               })
-          } else if(this.status === 'pending') {
+          } else if (this.status === 'pending') {
               // 重点
               // 如果pre_obj状态还是pending 表示上一个异步操作还没完成
               // 那么就创建异步执行方法 存入pre_obj的任务队列里
               // 注意！存的是方法 不是在这里执行resolve
               this.fulfilledCallback.push(() => {
-                  try {
-                      let result = onFulfilled(this.value)
-                      if(result instanceof MyPromise) {
-                          result.then(value => {
-                              resolve(value)
-                          }, err => {
-                              reject(err)
-                          })
-                      } else {
-                          resolve(result)
+                  // 任务队列中的方法也是异步执行
+                  setTimeout(() => {
+                      try {
+                          let result = onFulfilled(this.value)
+                          if (result instanceof MyPromise) {
+                              result.then(value => {
+                                  resolve(value)
+                              }, err => {
+                                  reject(err)
+                              })
+                          } else {
+                              resolve(result)
+                          }
+                      } catch (err) {
+                          reject(err)
                       }
-                  } catch(err) {
-                      reject(err)
-                  }
+                  })
               })
               this.rejectedCallback.push(() => {
-                  try {
-                      let result = onReject(this.error)
-                      if(result instanceof MyPromise) {
-                          result.then(value => {
-                              resolve(value)
-                          }, err => {
-                              reject(err)
-                          })
-                      } else {
-                          resolve(result)
+                  setTimeout(() => {
+                      try {
+                          let result = onReject(this.error)
+                          if (result instanceof MyPromise) {
+                              result.then(value => {
+                                  resolve(value)
+                              }, err => {
+                                  reject(err)
+                              })
+                          } else {
+                              resolve(result)
+                          }
+                      } catch (err) {
+                          reject(err)
                       }
-                  } catch(err) {
-                      reject(err)
-                  }
+                  })
               })
           }
       })
@@ -477,21 +484,21 @@
       // 返回一个新promise对象 注意这里的resolve reject后面要用到
       return new MyPromise((resolve, reject) => {
           // 处理参数类型不符的情况
-          if(!Array.isArray(promise_list)) {
+          if (!Array.isArray(promise_list)) {
               throw '必须传数组'
           }
           let count = 0 // 计数
           let total = promise_list.length // 总数
           let result = [] // 记录成功执行的结果
           // 遍历promise_list 将元素返回值取出
-          for(let i = 0; i < total, i++){
+          for (let i = 0; i < total, i++) {
               // 通过then取值
               obj.then(value => {
                   count++
                   // 注意！这里不能用push 因为then是异步执行
                   result[i] = value
                   // 判断是否全部执行完
-                  if(count === total){
+                  if (count === total) {
                       // 所有promise执行完后 将result数组作为返回值
                       resolve(result)
                   }
