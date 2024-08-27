@@ -491,7 +491,7 @@
           let total = promise_list.length // 总数
           let result = [] // 记录成功执行的结果
           // 遍历promise_list 将元素返回值取出
-          for (let i = 0; i < total, i++) {
+          for (let i = 0; i < total; i++) {
               // 通过then取值
               obj.then(value => {
                   count++
