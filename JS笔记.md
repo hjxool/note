@@ -1631,6 +1631,13 @@
               // 基本数据类型 直接返回
               return source
           }
+          // 如果是日期或正则对象则直接返回一个新对象
+          if(source instanceof Date){
+              return new Date(source)
+          }
+          if(source instanceof RegExp){
+              return new RegExp(source)
+          }
           if(hash.has(source)) {
               // 哈希表中已经有同引用的对象 直接返回记录值 防止循环引用
               return hash.get(source)
@@ -1651,7 +1658,7 @@
           return clone
       }
       ```
-
+    
 - ==传值和传址==：**基本**数据类型的**等号赋值**是传值，而对象这种**引用**数据类型则是**传址**
 
 - ==基本数据类型==：`undefined、number、string、null`
