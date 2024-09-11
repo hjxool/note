@@ -1182,6 +1182,11 @@
 
   - `Object.defineProperty`监测不到劫持对象的==增删==，而==proxy==的set加入了监测==**增**==的能力，当`obj.新属性`时，也可以监测的到
   - ※Proxy不是==深拷贝==，只是==浅拷贝==，即如果是多层结构的对象，代理这个对象==无法检测==到里层属性值的变化
+  - ※Proxy其实是对原对象的==映射==，它并==不是复制了一个新对象做拦截==，读取和修改Proxy对象，其实都是在原对象身上进行操作
+    - 只有操作Proxy对象才能触发拦截，读取原对象不会触发
+    - 数组
+      - 只有修改数组在栈中存的索引才会触发，调数组api和修改元素都不会触发
+
 
   ```js
   let obj = {
@@ -1194,7 +1199,7 @@
   // proxy代理普通对象
   let proxy_obj = new Proxy(obj, {
       get(target, key, receiver){
-          // target 目标对象，即obj
+          // target 目标对象，即obj target === obj
           // key 要访问的键名，如obj.a，key就是'a'
           // receiver 代理对象或继承代理的对象，本例中是proxy_obj
           console.log('触发读取')
