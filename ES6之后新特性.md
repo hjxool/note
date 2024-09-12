@@ -519,10 +519,10 @@
 
 - 属性方法
 
-  - size：返回集合个数，类似于length
-  - add：添加一个新元素，并返回新的集合，类似于push
-  - delete(索引)：删除索引位置的元素，返回boolean值，类似于splice
-  - has(值)：检测集合中是否包含某个元素，返回boolean
+  - `size`：返回集合个数，类似于length
+  - `add`：添加一个新元素，并返回新的集合，类似于push
+  - `delete`(索引)：删除索引位置的元素，返回boolean值，类似于splice
+  - `has`(值)：检测集合中是否包含某个元素，返回boolean
 
 - 用例
 
