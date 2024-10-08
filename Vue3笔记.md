@@ -415,6 +415,8 @@
 	<a :[attributeName]="myId"> ... </a>
     <!--可以绑定表达式-->
 	<button @click="num++">{{ num }}</button>
+	<!--不带参数的v-bind 可以实现动态属性-->
+	<div v-bind="objectOfAttrs"></div>
 
 	<!--修饰符 以.xxx 形式-->
     <!--下例等同于 onSubmit 中 event.preventDefault() -->
@@ -436,6 +438,11 @@
     }
     let attributeName = ref('hhh')
     let num = ref(1)
+    let objectOfAttrs = {
+      id: 'container',
+      class: 'wrapper',
+      style: 'background-color:green'
+    }
 </script>
 ```
 
