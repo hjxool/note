@@ -73,3 +73,147 @@
   - 作用域插槽
     - 匿名插槽、具名插槽的一个变体，可以是匿名插槽，也可以是具名插槽
     - 该插槽的不同点在于子组件渲染作用域插槽时，可以将子组件内部数据传递给父组件，让父组件根据子组件的传递过来的数据决定如何渲染该插槽
+
+- 原理
+
+  - 子组件实例化时，获取到父组件传入的slot标签的内容，存放在`vm.$slot`中，如匿名插槽为`vm.$slot.default`，具名插槽为`vm.$slot.xxx`
+
+  - 当组件执行==渲染函数==时候，遇到slot标签，使用`$slot`中的内容进行替换，**此时**可以为插槽传递数据，若存在数据，则可称该插槽为==作用域插槽==
+
+## 如何保存页面的当前状态
+
+- 组件会被卸载
+  - 将状态存在`LocalStorage / SessionStorage`
+    - 在组件即将被销毁的生命周期中用`JSON.stringify()`将组件状态存在`LocalStorage / SessionStorage`中
+  - 路由传值
+    - 通过组件的`props`
+  - 使用`<keep-alive>`
+    - 注意组件==第一次加载==时，会在`mounted`后调用`activated`缓存组件，==之后再次进入组件，只会触发==`activated`
+    - 使用了`deactivated`就不会调用`beforeDestroy`和`destroyed`
+- 组件不会被卸载
+  - 单页面渲染
+    - 要切换的组件作为子组件**全屏**渲染，父组件中页面状态不会变
+
+## 常见事件修饰符
+
+- `.stop`
+  - 阻止事件==冒泡==
+  - 等同于 JavaScript 中的`event.stopPropagation()`
+
+- `.prevent`
+  - ==阻止默认行为==
+  - 等同于 JavaScript 中的`event.preventDefault()`
+- `.capture`
+  - 与事件冒泡相反，事件捕获由外到内
+- `.self`
+  - 只会触发自己的事件，==不含子元素==
+
+- `.once`
+  - 只触发一次
+
+## v-if、v-show、v-html原理
+
+- `v-if`会调用`addIfCondition`方法，生成`vnode`的时候会忽略对应节点，`render`的时候就不会渲染
+  - 编译过程
+    - `v-if`切换有一个局部编译/卸载的过程，切换时会销毁和重新加载内部的事件监听和子组件，这也是为什么`v-if`可以刷新组件内容
+- `v-show`会生成`vnode`，`render`的时候会渲染成真实节点，只是在渲染过程中会修改节点上的`display`属性
+
+- `v-html`会先移除节点下的所有节点，调用`addProp`方法设置`innerHTML`值
+
+## v-model如何实现
+
+- 用在表单元素上
+
+  ```html
+  <input v-model="message" />
+  <!-- 等同于 -->
+  <input 
+      :value="message" 
+      @input="message=$event.target.value"
+  >
+  ```
+
+- 用在自定义组件上
+
+  - 会为组件添加`props:['value']`和绑定`@input`事件
+
+  ```html
+  <child 
+         :value="message"
+         @input="onmessage"
+  ></child>
+  
+  methods:{
+      onmessage(e){
+          $emit('input',e.target.value)
+      }
+  }
+  ```
+
+## keep-alive如何实现，具体缓存的是什么
+
+- keep-alive的三个属性
+  - `include="字符串/正则"`：只有名称匹配的组件会被缓存
+  - `exclude="字符串/正则"`：名称匹配的组件不会被缓存
+  - `max="数字"`：最多可以缓存多少组件实例
+
+- 流程
+  1. 判断组件`name`，不在`include`或者在`exclude`中，直接返回`vnode`，说明该组件不被缓存
+  2. 获取组件实例`key`，如果有，使用已有`key`，否则重新生成
+  3. `key`生成规则，`cid +"∶∶"+ tag`，仅靠`cid`是不够的，因为相同的构造函数可以注册为不同的本地组件
+  4. 如果缓存对象内存在，则直接从缓存对象中获取组件实例给`vnode`，不存在则添加到缓存对象中
+  5. 最大缓存数量，当缓存组件数量超过`max`值时，清除`keys`数组内第一个组件
+
+- 实现
+
+  ```js
+  // 接收：字符串，正则，数组
+  let patternTypes: Array<Function> = [String, RegExp, Array]
+  
+  export default {
+    name: 'keep-alive',
+    abstract: true, // 抽象组件,它自身不会渲染成DOM元素，也不会出现在父组件链中
+  
+    props: {
+      include: patternTypes, // 缓存
+      exclude: patternTypes, // 不缓存
+      max: [String, Number], // 缓存组件的最大实例数量, 由于缓存的是组件实例(vnode)，数量过多的时候，会占用过多的内存
+    },
+  
+    created() {
+      // 用于初始化缓存虚拟DOM数组和vnode的key
+      this.cache = Object.create(null)
+      this.keys = []
+    },
+  
+    destroyed() {
+      // 销毁缓存cache的组件实例
+      for (const key in this.cache) {
+        pruneCacheEntry(this.cache, key, this.keys)
+      }
+    },
+  
+    mounted() {
+      // 监控include和exclude的改变，根据最新的include和exclude的内容，来实时削减缓存的组件的内容
+      this.$watch('include', (val) => {
+        pruneCache(this, (name) => matches(val, name))
+      })
+      this.$watch('exclude', (val) => {
+        pruneCache(this, (name) => !matches(val, name))
+      })
+    },
+  }
+  ```
+
+- `render`函数
+
+  ```js
+  function render() {
+      // 获取默认插槽
+      let slot = this.$slots.default
+      // 获取第一个子组件
+      let vnode = getFirstComponentChild(slot)
+  }
+  ```
+
+  
