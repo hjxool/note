@@ -209,10 +209,66 @@
 
   ```js
   function render() {
+      // ...
       // 获取默认插槽
       let slot = this.$slots.default
       // 获取第一个子组件
       let vnode = getFirstComponentChild(slot)
+      // 组件参数
+      let componentOptions = vnode && vnode.componentOptions
+      // 判断是否有组件参数
+      if(componentOptions) {
+          // 获取组件名
+          let name = getComponentName(componentOptions)
+          let {include, exclude} = this
+          if((include && (!name || !matches(include, name))) || (exclude && name && matches(exclude, name))) {
+              // include不匹配 或 exclude匹配 则直接返回组件实例
+              return vnode
+          }
+          let {cache, keys} = this
+          // 获取组件对应的key 有则读取 无则生成新的
+          let key = vnode.key == null ? componentOptions.Ctor.cid + (componentOptions.tag ? `::${componentOptions.tag}` : '') : vnode.key
+          if(cache[key]) {
+              // 有缓存 则渲染缓存的实例
+              // 注 组件初次渲染的时候componentInstance为undefined
+              vnode.componentInstance = cache[key].componentInstance
+              // LRU缓存策略 即最近操作过的放数组末尾
+              remove(keys, key) // 从原来的位置移除
+              keys.push(key) // 再添加到末尾
+          } else {
+              // 没有缓存 则先存起来
+              cache[key] = vnode
+              keys.push(key) // 放在数组末尾
+              if(this.max && keys.length > this.max) {
+                  // 新添加组件缓存后 如果超出max设置的数量上限
+                  // 则把缓存中旧的记录删除 即数组头部的为最长时间不用的
+                  pruneCacheEntry(cache, keys[0], keys, this._vnode)
+              }
+          }
+          // 将组件的keepAlive属性设置为true
+          // keepAlive判断是否要执行组件的created、mounted
+          vnode.data.keepAlive = true
+      }
+      // 最后将配置了缓存的vnode返回
+      return vnode || (slot && slot[0])
+  }
+  ```
+
+- 首次渲染
+
+  - 判断组件的`abstract`属性，才往父组件里面挂载DOM
+
+  ```js
+  function initLifecycle(vm) {
+      // 找到父级节点 将当前节点挂载
+      let parent = vm.$options.parent
+      // 判断组件的abstract属性
+      if(parent && !vm.$options.abstract) {
+          // 父级是抽象组件 且 还有父级 就继续向上找
+          while(parent.$options.abstract && parent.$parent) {
+              
+          }
+      }
   }
   ```
 
