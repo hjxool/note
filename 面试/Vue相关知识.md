@@ -266,10 +266,12 @@
       if(parent && !vm.$options.abstract) {
           // 父级是抽象组件 且 还有父级 就继续向上找
           while(parent.$options.abstract && parent.$parent) {
-              
+              parent = parent.$parent
           }
+          parent.$children.push(vm)
       }
+      
   }
   ```
-
+  
   
