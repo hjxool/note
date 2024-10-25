@@ -270,7 +270,13 @@
           }
           parent.$children.push(vm)
       }
-      
+      // 添加vm属性
+      vm.$parent = parent // 指定父节点
+      vm.$root = parent ? parent.$root : vm // 指定根节点
+      vm.$children = []
+      vm.$refs = {}
+      vm._watcher = null
+      // ...
   }
   ```
   
