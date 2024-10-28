@@ -279,5 +279,152 @@
       // ...
   }
   ```
-  
-  
+
+  - 判断当前`keepAlive`和`componentInstance`是否存在，来决定使用先前的组件实例还是创建新的组件实例
+
+- LRU缓存策略
+
+  - 记录数据，比如用数组，依据核心思想"**如果数据最近被访问过，那么将来被访问的几率也更高**"，将最近访问过的数据放在数组末尾，最久没被调用过的数据则放在数组首位，如果数组中有数据被访问，则将其从数组中移除再添加至数组末尾来更新数据最近访问记录
+    - 例：链表的实现思路
+      - 新数据插入到链表头部
+        - 因为链表都是从头开始检索，放在头部是最容易快速访问的
+      - 每当缓存数据被访问，将数据移动到链表头部
+      - 链表满的时候，将链表尾部丢弃
+
+## $nextTick 原理及作用
+
+- 原理
+  - 本质是利用JS**事件循环**机制，用如`Promise`、`setTimeout`等原生方法来模拟微/宏任务的实现，等主线程更新完DOM树后，异步回调执行时对更新后的DOM进行处理
+
+- 作用
+  - 数据变化后的操作，需要使用随数据变化而变化的DOM结构的时候
+  - Vue生命周期中，如果在`created()`钩子进行DOM操作
+    - 因为在`created()`时，页面DOM还未渲染，这时候没法操作DOM，所以，此时如果想要操作DOM，必须将操作的代码放在`nextTick()`的回调函数中
+
+## Vue2中如何封装数组方法
+
+- 简单来说，通过==重写数组原生方法==，在数组方法调用时，获取对象身上的`__ob__`，如果有新的值，则递归设置数据代理，并手动调用`__ob__`的`dep`通知`watcher`执行模板渲染
+
+  ```js
+  // Object.create不同于构造函数
+  // 在创建 对象 的同时 还会设置其继承目标对象
+  // 即原型链arrayMethods.__proto__ === Array.prototype
+  export const arrayMethods = Object.create(Array.prototype)
+  // 要重写的方法
+  const methods = [
+    "push",
+    "pop",
+    "shift",
+    "unshift",
+    "splice",
+    "sort",
+    "reverse"
+  ]
+  for(let name of methods) {
+      // 用闭包缓存 原生数组方法
+      let 原方法 = Array.prototype[name]
+      def(methods, name, function (...args) {
+          // 注意 def是在其他地方定义的方法
+          // 传入的回调函数并不是在此处执行
+          // 而是将传入的回调函数使用bind等方式改变this指向
+          // 所以此处this指向为 调用该函数的数组对象
+          let result = 原方法.apply(this, args) // 执行原生方法得到结果
+          let 插入参数
+          switch (name) {
+              case "push":
+              case "unshift":
+                  插入参数 = args
+                  break
+              case "splice":
+                  // splice(index, n, args) 所以从传入参数中的第三个开始获取
+                  插入参数 = args.slice(2)
+                  break
+          }
+          if(插入参数) {
+              // 类似Object.defineProperty拦截数据变化时
+              // 当触发set 要深度递归对新值进行代理一样
+              // 此处数组中有了新插入的值 同样递归进行代理
+              this.__ob__.observeArray(插入参数)
+          }
+          // 数组发生了变化 手动调用 通知watcher更新
+          this.__ob__.dep.notify()
+          // 返回原生方法结果
+          return result
+      })
+  }
+  ```
+
+## Vue template到render过程
+
+1. 执行`compileToFunctions`将`template`转化为AST
+   - AST是一种用JS对象的形式描述模板
+   - 解析过程：利用正则表达式顺序解析`template`中字符串内容，当解析到==开始标签、闭合标签、文本==的时候都会分别执行对应的==回调函数==，从而构造AST树
+     - AST元素节点分为三种类型
+       - `type==1`：普通元素
+       - `type==2`：表达式
+       - `type==3`：纯文本
+2. 调用`optimize(ast,options)`深度遍历AST
+   - 对静态节点打标记，后续渲染时，==直接跳过静态节点==，从而优化渲染速度
+3. `generate(ast, options)`生成代码
+   - `generate`将AST编译成，形如`<div>{{...}}`的字符串，并将**静态部分**放到`staticRenderFns`中，最后通过`new Function('...')`生成`render`函数
+
+## Vue data中属性值发生变化后视图会同步渲染吗
+
+- 不会同步渲染，而是侦听到数据变化，然后开启一个队列，缓冲在==同一事件循环中==发生的所有数据变更，其中同一个`watcher`多次触发会被**去重**
+
+## Vue自定义指令
+
+- 全局定义：`Vue.directive("xxx",{})`
+
+- 局部定义：`directives:{focus:{}}`
+
+- 生命周期
+
+  - `bind`：只调用一次，指令第一次绑定到元素时调用
+    - 可以进行一次性的初始化设置
+  - `inSerted`：被绑定元素==插入父节点==时调用
+    - 仅保证父节点存在，但不一定已被插入文档中
+
+  - `update`：组件的`VNode`更新时调用
+    - 只要`VNode`变化就会调用，指令的值可能没有改变，==可以通过比较触发前后的值来忽略不必要的模板更新==
+  - `ComponentUpdate`：指令所在组件的`VNode`及其子`VNode`全部更新后调用
+  - `unbind`：只调用一次，指令与元素==解绑时调用==
+
+- 使用场景
+  - 需要操作DOM时
+    - 如自定义指令实现==图片懒加载==
+
+## 子组件可以改变父组件数据吗
+
+- 不可以，这是为了维护父子组件的单向数据流，即父级更新通过`props`流向子组件，反过来则不行，这是为了防止意外改变父组件状态，使得数据混乱，变得难以理解，子组件可以通过`$emit`触发父组件事件，由父组件自行修改自己状态
+
+## React 和 Vue 之间的异同
+
+- 相同点
+
+  - 都使用虚拟DOM提高**重绘**性能
+  - 都有`props`的概念，允许组件间传值
+  - 提倡==组件化==，将应用拆成功能模块，提高复用性
+
+- 不同点
+
+  - Vue支持数据==双向绑定==，而React提倡==单向==数据流
+
+  - 使用虚拟DOM方面
+    - Vue会跟踪每个组件的依赖关系，不需要重新渲染整个组件树
+    - React则是当属性值被改变时，全部子组件都会重新渲染
+      - React可以通过`shouldComponentUpdate`生命周期方法进行优化
+  - 组件书写方式(最大不同点)
+    - Vue
+      - 使用常规HTML模板
+      - 数据都挂载在`this`上，所以`import`组件后，还需要在`components:{}`属性中再==声明后使用==
+    - React
+      - 用JS的语法扩展——JSX书写
+      - React中`render`函数支持闭包特性，所以`import`引入的组件在`render`中可以==直接调用==
+  - 数据监听原理不同
+    - Vue通过数据劫持，能精确知道数据变化，且具有良好性能
+    - React通过==比较引用==的方式，不进行`shouldComponentUpdate`优化，可能会导致大量不必要的DOM重新渲染
+  - 高阶组件不同
+    - React支持==用JSX直接写函数式组件==，并用Hook拓展函数组件
+    - Vue使用HTML模板创建组件，并需要==额外的转换操作==才能生成`render`函数(见`template到render过程`)
+
