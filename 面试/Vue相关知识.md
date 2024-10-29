@@ -428,3 +428,159 @@
     - React支持==用JSX直接写函数式组件==，并用Hook拓展函数组件
     - Vue使用HTML模板创建组件，并需要==额外的转换操作==才能生成`render`函数(见`template到render过程`)
 
+## assets和static的区别
+
+- 相同点
+  - 都用来存放==静态资源==文件。如图片、样式等
+- 不同点
+  - `assets`中存放的静态资源文件在项目打包时，会进行压缩
+  - `static`中的静态资源会原样上传到服务端
+- 建议
+  - 将==样式文件、js文件==等放在`assets`中，进行代码压缩和文件压缩
+  - 而第三方资源如`iconfoont.css`等文件可以放置在`static`中，因为文件已经处理过，可直接上传
+
+## Vue性能优化
+
+- 编码阶段
+
+  - 尽量减少data中数据
+
+    - data中数据都会增加`getter`和`setter`，以及收集对应的`watcher`
+
+  - `v-if`和`v-for`不能连用
+
+  - 减少监听事件。用事件代理取代`v-for`给每项元素绑定事件
+
+    - 就是在`v-for`外层容器添加**单个**事件监听，通过`event.target`获得点击目标信息
+
+    ```vue
+    <template>
+        <ul  @click="fn">
+          <li v-for="(item, index) in items" :data-index="index">
+            {{ item }}
+          </li>
+        </ul>
+    </template>
+    <script>
+    export default {
+      data() {
+        return {
+          items: ['Item 1', 'Item 2', 'Item 3']
+        };
+      },
+      methods: {
+        fn(event) {
+          if (event.target.tagName === 'LI') {
+            let index = event.target.dataset.index;
+            console.log('Clicked index:', index);
+            console.log('Clicked value:', this.items[index]);
+          }
+        }
+      }
+    };
+    </script>
+    ```
+
+  - SPA页面采用`<keep-alive>`缓存组件
+
+  - 大多数情况下，用`v-if`而非`v-show`
+
+  - `v-for`绑定`key`。避免重复渲染
+
+  - 路由懒加载
+
+    - 定义：组件在==需要时加载==，而非==启动时一次性加载==
+    - 即在用户访问到对应组件内容时，使用`import()`动态加载
+
+    ```js
+    let routes = [
+        {
+            path: '/home',
+            component: () => import('./views/Home.vue')
+        }
+    ]
+    import Router from 'vue-router'
+    export default new Router({routes})
+    ```
+
+  - 异步组件
+
+    - 定义：同**路由懒加载**都是==按需加载==，比路由懒加载==更灵活==，因为在==组件内定义异步逻辑==，而不仅限于路由
+    - 同样用`import()`动态加载
+    - `.js`中使用
+
+    ```js
+    Vue.component('xxx', {
+        // 需要加载的组件
+        component: import('./components/xxx.vue'),
+        // 加载时使用的组件
+        loading: LoadingComponent,
+        // 加载失败组件
+        error: ErrorComponent,
+        // 延迟加载时间
+        delay: 200,
+        // 超时时间
+        timeout: 3000
+    })
+    ```
+
+    - `.vue`中使用`defineAsyncComponent`
+
+    ```vue
+    <template>
+    	<async-component></async-component>
+    </template>
+    
+    <script>
+    import { defineAsyncComponent } from 'vue';
+    
+    export default {
+      components: {
+        AsyncComponent: defineAsyncComponent(() => import('./xxx.vue'))
+      }
+    };
+    </script>
+    ```
+
+  - 防抖、节流
+  - `import()`按需导入第三方模块
+  - 图片懒加载、长列表滚动到==可视区域==动态加载
+
+- SEO优化
+
+  - 预渲染
+
+    - 定义：由服务端返回==静态HTML文件==
+    - 适用于内容不常变化的页面，如博客文章
+    - 常用工具
+      - `Next.js`：React发布的框架，支持预渲染和SSR
+      - `Nuxt.js`：Vue发布的框架，提供静态站点生成功能
+
+  - 服务端渲染SSR
+
+    - 定义：根据**请求**==动态生成HTML内容==
+    - 适用于内容变化的页面，如用户仪表盘、社交媒体应用
+
+    - 缺点：只支持`beforeCreate`和`created`两个钩子
+
+- 打包优化
+
+  - 同Webpack优化方式优化Vite
+
+- 用户体验
+
+  - 骨架屏
+
+  - PWA
+
+# 生命周期
+
+## Vue生命周期
+
+1. `beforeCreate`：事件监听、`watcher`、数据代理都还没开始，无法访问`data`、`computed`、`watch`、`methods`数据
+2. `created`：实例创建完成。可以访问`data`、`computed`、`watch`、`methods`数据。**但**因为未挂载到页面，不能访问`$el`
+3. `beforeMount`：挂载开始之前。已完成模板编译，根据`data`数据和`template`生成VNode
+4. `mounted`：根节点被VNode替换，并挂载到实例上
+5. `beforeUpdate`：响应式数据更新时调用。此时虽然数据更新了，但真实DOM还没有被渲染
+6. `updated`：VNode重新渲染后调用。此时DOM已更新，可以执行DOM操作。但是应避免在此时更改状态，会导致更新无限循环
+7. `beforeDestroy`：
