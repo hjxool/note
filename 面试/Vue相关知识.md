@@ -583,4 +583,178 @@
 4. `mounted`：根节点被VNode替换，并挂载到实例上
 5. `beforeUpdate`：响应式数据更新时调用。此时虽然数据更新了，但真实DOM还没有被渲染
 6. `updated`：VNode重新渲染后调用。此时DOM已更新，可以执行DOM操作。但是应避免在此时更改状态，会导致更新无限循环
-7. `beforeDestroy`：
+7. `beforeDestroy`：实例销毁之前调用。此时实例仍可用，一般在这时清理监听事件和定时任务
+8. `destroyed`：实例销毁后调用。`v-bind`、`v-on`事件监听会被移除，但是`$bus.$on`等事件不会自动移除
+
+## 子组件和父组件执行顺序
+
+- 渲染过程
+  1. 父组件`beforeCreate`
+  2. 父组件`created`
+  3. 父组件`beforeMount`
+  4. 子组件`beforeCreate`
+  5. 子组件`created`
+  6. 子组件`beforeMount`
+  7. 子组件`mounted`
+  8. 父组件`mounted`
+- 更新过程
+  1. 父组件`beforeUpdate`
+  2. 子组件`beforeUpdate`
+  3. 子组件`updated`
+  4. 父组件`updated`
+- 销毁过程
+  1. 父组件`beforeDestroy`
+  2. 子组件`beforeDestroy`
+  3. 子组件`destroyed`
+  4. 父组件`destoryed`
+
+## 一般在哪个生命周期请求数据
+
+- 可以在`created`、`beforeMount`、`mounted`中进行请求，因为`data`已创建，可以进行数据赋值
+
+## keep-alive 中的生命周期
+
+- `keep-alive`是 Vue 内置组件，以实例对象形式保存在内存中，防止重复渲染DOM
+- 用`keep-alive`包裹的组件会多出两个生命周期：`deactivated`、`activated`。同时`beforeDestroy`和`destroyed`不会再被触发，因为组件不会被真正销毁
+- 初次熏染时
+  - `... -> mounted -> activated`
+- 组件被换掉时
+  - `-> deactivated`
+- 再被切回来时
+  - `-> activated`
+
+# 组件通信
+
+## props/$emit
+
+- `props`
+  - 只能父向子传值，单向下行绑定，==子组件数据随父组件更新==
+  - 可接收各种数据类型，如**函数**
+  - 命名规则：若`props`中使用驼峰形式，则模板中需使用短横线形式
+
+- `$emit`
+  - 父组件在子组件上绑定事件监听，子组件通过`$emit`触发，并可以传递参数给父组件
+
+## 事件总线
+
+- 适用于==任意组件间通信==
+
+  1. 创建事件总线
+
+     - 注意，Vue3开始==组合式API==中没有`onMounted`之前的钩子函数，因此不适合像Vue2中在`beforeCreate`中添加==全局Vue实例==到`$bus`
+
+     ```js
+     // event-bus.js
+     import Vue from 'vue'
+     export const EventBus = new Vue()
+     ```
+
+  2. 监听事件，接收参数
+
+     ```vue
+     <template>
+       <div>求和: {{count}}</div>
+     </template>
+     <script setup>
+     // 组件中 按需引入 全局vue实例对象
+     import { EventBus } from './event-bus.js'
+     import {ref, onMounted} from 'vue'
+     let count = ref(0)
+     onMounted(()=>{
+         EventBus.$on('addition', param => {
+           count.value = count.value + param.num;
+         })
+     })
+     </script>
+     ```
+
+  3. 发送事件
+
+     ```vue
+     <template>
+       <div>
+         <button @click="add">加法</button>    
+       </div>
+     </template>
+     <script>
+     import {EventBus} from './event-bus.js'
+     import {ref} from 'vue'
+     let num = ref(0)
+     function add() {
+         EventBus.$emit('addition', {
+             num: num.value++
+         })
+     }
+     </script>
+     ```
+
+- 注意，用这种方式通信，`EventBus.$on`绑定的监听事件并不会随组件销毁而消失，因为存于全局Vue实例中，因此需要在组件销毁钩子函数中将事件注销`EventBus.$off('eventName')`，且全局事件总线会==导致后期维护困难==
+
+  - 注：`$off`可以传入第二个参数，如`EventBus.$off('eventName', this.处理事件方法)`，表示==移除监听同一事件的具体事件处理函数==，从而精确控制哪些处理函数被移除，因为同一事件可能有多个组件监听，只清除被卸载组件的处理方法。
+  - 如果只传入事件名称`EventBus.$off('eventName')`，可能会误删其他监听器
+
+## 依赖注入provide/inject
+
+- 用于**父子组件之间的通信**，在==组件嵌套层数很深的情况下==，可以用这种方法进行传值，就不用一层一层的传递了
+
+- `provide / inject`是Vue提供的两个**钩子函数**，和`data`、`methods`同级
+
+  - 父组件
+
+  ```js
+  // 选项式
+  provide() { 
+      return {     
+          num: this.num  
+      }
+  }
+  // 组合式API
+  import {provide, ref} from 'vue'
+  let num = ref(0)
+  provide('num', num.value)
+  ```
+
+  - 子组件
+
+  ```js
+  // 选项式
+  inject: ['num']
+  // 组合式API
+  import {inject} from 'vue'
+  let num2 = inject('num')
+  ```
+
+- 响应式数据注入，建议响应数据的变化保持在组件自身内
+
+  - 父组件
+
+  ```js
+  import { provide, ref } from 'vue'
+  let num = ref(0)
+  function fn(n) {
+    num.value = n
+  }
+  provide('add', {
+      fn, // 传入函数而非响应式数据值
+      num
+  })
+  ```
+
+  - 子组件
+
+  ```vue
+  <template>
+    <button @click="fn(2)">{{ num }}</button>
+  </template>
+  <script setup>
+  import { inject } from 'vue'
+  let { fn, num } = inject('add')
+  </script>
+  ```
+
+## $parent / $children
+
+- `$parent`让组件访问==上一级==父组件的实例
+
+- `$children`让组件访问子组件的实例
+  - 但是==并不能保证顺序==，且访问的==数据也不是响应式==的
