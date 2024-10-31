@@ -758,3 +758,84 @@
 
 - `$children`让组件访问子组件的实例
   - 但是==并不能保证顺序==，且访问的==数据也不是响应式==的
+
+# 路由
+
+## Router懒加载如何实现
+
+- 非懒加载
+
+  ```js
+  import List from '@/components/list.vue'
+  let router = new Router({
+    routes: [
+      { path: '/list', component: List }
+    ]
+  })
+  ```
+
+- 懒加载
+
+  - 方式一：`import`动态加载
+
+  ```js
+  let List = () => import('@/components/list.vue')
+  let router = new Router({
+      routes: [
+          { path: '/list', component: List }
+      ]
+  })
+  ```
+
+  - 方式二：`require`动态加载
+
+  ```js
+  // 注意 与import 写法 传参 区别
+  let List = resolve => require(['@/components/list.vue'], resolve)
+  let router = new Router({
+      routes: [
+          { path: '/list', component: List }
+      ]
+  })
+  ```
+
+## 路由的hash和history区别
+
+- `hash`模式
+
+  - **简介**：路由的==默认模式==，由`#`号后的值构成，如`www.abc.com/#/vue`，`hash`值为`#/vue`
+  - **特点**：`hash`值虽然在URL里，但不会出现在HTTP请求中。所以改变`hash`值，==不会重新加载页面==
+
+  - **原理**：主要通过`onhashchange()`事件实现
+
+    - 优点：页面hash值变化时，无需向后端发起请求，前端就可以监听事件的改变，按规则加载相应的代码
+    - 注意：`hash`值变化对应的URL会被浏览器记录下来，浏览器能实现页面的前进和后退
+
+    ```js
+    window.onhashchange = function(event) {
+        let hash = location.hash.slice(1) // #号后的部分
+    }
+    ```
+
+- `history`模式
+
+  - **简介**：`history`模式的URL没有`#`号，使用传统的路由分发模式，即用户输入一个URL时，服务器会接收这个请求，并解析这个URL
+  - **特点**：没有`#`号，看起来比`hash`模式URL好看一点。但是`history`模式需要后台配置支持，如果后台没有正确配置，访问时会返回404
+    - 缺点：刷新页面时，如果没有相应的路由或资源，会404
+
+  - **API**
+
+    - 修改历史状态：`pushState()`、`replaceState()`，用这两个API修改url，浏览器不会立即向后端发送请求
+
+    - 切换历史状态：`forward()`、`back()`、`go()`，对应浏览器的前进、后退、跳转
+
+  - 要启用`history`模式，进行如下配置
+
+    ```js
+    let router = new Router({
+        mode: 'history',
+        routes: [...]
+    })
+    ```
+
+    
