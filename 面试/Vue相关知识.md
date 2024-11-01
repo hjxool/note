@@ -838,4 +838,151 @@
     })
     ```
 
-    
+
+## 如何获取页面hash变化
+
+- 监听`$route`的变化
+
+  ```js
+  // 路由发生变化的时候执行
+  watch: {
+      $route: {
+          handler: function(val, oldVal) {},
+          deep: true, // 深度监听
+      },
+      // 简写
+      $route(val, oldVal) {}
+  }
+  ```
+
+- `window.location.hash`读取`#`值
+  - `window.location.hash`可读可写，写入时可以在不重载网页的前提下，添加一条历史访问记录
+
+## $route 和 $router 区别
+
+- `$route`是“==路由信息对象==”，包括`path`，`params`，`hash`，`query`等路由信息属性
+
+- `$router`是“路由==实例对象==”，包括路由的跳转方法，钩子函数等
+
+## 动态路由 及 动态参数的获取
+
+- `param`方式
+
+  - 路由定义
+
+  ```js
+  // APP.vue中
+  // 方式1 路径后拼接动态参数
+  <router-link :to="'/user/' + userId">用户</router-link>
+  // 方式2
+  <router-link :to="{name: 'user', params: {id: ...}}">用户</router-link>
+  
+  // index.js中
+  {
+      // 用:加名称的方式 按顺序 接收参数
+      path: '/user/:id',
+      component: User, // 表示只要是/user/:id的形式都是跳转User组件
+  }
+  ```
+
+  - 路由跳转
+
+  ```js
+  // 方式1
+  <router-link :to="..."></router-link>
+  // 方式2
+  this.$router.push({name: 'user', params: {id: '123'}})
+  // 方式3
+  this.$router.push('/user/' + '123')
+  ```
+
+  - 参数获取
+    - 通过`$route.params.id`获取传递的值
+
+- `query`方式
+
+  - 路由定义与跳转
+
+  ```js
+  // 方式1
+  <router-link :to="{name: 'user', query: {id: '...'}}"></router-link>
+  // 方式2
+  <router-link :to="{path: '/user', query: {id: '...'}}"></router-link>
+  // 方式3
+  <button @click="fn"></button>
+  fn() {
+      this.$router.push({
+          path: '/user',
+          query: {id: 'id'}
+      })
+  }
+  ```
+
+  - 参数获取
+    - 通过`$route.query.id`获取传递的值
+
+- `name`和`path`跳转区别
+
+  - 例多层级路由配置
+
+  ```js
+  let routes = [
+      {
+          path: '/user',
+          name: 'user',
+          conponent: User,
+          children: [
+              {
+                  path: 'profile',
+                  name: 'user-profile',
+                  component: Profile
+              }
+          ]
+      }
+  ]
+  ```
+
+  - `name`属性表示多层级路径
+
+  ```vue
+  <router-link :to="{name: 'user-profile'}"></router-link>
+  ```
+
+  - `path`表示多层级路径
+
+  ```vue
+  <router-link :to="{path: '/user/profile'}"></router-link>
+  ```
+
+## 路由守卫和钩子函数
+
+### 路由守卫
+
+- 作用：植入导航过程的操作逻辑。如登录权限验证，进行路由跳转前先验证是否登录，否则跳转登录页
+
+- 全局路由守卫
+
+  ```js
+  // 前置守卫 跳转前
+  router.beforeEach((to, from, next) => {
+      // 判断登录信息是否存在
+      let info = Vue.prototype.自定义属性和方法('userData')
+      if(info) {
+          // 有用户信息 允许跳转
+          next()
+      } else {
+          if(to.path == '/login') {
+              // 跳转的是登录页 允许跳转
+              next()
+          } else {
+              // 其他 跳转到登录
+              alert('请重新登录')
+              window.location.href = '跳转路径'
+          }
+      }
+  })
+  // 后置守卫 跳转后
+  router.afterEach((to, from) => {
+      // 
+  })
+  ```
