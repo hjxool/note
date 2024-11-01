@@ -954,35 +954,193 @@
   <router-link :to="{path: '/user/profile'}"></router-link>
   ```
 
+- `params`与`query`区别
+  - `query`==刷新不会丢失==`query`里面的数据
+  - `params`==刷新会丢失== `params`里面的数据
+
 ## 路由守卫和钩子函数
 
 ### 路由守卫
 
 - 作用：植入导航过程的操作逻辑。如登录权限验证，进行路由跳转前先验证是否登录，否则跳转登录页
 
-- 全局路由守卫
+### ==全局==路由守卫
 
-  ```js
-  // 前置守卫 跳转前
-  router.beforeEach((to, from, next) => {
-      // 判断登录信息是否存在
-      let info = Vue.prototype.自定义属性和方法('userData')
-      if(info) {
-          // 有用户信息 允许跳转
-          next()
-      } else {
-          if(to.path == '/login') {
-              // 跳转的是登录页 允许跳转
-              next()
-          } else {
-              // 其他 跳转到登录
-              alert('请重新登录')
-              window.location.href = '跳转路径'
-          }
-      }
-  })
-  // 后置守卫 跳转后
-  router.afterEach((to, from) => {
-      // 
-  })
-  ```
+```js
+// 前置守卫 跳转前
+router.beforeEach((to, from, next) => {
+    // 判断登录信息是否存在
+    let info = Vue.prototype.自定义属性和方法('userData')
+    if(info) {
+        // 有用户信息 允许跳转
+        next()
+    } else {
+        if(to.path == '/login') {
+            // 跳转的是登录页 允许跳转
+            next()
+        } else {
+            // 其他 跳转到登录
+            alert('请重新登录')
+            window.location.href = '跳转路径'
+        }
+    }
+})
+// 后置守卫 跳转后
+router.afterEach((to, from) => {
+    // 例 跳转后滚动条回到顶部
+    // scrollTo(x, y)窗口滚动到指定位置
+    window.scrollTo(0, 0)
+})
+```
+
+### 路由==单独配置==守卫
+
+```js
+export default [
+    {
+        path: '/',
+        name: 'login',
+        component: Login,
+        // 单独配置路由守卫
+        beforeEnter: (to, from, next) => {
+            next()
+        }
+    }
+]
+```
+
+### 组件内的钩子函数
+
+- 注意与单独配置的路由守卫的区别，它是与生命周期函数同级的配置参数
+
+```js
+export default {
+    name: 'Login',
+    // 进入组件前触发
+    beforeRouteEnter(to, from, next) {
+        // 注意 beforeRouteEnter时 组件实例还没创建因此无法访问this
+        next(vm => {
+            // 需要在next进行下一步时才能访问到
+            vm.fn()
+        })
+    },
+    // 组件更新时触发
+    beforeRouteUpdate(to, from, next) {},
+    // 离开组件调用
+    beforeRouteLeave(to, from, next) {}
+}
+```
+
+### 生命周期等钩子函数触发顺序
+
+- 假设从A组件离开，进入B组件
+
+1. `beforeRouteLeave`：离开路由前触发，==可取消离开路由==
+2. `beforeEach`：触发全局前置守卫，可用于登录验证、全局路由loading等
+3. `beforeEnter`：触发路由独享守卫
+4. `beforeRouteEnter`：进入组件前的钩子函数
+5. `beforeResolve`：全局解析守卫
+6. `afterEach`：此时已经进入组件创建流程，触发全局后置守卫
+
+- 此时才正式开始创建组件实例
+
+7. `beforeCreate`：B组件生命周期
+8. `created`
+9. `beforeMount`
+
+- 注意！B组件走到`beforeMount`，此时才执行组件A离开生命周期
+
+10. `deactivated`：离开组件A，或者触发组件A的`beforeDestroy`和`destroyed`
+11. `mounted`：组件B挂载
+12. `activated`：缓存组件B
+
+- 注意！此时`beforeRouteEnter`的回调函数才开始执行
+
+13. 执行`beforeRouteEnter`的`next(callback)`回调函数
+
+## 路由跳转和location.href区别
+
+- `location.href`跳转简单，但会刷新页面
+- `history.pushState`==不刷新页面==，静态跳转
+- Vue-router跳转，使用`diff`算法，减少了dom消耗
+  - `hash`模式，使用`#/xxx`形式，不会引起页面加载
+  - `history`模式，使用`history.pushState`
+
+# Vuex
+
+## Vuex原理
+
+- 定义
+  - Vuex是专为Vue开发的状态管理模式。核心就是`store`(仓库)。`store`可以视作一个**容器**，包含应用中大部分的`state`(状态)
+- 特点
+  - Vuex的状态存储是响应式的。若`store`中的状态发生变化，依赖对应状态的组件也会更新
+  - 改变`store`中状态的唯一途径就是通过`mutation`，这是为了便于跟踪状态变化，==类似于数据劫持==
+
+## action与mutation区别
+
+- `mutation`
+
+  - 执行一系列同步操作，用于修改state中变量值
+
+  - 定义一个`mutations`
+
+    ```js
+    let store = new Vuex.Store({
+        state: {
+            num: 1
+        },
+        mutations: {
+            // 当触发该mutations方法时改变count属性值
+            add(state, args) {
+                state.num += args.n
+            }
+        }
+    })
+    ```
+
+  - `commit`触发`mutation`方法
+
+    ```js
+    methods: {
+        fn() {
+            this.$store.commit('add', {n: 2})
+        }
+    }
+    ```
+
+- `action`
+
+  - 可以包含==异步==操作，但==不能直接操作State==
+
+  - `action`提交的是`mutation`，而不是像`mutation`直接修改值
+
+    ```js
+    let store = new Vuex.Store({
+        state: {
+            num: 1
+        },
+        mutations: {
+            add(state, args) {
+                state.num += args.n
+            }
+        },
+        actions: {
+            add2(context) {
+                // context是state父级
+                setTimeout(() => {
+                    context.commit('add')
+                })
+            }
+        }
+    })
+    ```
+
+  - `dispatch`触发`action`方法
+
+    ```js
+    methods: {
+        fn() {
+            this.$store.dispatch('add2', {n: 2})
+        }
+    }
+    ```
