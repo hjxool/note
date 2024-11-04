@@ -1144,3 +1144,238 @@ export default {
         }
     }
     ```
+
+## Redux 与 Vuex 区别
+
+- 区别
+  - Vuex改进了Redux中的`Action`和`Reducer`函数，以`mutations`变化函数取代`Reducer`，无需`switch`，只需在对应的`mutation`函数里改变`state`值即可
+  - Vuex由于Vue自动重新渲染的特性，无需重新订阅渲染函数，只要生成新的`State`即可
+- 相同点
+  - ==单—==数据源
+  - `state`数据变化拦截
+
+## 为什么要用Vuex 或 Redux
+
+- 对于**多层嵌套**的组件传参会非常繁琐，**兄弟组件**间的状态传递要么繁琐，要么后期维护困难
+- 所以使用Vuex或Redux，把组件的共享属性抽出来，以一个全局单例模式管理。这种情况下，不管在哪个位置，任何组件都能获取共享属性或者触发行为修改共享属性
+
+## Vuex有哪些属性
+
+- `state`： 存放基本数据
+- `getters`： 由基本数据派生出的数据，可以理解为计算属性
+- `mutations`： 更改数据的方法，==同步==执行
+- `actions`： 包裹`mutations`，可以==异步==触发`mutations`中的方法
+- `modules`： 模块化Vuex，类似Vue`data`中声明不同对象管理不同组的数据
+
+## Vuex 与 全局变量 的区别
+
+- Vuex存储的状态是响应式的，状态改变，引用Vuex状态的组件内容也会更新。而全局变量不会触发Vue响应式更新模板
+- Vuex中`store`不能直接被改变，只能通过`this.$store.commit()`触发`mutation`从而修改`state`，这样可以拦截修改`state`的操作
+
+## 为什么mutation不能异步
+
+- 因为要拦截`state`修改操作，就不能异步，因为异步的一大缺点就是不知何时执行
+
+## 严格模式有什么用 如何开启
+
+- 严格模式下，任何不是由`mutation`函数引起的变更，都会抛出错误
+
+- 开启严格模式
+
+  ```js
+  const store = new Vuex.Store({
+      strict: true
+  })
+  ```
+
+## 如何在组件中批量使用Vuex的getter属性
+
+- 使用Vuex的`mapGetters`函数、Vue的`mixins`混入配置项，以及扩展运算符
+
+  ```js
+  // xxx.js
+  // 在组件中引入vuex方法
+  import {mapGetters} from 'vuex'
+  export default {
+      computed: {
+          value1() {
+              return this.value2 + this.value3
+          },
+          // 使用扩展运算符将mapGetters结果展开 作为computed配置项
+          ...mapGetters(['xxx1', 'xxx2', ...])
+      }
+  }
+  ```
+
+## 组件中如何简写提交mutation
+
+- 使用Vuex的`mapMutations`函数将`mutation`方法重命名，作为`methods`配置项
+
+  ```js
+  // xxx.js
+  // 组件中引入vuex方法
+  import {mapMutations} from 'vuex'
+  methods: {
+      fn1() {...},
+      ...mapMutations({
+          fn2: 'add_num'
+      })
+  }
+  // 组件中调用时
+  this.fn2(10)
+  // 等同于
+  this.$store.commit('add_num', 10)
+  ```
+
+# Vue3
+
+## Vue3有什么更新
+
+- 监测机制的改变
+  - Vue3使==用Proxy实现数据劫持==
+-  `Object.defineProperty`只能监测属性，不能监测对象
+  - Proxy数据劫持，可以拦截到属性的**添加**和**删除**
+  - 可以拦截到数组**长度**和**索引位置值**的变更
+  - 支持`Map`、`Set`、`WeakMap`和`WeakSet`
+
+- 作用域插槽
+
+  - Vue2中作用域插槽改变，父组件会**重新渲染**。而Vue3把作用域插槽改成了==函数形式==，只会使子组件重新渲染，提升了渲染性能
+
+    - Vue2
+      - Vue2中使用`slot-scope="slotProps"`形式，当`slotProps`里的数据发生改变，父组件就要重新渲染`<child-component><template slot-scope="slotProps">`这部分模板
+
+    ```Vue
+    <!-- 父组件 -->
+    <template>
+      <div>
+        <child-component>
+          <template slot="xxx" slot-scope="slotProps">
+            <p>{{ slotProps.text }}</p>
+          </template>
+        </child-component>
+      </div>
+    </template>
+    <!-- 子组件 -->
+    <template>
+      <div>
+        <slot name="xxx" :text="message"></slot>
+      </div>
+    </template>
+    <script>
+    export default {
+      data() {
+        return {
+          message: 'Hello from child component'
+        };
+      }
+    };
+    </script>
+    ```
+
+    - Vue3
+      - 而Vue3中用`v-slot="{ text }"`这种形式，`{text}`部分会被解析成**函数**，这样当`{text}`中数据变化，只用重新调用`() => ({text})`函数，而不会引起父组件重新渲染
+
+    ```vue
+    <!-- 父组件 -->
+    <template>
+      <div>
+        <ChildComponent v-slot:xxx="{ text }">
+          <p>{{ text }}</p>
+        </ChildComponent>
+      </div>
+    </template>
+    <!-- 子组件 -->
+    <template>
+      <div>
+        <slot name="xxx" :text="message"></slot>
+      </div>
+    </template>
+    
+    <script>
+    import { defineComponent, ref } from 'vue';
+    export default defineComponent({
+      setup() {
+        const message = ref('Hello from child component');
+        return {
+          message
+        };
+      }
+    });
+    </script>
+    ```
+
+- `render`函数书写格式改变
+
+  - Vue2
+
+    ```js
+    render: function(createElement) {
+        return createElement('div', [
+            createElement('span', 'hello'),
+            createElement('button', {
+                on: {
+                    click: this.fn
+                }
+            }, 'click me')
+        ])
+    }
+    ```
+
+  - Vue3
+
+    ```js
+    import {h} from 'vue'
+    render: function() {
+        return h('div', [
+            h('span', 'hello'),
+            h('button', {
+                onClick: this.fn
+            }, 'click me')
+        ])
+    }
+    ```
+
+- 对象式的组件声明方式
+
+  - Vue2中通过声明一个变量，变量内定义一系列配置项，而Vue3使用==写法形似类==
+
+    - Vue2
+
+    ```js
+    export default {
+      data() {
+        return {
+          message: 'Hello, Vue 2!'
+        };
+      },
+      methods: {
+        greet() {
+          console.log(this.message);
+        }
+      },
+      created() {
+        this.greet();
+      }
+    };
+    ```
+
+    - Vue3
+
+    ```js
+    import { defineComponent, ref } from 'vue';
+    
+    export default defineComponent({
+      setup() {
+        const message = ref('Hello, Vue 3!');
+        const greet = () => {
+          console.log(message.value);
+        };
+        greet();
+        return {
+          message,
+          greet
+        };
+      }
+    });
+    ```
