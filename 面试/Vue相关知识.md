@@ -1232,79 +1232,77 @@ export default {
 ## Vue3有什么更新
 
 - 监测机制的改变
-  - Vue3使==用Proxy实现数据劫持==
--  `Object.defineProperty`只能监测属性，不能监测对象
+  - Vue3使==用Proxy实现数据劫持==，Vue2用`Object.defineProperty`只能监测属性，不能监测对象
+  
   - Proxy数据劫持，可以拦截到属性的**添加**和**删除**
-  - 可以拦截到数组**长度**和**索引位置值**的变更
-  - 支持`Map`、`Set`、`WeakMap`和`WeakSet`
-
+  - Proxy可以拦截到数组**长度**和**索引位置值**的变更
+  - Proxy支持`Map`、`Set`、`WeakMap`和`WeakSet`
+  
 - 作用域插槽
 
-  - Vue2中作用域插槽改变，父组件会**重新渲染**。而Vue3把作用域插槽改成了==函数形式==，只会使子组件重新渲染，提升了渲染性能
-
-    - Vue2
-      - Vue2中使用`slot-scope="slotProps"`形式，当`slotProps`里的数据发生改变，父组件就要重新渲染`<child-component><template slot-scope="slotProps">`这部分模板
-
-    ```Vue
-    <!-- 父组件 -->
-    <template>
-      <div>
-        <child-component>
-          <template slot="xxx" slot-scope="slotProps">
-            <p>{{ slotProps.text }}</p>
-          </template>
-        </child-component>
-      </div>
-    </template>
-    <!-- 子组件 -->
-    <template>
-      <div>
-        <slot name="xxx" :text="message"></slot>
-      </div>
-    </template>
-    <script>
-    export default {
-      data() {
-        return {
-          message: 'Hello from child component'
-        };
-      }
-    };
-    </script>
-    ```
-
-    - Vue3
-      - 而Vue3中用`v-slot="{ text }"`这种形式，`{text}`部分会被解析成**函数**，这样当`{text}`中数据变化，只用重新调用`() => ({text})`函数，而不会引起父组件重新渲染
-
-    ```vue
-    <!-- 父组件 -->
-    <template>
-      <div>
-        <ChildComponent v-slot:xxx="{ text }">
-          <p>{{ text }}</p>
-        </ChildComponent>
-      </div>
-    </template>
-    <!-- 子组件 -->
-    <template>
-      <div>
-        <slot name="xxx" :text="message"></slot>
-      </div>
-    </template>
-    
-    <script>
-    import { defineComponent, ref } from 'vue';
-    export default defineComponent({
-      setup() {
-        const message = ref('Hello from child component');
-        return {
-          message
-        };
-      }
-    });
-    </script>
-    ```
-
+  - Vue2中作用域插槽改变，父组件会**重新渲染**
+    - Vue2使用`slot-scope="slotProps"`形式，当`slotProps`里的数据发生改变，父组件就要重新渲染`<child-component><template slot-scope="slotProps">`这部分模板
+  
+  ```Vue
+  <!-- 父组件 -->
+  <template>
+    <div>
+      <child-component>
+        <template slot="xxx" slot-scope="slotProps">
+          <p>{{ slotProps.text }}</p>
+        </template>
+      </child-component>
+    </div>
+  </template>
+  <!-- 子组件 -->
+  <template>
+    <div>
+      <slot name="xxx" :text="message"></slot>
+    </div>
+  </template>
+  <script>
+  export default {
+    data() {
+      return {
+        message: 'Hello from child component'
+      };
+    }
+  };
+  </script>
+  ```
+  
+  - Vue3把作用域插槽改成了==函数形式==，只会使子组件重新渲染，提升了渲染性能
+    - Vue3用`v-slot="{ text }"`这种形式，`{text}`部分会被解析成**函数**，这样当`{text}`中数据变化，只用重新调用`() => ({text})`函数，而不会引起父组件重新渲染
+  
+  ```vue
+  <!-- 父组件 -->
+  <template>
+    <div>
+      <ChildComponent v-slot:xxx="{ text }">
+        <p>{{ text }}</p>
+      </ChildComponent>
+    </div>
+  </template>
+  <!-- 子组件 -->
+  <template>
+    <div>
+      <slot name="xxx" :text="message"></slot>
+    </div>
+  </template>
+  
+  <script>
+  import { defineComponent, ref } from 'vue';
+  export default defineComponent({
+    setup() {
+      const message = ref('Hello from child component');
+      return {
+        message
+      };
+    }
+  });
+  </script>
+  ```
+  
 - `render`函数书写格式改变
 
   - Vue2
@@ -1338,44 +1336,121 @@ export default {
 
 - 对象式的组件声明方式
 
-  - Vue2中通过声明一个变量，变量内定义一系列配置项，而Vue3使用==写法形似类==
+  - Vue2是配置项风格，用一系列属性完成组件定义
+    - 极易上手，但不够灵活优雅
+    - 过于依赖`this`，比如`methods`中`this`指向组件实例，而非`methods`所在对象，使得 TypeScript 在Vue2 中不好用，根本原因是TS特性是==静态类型检查==，而`this`过于灵活，所以对TS不是很友好
 
-    - Vue2
-
-    ```js
-    export default {
-      data() {
-        return {
-          message: 'Hello, Vue 2!'
-        };
-      },
-      methods: {
-        greet() {
-          console.log(this.message);
-        }
-      },
-      created() {
-        this.greet();
+  
+  ```js
+  export default {
+    data() {
+      return {
+        message: 'Hello, Vue 2!'
+      };
+    },
+    methods: {
+      greet() {
+        // 这句在TS可能会报错 因为无法正确推断 this 的类型
+        console.log(this.message);
       }
-    };
-    ```
+    },
+    created() {
+      this.greet();
+    }
+  };
+  ```
 
-    - Vue3
+  - Vue3==写法形似类==
+    - Vue3引入==组合式API==，通过在`setup`函数，像普通变量一样声明使用，从而更自然地使用TS
+  
+  
+  ```js
+  import { defineComponent, ref } from 'vue';
+  export default defineComponent({
+    setup() {
+      const message = ref('Hello, Vue 3!');
+      const greet = () => {
+        console.log(message.value);
+      };
+      greet();
+      return {
+        message,
+        greet
+      };
+    }
+  });
+  ```
 
-    ```js
-    import { defineComponent, ref } from 'vue';
-    
-    export default defineComponent({
-      setup() {
-        const message = ref('Hello, Vue 3!');
-        const greet = () => {
-          console.log(message.value);
-        };
-        greet();
-        return {
-          message,
-          greet
-        };
-      }
-    });
-    ```
+## 组合式API和React的Hook很像，区别是什么
+
+- React Hook
+
+  - 从Hook的实现来看，Hook是根据`useState`的调用顺序来确定下一次重渲染时的`state`是源自哪个`useState`
+  - 因此==不能在循环、条件、嵌套函数中调用Hook==
+  - 必须确保是==在React函数的顶层调用Hook==
+  - `useEffect`、`useMemo`等函数必须手动确定依赖关系
+
+- 组合式API
+
+  - 由于是基于Vue响应式，==组合式API不用顾虑调用顺序，可以在循环、条件、嵌套函数中使用==
+  - 一次组件实例化==只调用一次setup函数==，而React Hook==每次重渲染都要调用Hook==
+
+  - Vue响应式自动完成了依赖收集，而React Hook需要手动传入依赖，因此对于Hook依赖的顺序很重要
+
+# 虚拟DOM
+
+## 对虚拟DOM的理解
+
+- 本质上来说，虚拟DOM是一个JS对象，通过对象的方式表示DOM结构，是对DOM的抽象。多次虚拟DOM的修改结果一次性更新到页面上，有效减少了重绘重排次数
+
+- Vue在每次数据==变化前，都会**缓存**一份虚拟DOM==。数据==变化后，当前的虚拟DOM会与缓存的虚拟DOM进行比较==。Vue内部封装了==diff算法==，通过这个算法进行比较，找到需要改变的部分进行重新渲染
+
+## 虚拟DOM的解析过程
+
+1. 初始渲染
+   - Vue将==模板编译成虚拟DOM树==，即JS对象，其中包含`TagName`、`props`和`Children`这些属性，称为==旧虚拟DOM==
+   - 根据旧虚拟DOM，Vue生成真实DOM，插入到文档中
+   - Vue初次编译时会声明一个渲染函数`render()`，每次调用都会生成新的虚拟DOM树
+2. 页面数据变化
+   - 当响应式数据发生变化时，会触发`watcher`回调函数重新渲染模板，触发`watcher`的同时会重新执行`render`函数生成新虚拟DOM
+     - 注意！在Vue中`watcher`回调函数不直接更新真实DOM，而是更新虚拟DOM中的模板，因此重新执行`render`函数是有必要的，根据新旧DOM树的对比，收集所有改动，一起进行更新
+3. 虚拟DOM比较
+   - Vue用**Diff算法**对比新虚拟DOM和旧虚拟DOM
+   - 这种比较过程是高效的，因为虚拟DOM是内存中的对象，比操作真实DOM快得多
+4. 更新DOM
+   - 找出差异后，Vue只对差异处进行更新(例如添加、删除或修改元素)，而不是重新解析和渲染整个DOM树
+
+## 虚拟DOM真的比真实DOM性能好吗
+
+- 首次渲染渲染大量DOM时，由于多了一层虚拟DOM的计算，会比innerHTML插入慢
+- 但在后续DOM操作时更快
+
+## Diff算法原理
+
+- 进行新老虚拟DOM对比时
+  1. 对比节点本身(`===`)，判断是否为同一节点，如果不是同一节点，则删除该节点重新创建节点进行替换
+  2. 如果是同一节点，则进行对比找不同的地方
+     1. `patchVnode`：先判断一方有子节点，一方没有子节点的情况。如：新的`children`没有子节点，则最终渲染结果会将旧的子节点移除
+     2. `updateChildren`：都有子节点的情况，判断如何最小程度更新节点(diff核心)
+  3. ==递归==比较子节点
+
+- ==diff算法只比较同层的子节点==，不进行跨级节点的比较，也就是说，只有当新旧`children`都为多个子节点时，才用Diff算法进行同层级比较
+
+## Vue中key的作用
+
+- 分两种情况会用到`key`：
+  - `v-if`中使用`key`
+    - 由于Vue会尽可能高效地渲染元素，通常会复用已有元素而不是从头开始渲染。因此当使用`v-if`来实现元素切换时，如果切换前后含有相同类型的元素，那么这个元素就会被复用
+    - 如相同的`input`元素，不用`key`，切换前后`input`内容都不会被清除掉，这是不符合需求的。因此通过使用`key`来唯一标识一个元素，该元素不会被复用
+    - 此时`key`的作用是==标识一个独立的元素==
+  - `v-for`中使用`key`
+    - `v-for`更新渲染过的列表时，默认使用“就地复用”的策略。如数据项的顺序发生改变，Vue**不会**移动DOM元素来匹配数据项的顺序，而是简单==复用同一位置的==元素
+    - 通过为列表中每一项提供一个`key`值，使Vue跟踪元素的身份，从而复用对应`key`值的元素
+    - 此时`key`的作用是==帮助高效更新渲染虚拟DOM==，通过`key`，diff算法可以更准确、快速
+      - 更准确：用`a.key === b.key`简单的就可以进行节点对比
+      - 更快速： 利用`key`的**唯一性**生成`map`对象来获取对应节点，比遍历的方式更快
+
+## 为什么不建议用索引作为key
+
+- 用索引作为`key`和没写没区别，Vue默认就会用索引作为`key`
+- 且用索引作为`key`，不管数组的顺序怎么颠倒，索引都是 0, 1, 2...这样排列，导致Vue会复用错误的旧子节点，做很多额外的工作
