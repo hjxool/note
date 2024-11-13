@@ -319,267 +319,68 @@
 
 ## class类
 
-- 与ES6不同点
+### 与ES6不同点
 
-  - TS在class最外层定义属性，在`constructor(){}`构造函数中赋值。而ES是在`constructor`中定义并赋值
+- TS在class最外层定义属性，在`constructor(){}`构造函数中赋值。而ES是在`constructor`中定义并赋值
 
-    ```ts
-    class Person{
-        name: string;
-        constructor(a: string){
-            this.name = a
-        }
+  ```ts
+  class Person{
+      name: string;
+      constructor(a: string){
+          this.name = a
+      }
+  }
+  ```
+
+- TS在class外层定义属性时，可以用**变量声明方式**设置初始值，然后根据值类型自动进行类型限制
+
+  ```ts
+  class A{
+      aaa = 'aaa'
+      bbb = 222
+  }
+  let a = new A()// 实例属性等于初始值
+  ```
+
+- JS中class可以在==构造函数==中给参数设默认值，但TS不行
+
+  ```ts
+  // JS中可以
+  class A {
+    constructor(a = 10) {
+      this.a = a
     }
-    ```
-
-  - TS在class外层定义属性时，可以用**变量声明方式**设置初始值，然后根据值类型自动进行类型限制
-
-    ```ts
-    class A{
-        aaa = 'aaa'
-        bbb = 222
+  }
+  let a = new A()
+  // TS中不行
+  class A {
+    // 或是 constructor(a = 10)也不行
+    constructor(a: number = 10) {
+      this.a = a
     }
-    let a = new A()// 实例属性等于初始值
-    ```
+  }
+  let a = new A()
+  // TS中普通函数可以设置默认值
+  function fn(a: string = 'aaa'){return a}
 
-  - JS中class可以在==构造函数==中给参数设默认值，但TS不行
+- 声明静态属性。ES6中没有类型声明
 
-    ```ts
-    // JS中可以
-    class A {
-      constructor(a = 10) {
-        this.a = a
-      }
-    }
-    let a = new A()
-    // TS中不行
-    class A {
-      // 或是 constructor(a = 10)也不行
-      constructor(a: number = 10) {
-        this.a = a
-      }
-    }
-    let a = new A()
-    // TS中普通函数可以设置默认值
-    function fn(a: string = 'aaa'){return a}
+  ```ts
+  class Person{
+      static name: string;
+  }
+  ```
 
-  - 声明静态属性。ES6中没有类型声明
-
-    ```ts
-    class Person{
-        static name: string;
-    }
-    ```
-
-  - TS中特有==只读属性==关键字`readonly`。生成对象后只读，不能修改属性
-
-    ```ts
-    class Person{
-        readonly name: string;
-    }
-    ```
-
-  - 关键字可以叠加使用
-
-    ```ts
-    class Person{
-        static readonly name: string;
-    }
-    ```
-
-  - TS中特有==基类==关键字`abstract`。声明为==抽象类/基类==的类**不能**用来创建对象，专门用来继承
-
-    - ==抽象类==中**才可以**声明==抽象方法==，即没有内容的函数，执行内容**必须**由派生类决定，派生类**必须**对抽象方法进行==重写==
-
-      ```ts
-      abstract class Phone{
-          name: string;
-          constructor(name: string){
-              this.name = name;
-          }
-          // 定义抽象方法 用 abstract 关键字
-          abstract callSomeOne(): void;
-      }
-      class SmartPhone extends Phone{
-          color: string;
-         	constructor(name: string, color: string){
-              super(name);
-              this.color = color;
-          }
-          callSomeOne(): void{
-              console.log('重写')
-          }
-      }
-      let p = new Phone('诺基亚') // 报错 基类无法创建实例
-      ```
-
-  - TS特有==接口==关键字`interface`
-
-    - 定义一个类的==标准结构==，包括有哪些==属性==和==方法==。所有属性、方法都不能有==实际的值==。类似抽象类
-
-      ```ts
-      // 接口
-      interface customClass{
-          name: string;
-          fn(): void;
-      }
-      // 定义类实现接口 implements关键字
-      // 可以增加自定义属性方法 但必须满足接口属性方法
-      class Person implements customClass{
-          name: string;
-        	age: number;
-        	constructor(a: string, b: number) {
-          	this.name = a
-          	this.age = b
-        	}
-        	fn(): void {
-          	console.log(111)
-        	}
-      }
-      ```
-
-    - 可以作为类型声明使用。与==类型别名==一样
-
-      ```ts
-      let obj: customClass = {
-          name: 'xxx',
-          age: 11,
-      }
-      ```
-
-    - 同名接口可以重复定义，使用时按全部同名接口结构叠加。==类型别名==不能重复定义
-
-      ```ts
-      interface customClass{
-          key1: unknown;
-          key2: boolean;
-      }
-      // 必须是全部同名接口累加结构 否则会报错
-      let obj: customClass = {
-          name: 'xxx',
-          age: 11,
-          key1: 'asda',
-          key2: false,
-      }
-      ```
-
-  - TS特有==修饰符==
-
-    - `public`
-
-      - 公共属性，可以在任意位置访问(包括子类)修改，定义属性时的默认值。如`class xx{name: string}`等于`class xx{public name: string}`
-
-    - `private`
-
-      - 私有属性，只能在==当前类内部==进行访问修改。但是可以通过定义方法暴露==属性值==的方式**访问**
-
-        ```ts
-        class Person{
-            private _name: string;
-            private _age: number;
-            constructor(a: string, b: number) {
-                this._name = a;
-                this._age = b;
-            }
-            // ES class关键字get、set存取器
-            get name() {
-                return this._name
-            }
-            set name(value: string) {
-            	this._name = value
-          	}
-        }
-        let a = new Person('aaa', 111)
-        a.name = 'bbb'
-        console.log(a.name)
-        ```
-
-    - `protected`
-
-      - 受保护属性，只能在**当前类**和**子类**==内部==访问修改
-
-        ```ts
-        class A{
-            protected key: string;
-            constructor(a: string) {
-                this.key = a;
-            }
-        }
-        class B extends A{
-            fn() {
-                return this.key; // 子类中可以访问
-            }
-        }
-        let a = new A('a')
-        a.key // 报错 不能访问
-        let b = new B('b')
-        b.key // 报错 同样不能访问
-        ```
-
-  - TS class语法糖
-
-    - 注：使用语法糖`public`不能省略
-
-      ```ts
-      class Person{
-          constructor(public _name: string, private _age: number) {}
-      }
-      // 等价于
-      class Person{
-          private _name: string;
-          private _age: number;
-          constructor(a: string, b: number) {
-              this._name = a;
-              this._age = b;
-          }
-      }
-
-  - TS特有==泛型==
-
-    - 定义==函数==或==类==时，遇到类型不明确的可以使用泛型
-
-      ```ts
-      // <>内xxx就是泛型名称 声明类型也是xxx
-      function fn<xxx>(params: xxx): xxx{
-          return params
-      }
-      fn(10) // 不指定泛型,ts可以自动判断类型
-      fn<string>('text') // 指定泛型类型,传入值类型必须与指定泛型相同
-      ```
-
-    - 可以同时指定多个泛型
-
-      ```ts
-      function fn<aa,bb>(p1: bb, p2: aa): aa{
-          return p1
-      }
-      fn(1, '2') // 同样可以自动判断类型
-      fn<string, number>('1', 2) // 指定多个泛型
-      ```
-
-    - 泛型可以通过继承==类==或==接口==指定范围
-
-      ```ts
-      class A{
-          constructor(public length: number){}
-      }
-      interface A{
-          length: number;
-      }
-      // extends是固定写法,即使实现接口也不能用implements
-      function fn<T extends A>(p: T): number{
-          return p.length;
-      }
-
-- 存取器`set`不能声明返回值类型
+- TS中存取器`set`不能声明返回值类型
 
   ```ts
   class A{
       // 报错 set不能声明返回值类型
       set key(val: number): void{...}
   }
+  ```
 
-- 类可以当作类型声明
+- TS中类可以当作类型声明
 
   ```ts
   class A{
@@ -611,6 +412,254 @@
         xxx2: string
     }
     let a: A = {xxx2: 'qqq'}
+    ```
+
+### TS中特有==只读属性==关键字readonly
+
+- 生成对象后只读，不能修改属性
+
+
+```ts
+class Person{
+    readonly name: string;
+}
+```
+
+- 关键字可以叠加使用
+
+  ```ts
+  class Person{
+      static readonly name: string;
+  }
+  ```
+
+
+### TS中特有==基类==关键字abstract
+
+- 声明为==抽象类/基类==的类**不能**用来创建对象，专门用来继承
+
+- ==抽象类==中**才可以**声明==抽象方法==，即没有内容的函数，执行内容**必须**由派生类决定，派生类**必须**对抽象方法进行==重写==
+
+  ```ts
+  abstract class Phone{
+      name: string;
+      constructor(name: string){
+          this.name = name;
+      }
+      // 定义抽象方法 用 abstract 关键字
+      abstract callSomeOne(): void;
+  }
+  class SmartPhone extends Phone{
+      color: string;
+     	constructor(name: string, color: string){
+          super(name);
+          this.color = color;
+      }
+      callSomeOne(): void{
+          console.log('重写')
+      }
+  }
+  let p = new Phone('诺基亚') // 报错 基类无法创建实例
+  ```
+
+### TS特有==接口==关键字interface
+
+- 定义一个类的==标准结构==，包括有哪些==属性==和==方法==。所有属性、方法都不能有==实际的值==。类似抽象类
+
+  ```ts
+  // 接口
+  interface customClass{
+      name: string;
+      fn(): void;
+  }
+  // 定义类实现接口 implements关键字
+  // 可以增加自定义属性方法 但必须满足接口属性方法
+  class Person implements customClass{
+      name: string;
+    	age: number;
+    	constructor(a: string, b: number) {
+      	this.name = a
+      	this.age = b
+    	}
+    	fn(): void {
+      	console.log(111)
+    	}
+  }
+  ```
+
+- 可以作为类型声明使用。与==类型别名==一样
+
+  ```ts
+  let obj: customClass = {
+      name: 'xxx',
+      age: 11,
+  }
+  ```
+
+- 同名接口可以重复定义，使用时按全部同名接口结构叠加。==类型别名==不能重复定义
+
+  ```ts
+  interface customClass{
+      key1: unknown;
+      key2: boolean;
+  }
+  // 必须是全部同名接口累加结构 否则会报错
+  let obj: customClass = {
+      name: 'xxx',
+      age: 11,
+      key1: 'asda',
+      key2: false,
+  }
+  ```
+
+- ※==类型导入/导出==
+
+  - 导出类型
+
+  ```ts
+  interface Aa {
+      aa: number
+  }
+  export type {Aa}
+  ```
+
+  - 导入类型
+
+  ```ts
+  // import type 为TS特有
+  import type {Aa} from './store.ts'
+  let t = computed<Aa>(() => store.getters)
+  ```
+
+### TS特有==修饰符==
+
+#### public
+
+- 公共属性，可以在任意位置访问(包括子类)修改，定义属性时的默认值。如`class xx{name: string}`等于`class xx{public name: string}`
+
+#### private
+
+- 私有属性，只能在==当前类内部==进行访问修改。但是可以通过定义方法暴露==属性值==的方式**访问**
+
+  ```ts
+  class Person{
+      private _name: string;
+      private _age: number;
+      constructor(a: string, b: number) {
+          this._name = a;
+          this._age = b;
+      }
+      // ES class关键字get、set存取器
+      get name() {
+          return this._name
+      }
+      set name(value: string) {
+      	this._name = value
+    	}
+  }
+  let a = new Person('aaa', 111)
+  a.name = 'bbb'
+  console.log(a.name)
+  ```
+
+#### protected
+
+- 受保护属性，只能在**当前类**和**子类**==内部==访问修改
+
+  ```ts
+  class A{
+      protected key: string;
+      constructor(a: string) {
+          this.key = a;
+      }
+  }
+  class B extends A{
+      fn() {
+          return this.key; // 子类中可以访问
+      }
+  }
+  let a = new A('a')
+  a.key // 报错 不能访问
+  let b = new B('b')
+  b.key // 报错 同样不能访问
+  ```
+
+### TS class语法糖
+
+- 注：使用语法糖`public`不能省略
+
+  ```ts
+  class Person{
+      constructor(public _name: string, private _age: number) {}
+  }
+  // 等价于
+  class Person{
+      private _name: string;
+      private _age: number;
+      constructor(a: string, b: number) {
+          this._name = a;
+          this._age = b;
+      }
+  }
+
+## TS特有==泛型==
+
+- 定义==函数==或==类==时，遇到==类型不明确(※)==的可以使用泛型
+
+  ```ts
+  // <>内xxx就是泛型名称 声明类型也是xxx
+  function fn<xxx>(params: xxx): xxx{
+      return params
+  }
+  fn(10) // 不指定泛型,ts可以自动判断类型
+  fn<string>('text') // 指定泛型类型,传入值类型必须与指定泛型相同
+  ```
+
+- 可以同时指定多个泛型
+
+  ```ts
+  function fn<aa,bb>(p1: bb, p2: aa): aa{
+      return p1
+  }
+  fn(1, '2') // 同样可以自动判断类型
+  fn<string, number>('1', 2) // 指定多个泛型
+  ```
+
+- 泛型可以通过继承==类==或==接口==指定范围
+
+  ```ts
+  class A{
+      constructor(public length: number){}
+  }
+  interface A{
+      length: number;
+  }
+  // extends是固定写法,即使实现接口也不能用implements
+  function fn<T extends A>(p: T): number{
+      return p.length;
+  }
+  ```
+
+- 泛型和`:string`类型声明的区别
+
+  - 简单来说，泛型是==动态的类型声明==，拓展性更强，`:`类型声明是把类型写死
+
+  ```ts
+  // 泛型声明动态类型
+  // 注意 其中T只是占位符 不是固定写法 也可用A X等字符代替
+  function fn<T>(arg: T): T {
+      return arg
+  }
+  // 使用时动态指定类型
+  fn<string>('hello')
+  fn<number>(123)
+  
+  // 接口使用泛型
+  inerface Box<A> {
+      xxx: A
+  }
+  let box: Box<string> = {xxx: 'xxx'}
+  ```
 
 ## 函数参数
 
@@ -729,4 +778,3 @@ let obj = {
     }
 }
 ```
-
