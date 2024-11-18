@@ -33,9 +33,7 @@
   - TS中传参数量和形参数量不一致也会报错
   - 函数的返回值，TS也会==自动进行类型判断==
 
-### 类型
-
-#### JS中原有的类型
+## JS中原有的类型
 
 - `number`
 
@@ -119,7 +117,7 @@
     let a: Array<number> // 声明数字类型的数组
 
 
-#### TS特有
+## TS特有
 
 - 字面量
 
@@ -152,20 +150,18 @@
     b = a // 报错 错误原因:unknown类型无法赋值给string类型
     ```
 
-  - Tips
+  - `unknown`可以赋值给`unknown`或`any`类型
 
-    - `unknown`可以赋值给`unknown`或`any`类型
+  - 不能直接赋值，但可以加类型判断后再赋值
 
-    - 不能直接赋值，但可以加类型判断后再赋值
-
-      ```ts
-      let a: unknown = 'hello'
-      let b: string
-      if(typeof a === 'string'){
-          b = a // 不会报错
-      }
-      ```
-
+    ```ts
+    let a: unknown = 'hello'
+    let b: string
+    if(typeof a === 'string'){
+        b = a // 不会报错
+    }
+    ```
+  
 - `void`
 
   - 表示空值，以函数为例`function fn(): void{}`，表示没有返回值的函数，声明为`void`后，函数中再`return 任意值`都会报错
@@ -217,13 +213,13 @@
 - HTML元素`HTMLElement`
   - 值类型为HTML元素
 
-#### 联合类型
+## 联合类型
 
 - 可以用逻辑语句连接==多个类型==
 - 如`let a: 'male' | 'female'`，这样`b`赋值`male`或`female`都允许，但是赋值其他值不行
 - 又如`let b: number | string`
 
-#### 类型断言
+## 类型断言
 
 - 告诉解析器，变量的实际类型
 
@@ -234,9 +230,31 @@
   b = a as string;
   // 语法2: <类型>变量
   b = <string>a
+  // 函数类型
+  let c = a as () => void // 表明a是函数 且 不接收参数 且 没有返回值
   ```
 
-#### 类型别名
+## 类型断言和:指定类型区别
+
+- `:`号
+
+  - 在==初始定义声明时==使用，确保代码一致性和可读性
+
+  ```ts
+  let a: string
+  ```
+
+- 类型断言
+
+  - 在==变量或方法使用时==使用，用于解决类型推断问题，如：与外部库交互时，无法推断出使用时的类型，就需要用断言
+
+  ```ts
+  let a:any = 'aaa'
+  // 在变量a使用时 断言它就是string 并取length属性
+  let b:number = (a as string).length
+  ```
+
+## 类型别名
 
 - 对于自定义类型用别名来代替，方便复用
 
