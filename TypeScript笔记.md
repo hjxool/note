@@ -745,7 +745,7 @@ interface Person {
 function fn(name: string, {age, address: {city}}: Person): string {}
 ```
 
-### 函数重载
+## 函数重载
 
 - 定义多个函数签名，以处理不同类型或数量的参数
 
