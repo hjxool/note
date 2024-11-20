@@ -751,13 +751,21 @@ function fn(name: string, {age, address: {city}}: Person): string {}
 
 ```ts
 // 方式1
-function fn(name: string): string
-function fn(age: number): string
-function fn(value: string | number): string {
-    if (typeof value === "string") {
-        return `Name: ${value}`;
+// 定义重载签名
+function fn(): void // 不接收参数 无返回值
+function fn(name: string, age: number): string // 接收参数 返回值为字符串
+function fn(num: number): number
+// 实现函数
+// 注意！因为有不同重载形式 因此实现函数具体内容时参数要用?号表示可选参数
+// 有不同类型返回值 或 同一参数位置有不同类型参数时
+// 函数的实现必须用|号全部覆盖
+function fn(nameOrNum?: string | number, age?: number): void | string | number {
+    if(typeof nameOrNum == 'string' && typeof age == 'number') {
+        // 对应fn(name: string, age: number): string的实现
+    } else if(typeof nameOrNum == 'number') {
+        // 对应fn(num: number): number
     } else {
-        return `Age: ${value}`;
+        // 对应fn(): void
     }
 }
 
