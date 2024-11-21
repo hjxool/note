@@ -254,13 +254,156 @@
   let b:number = (a as string).length
   ```
 
-## 类型别名
+## 类型别名 type
 
 - 对于自定义类型用别名来代替，方便复用
 
   ```ts
   type type1 = 1 | 2 | 3 | 4
   let a: type1
+  ```
+
+## 接口 interface
+
+- 定义一个类的==标准结构==，包括有哪些==属性==和==方法==。所有属性、方法都不能有==实际的值==。类似抽象类
+
+  ```ts
+  // 接口
+  interface customClass{
+      name: string;
+      fn(): void;
+  }
+  // 定义类实现接口 implements关键字
+  // 可以增加自定义属性方法 但必须满足接口属性方法
+  class Person implements customClass{
+      name: string;
+    	age: number;
+    	constructor(a: string, b: number) {
+      	this.name = a
+      	this.age = b
+    	}
+    	fn(): void {
+      	console.log(111)
+    	}
+  }
+  ```
+
+- 可以作为类型声明使用。与==类型别名==一样
+
+  ```ts
+  let obj: customClass = {
+      name: 'xxx',
+      age: 11,
+  }
+  ```
+
+- 同名接口可以重复定义，使用时按全部同名接口结构叠加。==类型别名==不能重复定义
+
+  ```ts
+  interface customClass{
+      key1: unknown;
+      key2: boolean;
+  }
+  // 必须是全部同名接口累加结构 否则会报错
+  let obj: customClass = {
+      name: 'xxx',
+      age: 11,
+      key1: 'asda',
+      key2: false,
+  }
+  ```
+
+- ※==类型导入/导出==
+
+  - 导出类型
+
+  ```ts
+  interface Aa {
+      aa: number
+  }
+  export type {Aa}
+  ```
+
+- 导入类型
+
+  ```ts
+  // import type 为TS特有
+  import type {Aa} from './store.ts'
+  let t = computed<Aa>(() => store.getters)
+  ```
+
+## 类型别名 与 接口 区别
+
+- 相同点
+
+  - 都可以用于定义==对象==结构
+
+  ```ts
+  type PersonType = {
+    name: string;
+    age: number;
+  };
+  
+  interface PersonInterface {
+    name: string;
+    age: number;
+  }
+  ```
+
+  - 都可以==继承==其他类型
+
+  ```ts
+  // 使用类型别名扩展 使用 =号 和 &符
+  type EmployeeType = PersonType & { employeeId: number };
+  
+  // 使用接口继承 使用 extends 关键字
+  interface EmployeeInterface extends PersonInterface {
+    employeeId: number;
+  }
+  ```
+
+- 区别
+
+  - 声明合并
+    - `interface`可以进行声明合并，多次声明同一个接口，TS会将它们合并
+    - `type`不支持声明合并，会报错
+
+  ```ts
+  interface Person {
+    name: string;
+  }
+  interface Person {
+    age: number;
+  }
+  // 合并后包含 name 和 age
+  const p: Person = { name: "Alice", age: 30 };
+  ```
+
+  - 联合类型和交叉类型
+    - `type`可以创建联合类型和交叉类型，`interface`则不能直接创建
+
+  ```ts
+  // 联合类型
+  type StringOrNumber = string | number
+  // 交叉类型
+  type PersonWithAddress = PersonType & { address: string }
+  ```
+
+  - 元组和其他类型
+    - `type`可以用于定义元组、基本类型的别名和其他更复杂的类型
+
+  ```ts
+  type StringArray = string[];
+  type NumberTuple = [number, number, number];
+  type Callback = (a: number, b: number) => void;
+  ```
+
+  - 匿名类型
+    - `interface`只能用于定义对象的结构
+    - 而`type`可以用于基本类型或联合类型
+
+  ```ts
+  type Alias = string; // 基本类型别名
   ```
 
 ## 配置
@@ -478,75 +621,6 @@ class Person{
       }
   }
   let p = new Phone('诺基亚') // 报错 基类无法创建实例
-  ```
-
-### TS特有==接口==关键字interface
-
-- 定义一个类的==标准结构==，包括有哪些==属性==和==方法==。所有属性、方法都不能有==实际的值==。类似抽象类
-
-  ```ts
-  // 接口
-  interface customClass{
-      name: string;
-      fn(): void;
-  }
-  // 定义类实现接口 implements关键字
-  // 可以增加自定义属性方法 但必须满足接口属性方法
-  class Person implements customClass{
-      name: string;
-    	age: number;
-    	constructor(a: string, b: number) {
-      	this.name = a
-      	this.age = b
-    	}
-    	fn(): void {
-      	console.log(111)
-    	}
-  }
-  ```
-
-- 可以作为类型声明使用。与==类型别名==一样
-
-  ```ts
-  let obj: customClass = {
-      name: 'xxx',
-      age: 11,
-  }
-  ```
-
-- 同名接口可以重复定义，使用时按全部同名接口结构叠加。==类型别名==不能重复定义
-
-  ```ts
-  interface customClass{
-      key1: unknown;
-      key2: boolean;
-  }
-  // 必须是全部同名接口累加结构 否则会报错
-  let obj: customClass = {
-      name: 'xxx',
-      age: 11,
-      key1: 'asda',
-      key2: false,
-  }
-  ```
-
-- ※==类型导入/导出==
-
-  - 导出类型
-
-  ```ts
-  interface Aa {
-      aa: number
-  }
-  export type {Aa}
-  ```
-
-  - 导入类型
-
-  ```ts
-  // import type 为TS特有
-  import type {Aa} from './store.ts'
-  let t = computed<Aa>(() => store.getters)
   ```
 
 ### TS特有==修饰符==
@@ -804,3 +878,39 @@ let obj = {
     }
 }
 ```
+
+## 复杂类型的声明
+
+- `Promise`
+
+  - 返回值或参数是`Promise`对象时，声明类型要用`<>`表示值的类型
+
+  ```ts
+  interface http请求 {
+    (a: string): Promise<string>; // Promise对象值类型为string
+  }
+  // Promise对象值类型为数字
+  const fn:Promise<number> = new Promise((resolve) => {
+      resolve(11)
+  })
+  ```
+
+- 数组
+
+  - 复杂对象数组
+
+  ```ts
+  interface User {
+    name: string;
+    age: number;
+    address: {
+      street: string;
+      city: string;
+      zipcode: string;
+    };
+  }
+  // 返回值类型为数组 且 数组元素结构类型符合User
+  function fn(): User[]
+  ```
+
+  
