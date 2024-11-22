@@ -396,12 +396,13 @@
   type StringArray = string[];
   type NumberTuple = [number, number, number];
   type Callback = (a: number, b: number) => void;
+  type aa = 'success' | 'error' | 'warning';
   ```
-
+  
   - 匿名类型
     - `interface`只能用于定义对象的结构
     - 而`type`可以用于基本类型或联合类型
-
+  
   ```ts
   type Alias = string; // 基本类型别名
   ```
@@ -912,5 +913,3 @@ let obj = {
   // 返回值类型为数组 且 数组元素结构类型符合User
   function fn(): User[]
   ```
-
-  

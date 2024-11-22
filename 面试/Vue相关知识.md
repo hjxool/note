@@ -1227,6 +1227,25 @@ export default {
   this.$store.commit('add_num', 10)
   ```
 
+## 如何commit模块的mutation
+
+- 使用`commit('模块名/方法名', 参数)`
+
+  ```js
+  <script setup>
+  import { computed } from 'vue';
+  import { useStore } from 'vuex';
+  
+  const store = useStore();
+  // 获取模块中的 state
+  const user = computed(() => store.state.user.user);
+  // 定义方法来更新用户信息
+  const updateUser = (newUser) => {
+    store.commit('user/setUser', newUser);
+  };
+  </script>
+  ```
+
 # Vue3
 
 ## Vue3有什么更新
