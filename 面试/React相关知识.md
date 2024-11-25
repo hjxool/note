@@ -119,3 +119,93 @@
 - 原理
   - 通过创建一个"fiber树"来跟踪组件的更新，节点对应组件树中的每一个React元素，其中包含组件、状态、props、DOM节点等信息
   - React-Fiber通过**协调**这些节点，决定哪些需要更新以及如何更新
+
+## React.Component 和 React.PureComponent 区别
+
+- `React.Component`
+
+  - Class组件的基类，用于复杂组件，不过在React16后逐步被函数组件代替
+
+- `React.PureComponent`
+
+  - Class组件的基类，写法同`React.Component`，用于简单组件，`PureComponent`自动实现了`shouldComponentUpdate`生命周期方法，对比`props`和`state`来决定组件是否需要重新渲染，从而提升渲染性能。
+  - 因此适合只挂载`props`和`state`，无复杂逻辑的"纯组件"
+
+  ```jsx
+  import React from 'react';
+  // 当 App 组件的 state.value 更新时
+  // MyComponent 只会在 value 发生变化时重新渲染
+  class MyComponent extends React.PureComponent {
+    render() {
+      console.log('MyComponent rendered');
+      return (
+        <div>
+          {this.props.value}
+        </div>
+      );
+    }
+  }
+  // 对比React.Component
+  class App extends React.Component {
+    state = {
+      value: 0
+    };
+    increment = () => {
+      this.setState({ value: this.state.value + 1 });
+    };
+    render() {
+      return (
+        <div>
+          <button onClick={this.increment}>Increment</button>
+          <MyComponent value={this.state.value} />
+        </div>
+      );
+    }
+  }
+  ```
+
+- 在React16后函数组件有了Hooks，`React.PureComponent`存在的意义是什么？
+
+  - `React.PureComponent`是Hooks没有引入之前，用于优化类组件性能的解决方案，在React16之前仍是重要工具
+
+- 与Hooks对比
+
+  - 函数组件中，可以使用`React.memo`来实现类似于`React.PureComponent`的优化
+  - 注意：只能用于==函数组件==
+  - 本质是通过`React.memo`==包装函数组件==，实现`props`==自动浅比较==。本质还是函数组件，因此可以用函数组件的所有东西
+
+  ```jsx
+  import React from 'react';
+  
+  // 定义一个简单的函数组件
+  const MyComponent = ({ name }) => {
+    return <div>Hello, {name}!</div>;
+  };
+  
+  // 使用React.memo包装 函数组件 
+  const MemoizedComponent = React.memo(MyComponent);
+  // 也可以自定义比较函数控制props比较逻辑
+  const MemoizedComponent = React.memo(MyComponent, (pre, next) => {// 类似shouldComponentUpdate
+      return pre.name === next.name
+  })
+  const App = () => {
+    const [count, setCount] = React.useState(0);
+    return (
+      <div>
+        <button onClick={() => setCount(count + 1)}>Increment</button>
+        <MemoizedComponent name="Alice" />
+      </div>
+    );
+  }
+  ```
+
+## 元素 组件 实例 之间的关系
+
+- 元素
+  - 创建之后不可变，描述了一个DOM节点，在屏幕上呈现成什么样子
+- 组件
+  - 可通过带有`render()`方法的class类
+  - 或有`return ('模板')`的函数创建
+- 实例
+  - **只有**用类声明的组件，即有使用`this`关键字指向的组件，才有实例
+  - 但是不需要直接创建一个组件的实例，因为React帮我们做了这些

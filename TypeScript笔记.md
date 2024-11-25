@@ -913,3 +913,42 @@ let obj = {
   // 返回值类型为数组 且 数组元素结构类型符合User
   function fn(): User[]
   ```
+
+## 声明全局变量/第三方库declare
+
+- `declare`关键字用于声明一个变量、函数、类或模块的类型，且==不需要实际实现==
+
+- 作用
+
+  - 用于告诉TypeScript编译器，这些变量或模块的实现==已经存在==于某个==外部环境==，像**全局变量**或**第三方库**，而==无需在当前文件==中提供具体的==实现代码==
+  - 用于将不需要打包的外部文件，用分开暴露的方式在`.vue`模块中引用
+
+- 示例
+
+  - `index.html`中引入`public`目录下`配置.js`
+
+  ```js
+  // 配置.js
+  const 运维配置IP = 'xxx'
+  const 运维配置端口 = 'xxx'
+  ```
+
+  - 在`src`目录下`vue引入配置.ts`中分别暴露
+    - 使用`declare`声明已经存在于全局的常量
+
+  ```ts
+  // 全局变量的声明
+  declare const 运维配置IP: string
+  declare const 运维配置端口: string
+  
+  export const IP = 运维配置IP;
+  export const 端口 = 运维配置端口;
+  ```
+
+  - 在`xx.vue`模块中按需引入
+
+  ```vue
+  <script setup>
+  import { IP } from '@/vue引入配置.'
+  </script>
+  ```
