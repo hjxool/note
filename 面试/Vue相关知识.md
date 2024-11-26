@@ -1246,6 +1246,20 @@ export default {
   </script>
   ```
 
+## 如何取模块的getter属性
+
+- 使用`store.getters['模块名/属性名']`
+
+  ```vue
+  <script setup>
+  import {useStore} from 'vuex'
+  
+  const store = useStore()
+  // 获取模块中的 getters
+  const name = computed(() => store.getters['user/name'])
+  </script>
+  ```
+
 # Vue3
 
 ## Vue3有什么更新
