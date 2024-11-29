@@ -1144,6 +1144,16 @@ export default {
         }
     }
     ```
+  
+  - 触发子模块`action`
+  
+    ```js
+    methods: {
+        fn() {
+            this.$store.dispatch('模块名/add2', {n: 2})
+        }
+    }
+    ```
 
 ## Redux 与 Vuex 区别
 
