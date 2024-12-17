@@ -1602,10 +1602,32 @@
 
 ##  JSON
 
-- [JSON.stringfy]()：将JS值(数组、对象等)转换为JSON字符串
+- `JSON.stringfy`：将JS值(数组、对象等)转换为JSON字符串
+  
   - `stringify(值,null,缩进)`可以格式化JSON字符串。**注！**格式化后的值必须放入==<pre/>==标签
+  
+- `JSON.parse`：将JSON字符串转换为JS，==不改变原始数据==
 
-- [JSON.parse]()：将JSON字符串转换为JS，==不改变原始数据==
+  - 可以传入回调函数，自定义处理值的转换
+
+  ```js
+  // 例 后端推来的JSON数据中包含long类型的数字 将其处理成字符串保持精度
+  ws.onmessage = ({data}) => {
+      data = JSON.parse(data, (key, value) => {
+          // keyJSON字符串中的键名 value键对应的值
+          if(typeof value === 'number' && value > Number.MAX_SAFEINTEGER){
+              // 遇到大数字处理成字符串返回
+              let n = BigInt(value)
+              let str = String(n)
+              return str
+          } else {
+              // 其他类型原样返回
+              return value
+          }
+      })
+  }
+  ```
+
 - JSON允许传递值包括：字符串、数字、布尔值、null、普通对象、数组。不允许传递方法及函数对象，这是js独有的
 
 ## 浅拷贝和深拷贝：
