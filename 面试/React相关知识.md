@@ -209,3 +209,8 @@
 - 实例
   - **只有**用类声明的组件，即有使用`this`关键字指向的组件，才有实例
   - 但是不需要直接创建一个组件的实例，因为React帮我们做了这些
+
+## React.createClass和extends Component的区别有哪些
+
+- `React.createClass`
+  - 本质是工厂函数
