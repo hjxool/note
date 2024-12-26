@@ -1218,7 +1218,7 @@
 - [setTime(时间戳)]()：==改变原Date对象==。`date.setTime(xxx)`，date就会变为时间戳对应的时间
 - `Date.now()`和`dateObject.getTime()`：获取==当前时刻时间戳==
 
-## Math对象方法
+## Math方法
 
 - `Math.floor(num)`：向下取整(floor意为地板)
 

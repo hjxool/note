@@ -234,6 +234,33 @@
   let c = a as () => void // 表明a是函数 且 不接收参数 且 没有返回值
   ```
 
+## 非空断言
+
+- 告诉编译器，变量不会是 `undefined`
+
+  - `!`号
+  - 场景：声明对象类型，其中有可选属性，在用该属性取值计算时，编译器提示错误
+
+  ```ts
+  // 声明可选属性
+  interface 矩阵元素 {
+  	label: string;
+  	列?: number;
+  	行?: number;
+  }
+  const 矩阵 = ref<矩阵元素[]>(
+  	list.map((e:any) => {
+          let btn: 矩阵元素 = {
+              label: e.name,
+              行: Math.ceil(e.id / data.Column),
+          };
+          // 在变量后加 !号 表示非空断言
+          btn['列'] = e.id - data.Column * (btn.行! - 1);
+          return btn;
+      })
+  )
+  ```
+
 ## 类型断言和:指定类型区别
 
 - `:`号
