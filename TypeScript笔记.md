@@ -345,18 +345,28 @@
   - 导出类型
 
   ```ts
+  // 方式1
   interface Aa {
       aa: number
   }
   export type {Aa}
+  // 方式2
+  export interface Aa {
+      aa: number
+  }
+  // 方式3
+  export {Aa}
   ```
 
 - 导入类型
 
   ```ts
-  // import type 为TS特有
+  // 方式1 import type 为TS特有
   import type {Aa} from './store.ts'
   let t = computed<Aa>(() => store.getters)
+  // 方式2、3
+  // 注意 导出时没有 type 导入时也没有
+  import {Aa} from './store.ts'
   ```
 
 ## 类型别名 与 接口 区别
