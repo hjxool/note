@@ -218,6 +218,10 @@
 - 可以用逻辑语句连接==多个类型==
 - 如`let a: 'male' | 'female'`，这样`b`赋值`male`或`female`都允许，但是赋值其他值不行
 - 又如`let b: number | string`
+- 多元素类型数组
+  - 用`()`包裹联合类型
+  - `let arr = (string | number)[]`
+
 
 ## 类型断言
 
