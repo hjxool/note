@@ -192,6 +192,8 @@
 
 - 如果是vue组合式风格
 
+  - 注意！`setup`不需要在`onLoad`或`onMounted`生命周期内建立通道
+
   ```vue
   <script setup>
   // 需要引入 获取当前组件实例的api
