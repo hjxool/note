@@ -147,3 +147,60 @@
       box-sizing: border-box;
   }
   ```
+
+## uniapp中如何使用页面跳转间的事件通道
+
+- 使用vue选项式风格
+
+  - 起始页
+
+  ```vue
+  <script>
+  export default {
+    methods:{
+      fn() {
+        uni.navigateTo({
+          url: 'test?id=1&name=uniapp',
+          events: {
+            收到跳转页发来的数据(data) {}
+          }
+        }).then(res => {
+          res.eventChannel.emit('往跳转页发送', ...参数)
+        })
+      }
+    }
+  }
+  </script>
+  ```
+
+  - 跳转页
+
+  ```vue
+  <script>
+  export default {
+    onLoad: function(option) {
+      // 注意 选项式有this直接调用api即可
+      const 通道 = this.getOpenerEventChannel();
+      // 发往起始页的方式
+      通道.emit('收到跳转页发来的数据', ...参数);
+      // 监听事件 获取上一页面通过eventChannel传送到当前页面的数据
+      通道.on('往跳转页发送', (data) => {})
+    }
+  }
+  </script>
+  ```
+
+- 如果是vue组合式风格
+
+  ```vue
+  <script setup>
+  // 需要引入 获取当前组件实例的api
+  import { getCurrentInstance } from 'vue';
+  const 组件实例 = getCurrentInstance().proxy
+  // 通过实例调取通道api
+  const 通道 = 组件实例.getOpenerEventChannel();
+  // 其他同上
+  通道.emit('收到跳转页发来的数据', ...参数);
+  通道.on('往跳转页发送', (data) => {})
+  </script>
+  ```
