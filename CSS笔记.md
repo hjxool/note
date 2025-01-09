@@ -522,3 +522,28 @@ p::first-letter {
     margin-left: 20px;
 }
 ```
+
+## 导入字体包
+
+- 使用`@font-face`
+
+  - `format('woff2')`作用是指定所引入字体文件的格式类型，帮助浏览器正确地识别和处理字体文件
+
+  ```css
+  @font-face {
+      font-family: '自定义名称';
+      src: url('路径/font.woff') format('woff'), // 如果有多个 这里是，号
+           url('路径/font.woff2') format('woff2'); // 结尾要用；号
+  }
+  // 使用导入的字体
+  .xxx {
+      font-family: '自定义名称', '字体包中字体名称';
+  }
+  ```
+
+- 支持的格式
+  - `woff2`：目前最常用的字体格式，具有高压缩率和广泛的浏览器支持
+  - `woff`：`woff2`的前身
+  - `ttf`：几乎所有的==操作系统==和浏览器都支持
+  - `otf`：`ttf`的升级版，具有更强的功能和更广泛的语言支持
+  - `eot`：主要用于==旧版浏览器==
