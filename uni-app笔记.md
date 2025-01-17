@@ -206,3 +206,18 @@
   通道.on('往跳转页发送', (data) => {})
   </script>
   ```
+
+## watch无法监听到defineProps
+
+- uniapp中使用解构赋值编译到小程序会有些问题
+
+  ```js
+  // 如果是在vite项目下 解构赋值的形式没问题
+  // 因为watch时会改成 () => props.show
+  const { show } = defineProps(['show'])
+  watch(()=>show,()=>{})
+  
+  // 但是在uniapp中 必须 用 props 进行取值
+  const props = defineProps(['show'])
+  watch(()=>props.show,()=>{})
+  ```
