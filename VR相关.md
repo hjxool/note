@@ -273,3 +273,9 @@ window.addEventListener('resize', () => {
   camera.updateProjectionMatrix()
 })
 ```
+
+## 场景和相机关系
+
+- 一个场景中可以存在多个相机，但是同时只能有一个相机的观察视角，也就是在==动画循环==中`renderer.render(scene, currentCamera)`切换`currentCamera`的相机实例
+- 如果要创建多个视角，如VR看房中，还有平面图，其实也是一个场景，场景中包含一个平面图，以及一个正交相机`OrthographicCamera`
+  - 如果有多个场景，那么==动画循环==中就要多次调用`renderer.render`，毕竟`renderer.render`参数只有一个`scene`

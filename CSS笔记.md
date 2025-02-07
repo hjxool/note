@@ -292,7 +292,7 @@
 
 ## 动画、过渡、变形
 
-- keyframe
+- `@keyframe`
   - 0%和100%可以用from to代替(但其实不太好用，不能来回)；
 
   - 搭配animation-name调用定义好的动画名

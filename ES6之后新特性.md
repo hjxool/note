@@ -875,9 +875,9 @@
 
   ```js
   1、通常形式 分别暴露 和 集中暴露
-  export let t = 111			 let t = 111
+  export let t = 111			   let t = 111
   export function fn(){}		 function fn(){}
-  						     export {t,fn}
+  						               export {t,fn}
   import * as 别名 from 'path'	*表示暴露出来的所有内容，别名则代替了所有内容 使用 别名.变量/方法 来使用
   import {t,fn} from 'path'	直接用t、fn调用
   import {t as m,fn} from 'path'	用m来调用t 可以单独给一个变量起别名
