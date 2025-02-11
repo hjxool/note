@@ -221,3 +221,69 @@
   const props = defineProps(['show'])
   watch(()=>props.show,()=>{})
   ```
+
+## 使用vant的组件Dialog无法跳转
+
+- 官方示例
+
+  - 注意：`Pages`中引入的是`"van-dialog": "wxcomponents/vant/dialog/index"`
+
+  ```vue
+  <template>
+  	<!-- 要显示弹窗，必须添加组件标签 且id="van-dialog"不能少！ -->
+  	<van-dialog id="van-dialog" />
+  </template>
+  <script setup>
+  // 注意与Pages中引入的不同
+  import Dialog from '@vant/weapp/dialog/dialog';
+  Dialog.confirm({
+    title: '标题',
+    message: '弹窗内容',
+  })
+  // 但实际上 无法触发后面的then和catch
+  // 在模拟器中显示是promise对象 但因为未知原因 有<canvas>存在时无法显示弹窗
+  // 而在真机模拟中 Dialog.confirm()得到的是 空对象{} 而非promise对象 无法触发后面的then和catch
+    .then(() => {
+      // on confirm
+    })
+    .catch(() => {
+      // on cancel
+    });
+  </script>
+  ```
+
+- 因此，只能在组件标签上绑定对应的关闭和确认方法才能正常使用
+
+  ```vue
+  <template>
+  	<van-dialog @confirm="turnTo" id="van-dialog" />
+  </template>
+  <script setup>
+  import Dialog from '@vant/weapp/dialog/dialog';
+  Dialog.confirm({
+    message: '弹窗内容',
+  })
+  function turnTo(){
+    uni.navigateTo({
+      url: ''
+    })
+  }
+  </script>
+  ```
+
+## scoped时无法修改vant组件样式
+
+- 因为`<style scoped>`会在每个元素标签上加一个`class="data-id"`，编译后CSS为`.a.data-id > .b.data-id`，因为是==交集选择器==，比起组件全局样式的`.b`优先级更低，因此无法覆盖组件原本样式
+
+  - 使用`::v-deep`可将`.data-id`去掉
+
+  ```vue
+  <style lang="less" scoped>
+    .a {
+      // 组件样式前加v-deep后 编译得.a.data-id > .b 因此可以覆盖样式
+      ::v-deep .b {
+        // 定制样式
+      }
+    }
+  </style>
+  ```
