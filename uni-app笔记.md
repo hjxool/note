@@ -287,3 +287,121 @@
     }
   </style>
   ```
+
+## 提示无法找到id为van-notify的节点
+
+- 一种情况是没有在`<template>`中加`<van-notify id="van-notify" />`标签元素
+
+- 另一种情况是需要设置`context`配置项
+
+  ```js
+  // 如果是组合式vue setup
+  import { getCurrentInstance } from 'vue';
+  const 组件实例 = getCurrentInstance().proxy;
+  Notify({ 
+    type: 'warning', 
+    message: '无法新增重名宠物', 
+    context: 组件实例
+  });
+  
+  // 如果是小程序中原生写法或者选项式vue
+  Notify({ 
+    type: 'warning', 
+    message: '无法新增重名宠物', 
+    context: this
+  });
+  ```
+
+- 还有一种情况，当前组件是子组件，当前组件添加`<van-notify id="van-notify" />`标签元素并==没有用，要往父组件添加==
+
+  ```vue
+  // 父组件
+  <template>
+  	<子组件 :父组件实例="组件实例"/>
+    <van-notify id="van-notify" />
+  </template>
+  <script setup>
+  const 组件实例 = ref(getCurrentInstance().proxy);
+  // 或者传入父组件 调用Notify
+  </script>
+  
+  // 子组件
+  <script setup>
+  const props = defineProps(['父组件实例']);
+  Notify({ type: 'warning', message: '', context: props.组件实例 });
+  </script>
+  ```
+
+## vant日历组件回显日期问题
+
+- vant日历没有传入值回显的功能，因此得在`:formatter`日期格式化函数中修改日期属性，达到回显的目的
+
+  ```vue
+  <template>
+  	<van-calendar
+  					@select="选择日期($event)"
+            <!-- 利用formatter回调函数回显 必须绑定英文方法否则报错 -->
+  					:formatter="formatter"
+  					type="range"
+  				/>
+  </template>
+  <script setup>
+  // 初始化时 从全局获取日期
+  let 日期 = [store.state.起始日期, store.state.结束日期];
+  // select事件在点击任意日期 后 执行
+  function 选择日期(e) {
+  	let [start, end] = e.detail;
+  	日期 = [start, end];
+  	if (!start || !end) {
+  		// 必须选择开始结束日期 否则禁用按钮
+  		禁用按钮.value = true;
+  	} else {
+  		禁用按钮.value = false;
+  	}
+  	// 更新函数体 重新触发日期格式化
+  	formatter = (day) => {
+  		return formatterFn(day);
+  	};
+  }
+  // 但是 formatter 在初始化 和 点击任意日期 前‼️ 都会触发
+  // 因此用一个响应式变量保存函数 在点击日期后再次赋值函数体从而重新执行日期格式化
+  let formatter = (day) => {
+  	return formatterFn(day);
+  };
+  function formatterFn(day) {
+  	const month = day.date.getMonth() + 1;
+  	const date = day.date.getDate();
+  	// 回显全局存的日期
+  	let [startDate, endDate] = 日期;
+  	let start;
+  	if (startDate) {
+  		start = startDate.getTime();
+  	}
+  	let end;
+  	if (endDate) {
+  		end = endDate.getTime();
+  	}
+  	let cur = day.date.getTime();
+  	// 回显前先清空原状态
+  	if (day.type == 'start' || day.type == 'end' || day.type == 'middle') {
+  		day.type = '';
+  		day.bottomInfo = '';
+  	}
+  	// 重新添加开始到结束之间的日期
+  	if (start && cur == start) {
+  		day.type = 'start';
+  	} else if (end && cur == end) {
+  		day.type = 'end';
+  	} else if (start && end && cur > start && cur < end) {
+  		day.type = 'middle';
+  	}
+  	// 添加开始结束日期文字
+  	if (day.type === 'start') {
+  		day.bottomInfo = '入住';
+  	} else if (day.type === 'end') {
+  		day.bottomInfo = '离店';
+  	}
+  	return day;
+  }
+  </script>
+  ```
