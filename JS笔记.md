@@ -2391,3 +2391,19 @@
       }
       this.render_file();
   },
+
+## query参数对象化
+
+```js
+let list = new URLSearchParams(location.search);
+// URLSearchParams得到的数组是经过Object.entries处理过的
+// 因此要用数组解构赋值
+for (let [key, value] of list) {
+    switch(key) {
+        case 'token':
+            //...
+            break
+    }
+}
+```
+
