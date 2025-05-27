@@ -1,41 +1,4 @@
-## 变化
-
-- vue3中data、methods配置项，可以声明在`setup(){}`函数中
-  - setup函数有两个默认参数——==props==、==context==
-    - ==props==用来接收从父级传入的参数，同以前的props配置项
-
-    - ==context==有三个主要的属性
-      - ==attrs==：用来兜底，当传入的参数没有用props声明接收，就可以在==attrs==中找到
-
-      - ==**emit**==：触发==父级绑定到子==组件的事件，使用方法同vue2中的**$emit**
-
-      - ==**slot**==：接收父级传入的插槽内容，**注！**vue3中插槽必须用`<template v-slot:name/>`的形式，name才能接收到插槽内容
-- 父级给子组件绑定的==自定义**事件**==，==子组件==可以用一个全新的配置项`emits:[ 'event' ]`来声明接收
-- vue2中[全局方法]()的==Vue.component/directive/...==，现在使用实例对象==vm.directive/...==就可以实现
-- vue2中==安装全局事件总线==的`Vue.prototype.xxx`变为了`vm.config.globalProperties`
-- vue3中==data选项==必须写为==函数形式==
-
 ## 组件
-
-![](https://upload-images.jianshu.io/upload_images/6322775-5708bc097d7f0416.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
-
-<center>要用对象的形式，对象名就是组件标签名称</center>
-
-- 创建vue实例对象，并注册使用组件
-
-![img](https://upload-images.jianshu.io/upload_images/6322775-71d852e4d355f256.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
-
-<center>component 属性挂载需要的组件</center>
-
-- 注意在==组合式API==中`components`配置项和`setup(){}`是**同级**
-
-  ```js
-  import componentA from './xxx.js'
-  let vm = {
-      components:{componentA},
-      setup(){...}
-  }
-  ```
 
 - 子组件接收父组件值
 
@@ -1115,3 +1078,169 @@
   ```
 
 ### 事件
+
+- 标签事件不写传参，默认传入DOM元素
+
+  ```vue
+  <template>
+  	<button @click="greet">Greet</button>
+  </template>
+  <script setup>
+      function greet(event) {
+        // `event` 是 DOM 原生事件
+        if (event) {
+          alert(event.target.tagName)
+        }
+      }
+  </script>
+  ```
+
+- 传入自定义参数
+
+  ```vue
+  <template>
+  	<button @click="say('bye')">Say bye</button>
+  	<!-- 如果想访问DOM元素 要传入$event -->
+  	<button @click="warn('F', $event)">Submit</button>
+      <!-- 使用箭头函数 -->
+  	<button @click="(event) => warn('F', event)">Submit</button>
+  </template>
+  <script setup>
+      function say(message) {
+        alert(message)
+      }
+      // $event
+      function warn(message, event) {
+        if (event) {
+          event.preventDefault()
+        }
+        alert(message)
+      }
+  </script>
+  ```
+
+- 事件修饰符
+
+  - 注1：修饰符调用顺序
+    - `@click.prevent.self` 会阻止元素及其子元素的所有点击事件的默认行为
+    - `@click.self.prevent` 则只会阻止对元素本身的点击事件的默认行为
+  - 注2：请勿同时使用 `.passive` 和 `.prevent`
+
+  ```html
+  <!-- 单击事件将停止传递 -->
+  <a @click.stop="doThis"></a>
+  <!-- 提交事件将不再重新加载页面 -->
+  <form @submit.prevent="onSubmit"></form>
+  <!-- 修饰语可以使用链式书写 -->
+  <a @click.stop.prevent="doThat"></a>
+  <!-- 也可以只有修饰符 -->
+  <form @submit.prevent></form>
+  <!-- 仅当 event.target 是元素本身时才会触发事件处理器 -->
+  <!-- 例如：事件处理器不来自子元素 -->
+  <div @click.self="doThat">...</div>
+  <!-- 添加事件监听器时，使用 `capture` 捕获模式 -->
+  <!-- 例如：指向内部元素的事件，在被内部元素处理前，先被外部处理 -->
+  <div @click.capture="doThis">...</div>
+  <!-- 点击事件最多被触发一次 -->
+  <a @click.once="doThis"></a>
+  <!-- 滚动事件的默认行为 (scrolling) 将立即发生而非等待 `onScroll` 完成
+  用于触摸事件 改善移动端设备滚屏性能 -->
+  <!-- 以防其中包含 `event.preventDefault()` -->
+  <div @scroll.passive="onScroll">...</div>
+  ```
+
+- 按键修饰符
+
+  - 注1：系统按键修饰符`.ctrl`、`.alt`、`.shift`、`.meta`
+  - 注2：`.exact` 修饰符只允许仅当对应按键修饰符被按下时触发
+
+  ```html
+  <input @keyup.enter="submit" />
+  ```
+
+### 表单输入绑定
+
+- 可以绑定的元素有`<input>`、`<textarea>`、`<select>`
+
+- 修饰符
+
+  ```html
+  <!-- .lazy 改为change事件之后更新数据 -->
+  <input v-model.lazy="msg" />
+  <!-- .number 输入自动转换为数字 -->
+  <input v-model.number="age" />
+  <!-- .lazy 去除输入内容中两端的空格 -->
+  <input v-model.trim="msg" />
+  ```
+
+### 侦听器
+
+- 基本用法
+
+  ```vue
+  <template>
+    <p>
+      Ask a yes/no question:
+      <input v-model="question"/>
+    </p>
+    <p>{{ answer }}</p>
+  </template>
+  <script setup>
+  import { ref, watch } from 'vue'
+  const question = ref('')
+  const answer = ref('Q')
+  // 数据源可以是
+  // 单个ref
+  watch(question, (newQuestion, oldQuestion) => {})
+  // getter 函数
+  watch(() => { question.value + answer.value }, (newQuestion, oldQuestion) => {})
+  // 多个来源组成的数组
+  watch([question, () => answer.value], ([newX, newY]) =>{})
+  </script>
+  ```
+
+- 不能直接监听响应式对象的属性值
+
+  ```js
+  const obj = reactive({ count: 0 })
+  // 错误，因为 watch() 得到的参数是一个 number
+  watch(obj.count, (count) => {})
+  // 正确写法 提供一个 getter 函数
+  watch(() => obj.count, (count) => {})
+  ```
+
+- 深层监听
+
+  ```js
+  // 当传入响应式对象 会隐式地创建一个深层侦听器
+  const obj = reactive({ count: 0 })
+  watch(obj, (newValue, oldValue) => {
+    // 在嵌套的属性变更时触发
+    // 注意：`newValue` 此处和 `oldValue` 是相等的
+    // 因为它们是同一个对象！
+  })
+  
+  // 如果用getter函数 只有在返回不同的对象时 才会触发回调
+  watch(() => state.someObject,() => {
+      // 仅当 state.someObject 被替换时触发
+  })
+  // 也可以显式地加上 deep 选项 强制转成深层侦听器
+  watch(() => state.someObject, (newValue, oldValue) => {
+      // 注意：`newValue` 此处和 `oldValue` 是相等的
+      // *除非* state.someObject 被整个替换了
+    },
+    { deep: true }
+  )
+  ```
+
+- 卸载侦听器
+
+  ```js
+  const unwatch = watchEffect(() => {})
+  // ...当该侦听器不再需要时
+  unwatch()
+  // 或 自动停止
+  watchEffect(() => {})
+  ```
+
+  
