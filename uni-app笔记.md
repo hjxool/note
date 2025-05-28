@@ -3,12 +3,28 @@
 ## 有现成的微信云开发环境，如何复用？
 
 1. 使用HbuilderX开发，**必须**运行到==微信开发者工具==，才能使用微信开发工具中管理的云环境，毕竟是不同平台
+
 2. **必须**创建名为`cloudfunctions`的目录，将其复制到`unpackage/dist/dev/mp-weixin`路径下
+   
+   - 并且配置HbuilderX的`manifest.json`文件，在`mp-weixin`中添加`"cloudfunctionRoot": "cloudfunctions/"`
    - 因为微信开发者工具下，云函数的存放目录固定名称为`cloudfunctions`，其他名称识别不了
    - 官方教程的`new CopyWebpackPlugin`要安装`copy-webpack-plugin`，是为了跳过手动复制到`unpackage`路径这步，**但是只能**在`vue.config.js`中使用，如果项目用的vite打包项目，则**不能用这个插件**
+   
 3. 此时，在==微信开发者工具==，就有`cloudfunctions`目录，右键该文件夹，关联云开发环境，新建云函数，编写完逻辑后，将云函数的`config.json`、`index.js`、`package.json`复制到HbuilderX下的`cloudfunctions`目录，进行备份，因为下次运行到小程序环境，依然会丢失`cloudfunctions`
-   - 注意！在HbuilderX编写云函数需按微信开发者工具中格式去写，不能用`uni.cloud`
-   - 只有在HbuilderX自己的云服务器平台配置关联的云服务才能用`uni.cloud`
+   - 注1：在HbuilderX编写云函数需按微信开发者工具中格式去写，不能用`uni.cloud`
+   
+     - 只有在HbuilderX自己的云服务器平台配置关联的云服务才能用`uni.cloud`
+   
+   - 注2：所有与微信云函数相关的调用全部用`wx.cloud`，而不是`uniCloud`
+   
+     - 并且要在`App.vue`中添加如下代码才能使用`wx.cloud`
+   
+       ```js
+       wx.cloud.init({
+           env: "cloud1-0gzy726e39ba4d96",
+           traceUser: true,
+       });
+       ```
 
 ## 如何使用vant一类第三方组件库
 
