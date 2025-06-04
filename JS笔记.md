@@ -239,35 +239,42 @@
 - [防抖]()：
   - 只能获取到==定时**执行前**最新的值==！因为每次都==清除旧==定时器，设置==新==定时器，新定时器里的闭包值都是新值
   - 使用“underscore”插件，使用时在“**created**”函数中用变量承接“**_.debounce(执行函数，防抖时间)**”函数，再在watch等需要使用的地方调用这个**变量**
-  - Tips:
-    - 想要给**防抖**执行的方法中**传入参数**，可以曲线救国，将参数**传入防抖**函数，**再**在防抖函数中**传给里面**的方法
+  - 想要给**防抖**执行的方法中**传入参数**，可以曲线救国，将参数**传入防抖**函数，**再**在防抖函数中**传给里面**的方法
   - 核心在于“**闭包**”，用函数包裹函数的形式可以形成闭包，就能形成作用域链，即使重新调用生成了另一个计时器，也能通过闭包的作用域链找到之前函数的变量(定时器)，并清除。
   - 思路：频繁调用的场景下，每次都设一个定时器，当小于定时再次调用时，会根据作用域链找到之前的定时任务，并清除同时再设一个新的定时任务，从而达到刷新计时的效果，当大于定时再调用，之前的定时任务已经执行完毕，变量重新回归null
-  
 
-![](https://upload-images.jianshu.io/upload_images/6322775-5b5f7fcbc417ab58.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+  ```js
+  export function 防抖(fn, delay) {
+  	let timer = null
+  	return (...args) => {
+  		clearTimeout(timer)
+  		timer = setTimeout(() => {
+  			fn(...args)
+  		}, delay)
+  	}
+  }
+  ```
 
-<center>函数防抖
-
-![](https://upload-images.jianshu.io/upload_images/6322775-42930d48acd99bc6.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
-
-<center>防抖简化版，因为核心理念就是清除、定时、清除、定时，如果超过时间，则定时任务完成后“timer”自动回归为null
 
 - [节流]()：每隔一段时间执行一次
-  
+
   - 可以获取到==新旧值==，可用于==延迟执行==回调方法，因为==不清除==定时器
   - 思路：利用闭包记录下每次调用时的时间，并计算当前时间和上一次时间的差值大于固定值时就执行，否则跳过，并继续叠加时间，直到差值大于固定时间
-  
 
-![img](https://upload-images.jianshu.io/upload_images/6322775-967503d0ac497b27.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+  ```js
+  export function 节流(fn, delay) {
+  	let timer = false
+  	return (...args) => {
+  		if (timer) return
+  		timer = true
+  		fn(...args)
+  		setTimeout(() => {
+  			timer = false
+  		}, delay)
+  	}
+  }
+  ```
 
-<center>函数节流（在初次调用时执行，滑动停止时立即停止）
-
-- 上面这个实现思路有个问题，使用的Date记录的是系统时间，即上一次停止调用时开始累计，当时隔很久再次调用时会**立即触发**而**不是重新**计算从滑动开始到结束的时间段，所以使用**标识符**改进
-
-![img](https://upload-images.jianshu.io/upload_images/6322775-f9fa0cfa41e6b00b.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
-
-<center>每次重新开始计算时间，延后停止
 
 - ==注意！==
   - 以上网络截图均是`dom.事件 = 防抖/节流(fn,delay)`形式绑定的事件方法，此时外部函数已经执行过一次，以==内部函数==作为返回值，之后再触发事件，使用的就是==闭包==，里面的`flag`、`timer`就变成了一直会延续下去的局部变量，==因此才能一直以一个变量为判别是否执行的标准==

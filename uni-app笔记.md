@@ -421,3 +421,12 @@
   }
   </script>
   ```
+
+## 使用Scroll-View组件相关问题
+
+- 将列表项放到`<scroll-view>`中无法滚动
+  - 需要给`<scroll-view>`设置高度、`overflow: hidden`才能滚动
+- 给`<scroll-view>`设置`padding`时会导致列表项超出去
+  - 不要给`<scroll-view>`添加样式，直接用一个自动撑大的容器包裹列表项放到`<scroll-view>`中滚动这个容器
+- 将`<scroll-view>`封装成组件后，滚动失效
+  - 需要给封装的组件外层添加高度或`flex-grow: 1`，并设置`overflow: hidden`，这时内部封装的`<scroll-view>`就不用设置`overflow: hidden`了，只用设置相对父容器的高度即可
