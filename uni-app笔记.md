@@ -436,3 +436,9 @@
   - 不要给`<scroll-view>`添加样式，直接用一个自动撑大的容器包裹列表项放到`<scroll-view>`中滚动这个容器
 - 将`<scroll-view>`封装成组件后，滚动失效
   - 需要给封装的组件外层添加高度或`flex-grow: 1`，并设置`overflow: hidden`，这时内部封装的`<scroll-view>`就不用设置`overflow: hidden`了，只用设置相对父容器的高度即可
+
+## Page页面只能有一个根元素
+
+- 因此如果想在`Page`页面添加第三方弹窗，需要写在根元素内
+- 而`Components`组件`<template>`内可以有多个根元素
+  - 本质就是将组件内的多个根元素平铺在父容器内
