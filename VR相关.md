@@ -285,3 +285,21 @@ window.addEventListener('resize', () => {
 - 这是因为旧版本小程序Canvas的`type="webgl"`特殊性所致，即使 `<canvas>` 写在前面，它依然会覆盖后面的元素
   - 小程序给出 `<cover-view>` 组件包裹非 Canvas 内容，用于覆盖在原生组件（如 Canvas）上方
 - 另一种情况是模拟器显示错误，只能在真机调试看到实际效果
+
+## 拖动时画面会偏移
+
+- 这是这是因为父容器被热点等元素撑大了，开启`overflow: hidden`
+
+- 以及小程序默认可以上下拖拽页面，在uni-app中
+
+  ```json
+  "globalStyle": {
+  		"disableScroll": true, // 关闭默认滚动
+  		"enablePullDownRefresh": false // 关闭下拉刷新
+  	},
+  ```
+
+## TWEEN动画怎么在小程序使用？
+
+- TWEEN库默认使用`performance`作为计时器，而`performance`只存在于浏览器环境，小程序中是`wx.getPerformance()`，因此会报错
+- 解决办法：下载`tween.esm.js`修改其中`performance.now()`为`Date.now()`
