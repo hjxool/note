@@ -442,3 +442,11 @@
 - 因此如果想在`Page`页面添加第三方弹窗，需要写在根元素内
 - 而`Components`组件`<template>`内可以有多个根元素
   - 本质就是将组件内的多个根元素平铺在父容器内
+
+## Vant的Dialog组件then和catch不能触发
+
+- 需要标签绑定`confirm`、`cancel`事件
+
+## Vant的Dialog组件确认按钮样式不是默认值
+
+- 需要在标签上用`:confirm-button-color="'#ee0a24'"`传入
