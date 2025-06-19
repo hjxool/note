@@ -452,3 +452,30 @@
 - 需要在标签上用`:confirm-button-color="'#ee0a24'"`传入
 
 ## 小程序中不要给组件加样式无法生效
+
+## uni-app+Vue3中如何在navigateBack时回传数据？
+
+- 使用uni提供的全局事件总线
+
+  ```js
+  // 返回页
+  // 全局事件总线 监听传回数据
+  uni.$on('未读信息', (data) => {
+  	console.log(data);
+  });
+  onBeforeUnmount(()=>{
+  	uni.$off('未读信息')
+  })
+  
+  // 跳转页
+  uni.$emit('未读信息');
+  uni.navigateBack({
+      delta: 3
+  });
+  ```
+
+- 注意！`wx.redirectTo` 或 `wx.switchTab` 进入的页面，不能使用`EventChannel`通道传回数据！
+
+## 明明导入了Notify为什么提示Notify is not a function
+
+- 这是因为ESM 解析错误，使用`import * as Notify from`即可解决
