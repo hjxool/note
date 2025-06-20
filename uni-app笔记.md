@@ -428,6 +428,43 @@
   </script>
   ```
 
+- （推荐）官方提供了`default-date`标签属性，可以传入默认选中的日期
+
+  - 如果是`type="range"`，则要传入日期对象数组
+
+  - 但是存在一个问题，如果将传入的默认日期设置为`computed`等响应式变量，当日期值改变时，会导致后续选中日期无法回显
+
+  - 为了解决这个问题，使用组件实例提供的`reset()`方法重置，才能正确回显
+
+    ```js
+    import { watch, computed, getCurrentInstance } from 'vue';
+    const 默认日期 = computed(() => [new Date(store.state.日期.入住), new Date(store.state.日期.离店)]);
+    watch(
+    	() => props.show,
+    	(value) => {
+    		if (value) {
+    			// 默认日期变了需要调用重置方法 否则会导致后续选中日期无法回显
+    			instance.selectComponent('#calendar').reset();
+    		}
+    	}
+    );
+    // 并且在按钮保存时 得延迟commit
+    function 保存日期({ detail }) {
+    	setTimeout(() => {
+    		let [start, end] = detail;
+    		store.commit('setState', {
+    			key: '日期',
+    			value: {
+    				入住: `${start.getFullYear()}/${start.getMonth() + 1}/${start.getDate()}`,
+    				离店: `${end.getFullYear()}/${end.getMonth() + 1}/${end.getDate()}`
+    			}
+    		});
+    	}, 200);
+    	emit('close');
+    }
+    ```
+
+
 ## 使用Scroll-View组件相关问题
 
 - 将列表项放到`<scroll-view>`中无法滚动
@@ -479,3 +516,8 @@
 ## 明明导入了Notify为什么提示Notify is not a function
 
 - 这是因为ESM 解析错误，使用`import * as Notify from`即可解决
+
+## Vant日历无法设置topInfo
+
+- 这是因为小程序版本在`calendar\components\month\index.js`中`setDays`的`config`没有这个字段，需要手动添加
+- 而且不能改变传入的`formatter`函数，否则`topInfo`无法正常显示
