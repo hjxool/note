@@ -521,3 +521,12 @@
 
 - 这是因为小程序版本在`calendar\components\month\index.js`中`setDays`的`config`没有这个字段，需要手动添加
 - 而且不能改变传入的`formatter`函数，否则`topInfo`无法正常显示
+
+## uniapp如何引入小程序版本ECharts
+
+- 在uni-app中`import`引入echart会报错`undefined`，而在微信开发者工具中，原生小程序可以用`import * as echarts from '../../components/ec-canvas/echarts.js';`
+- 这是因为原生小程序的构建机制并不强制要求模块必须是标准的 ES Module（ESM）格式，允许使用 `import * as echarts from '...'` 的方式导入一个 UMD 格式的模块（即 `echarts.js` 中那段 `!function(t,e){...}` 的包装器）
+  - 在原生小程序中等价于`const echarts = globalThis.echarts;`
+- 在uni-app中使用
+  - `const echarts = require('../../wxcomponents/ec-canvas/echarts.js');`
+  - 或`const chart = globalThis.echarts.init(canvas, null, { ... });`
