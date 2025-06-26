@@ -530,3 +530,7 @@
 - 在uni-app中使用
   - `const echarts = require('../../wxcomponents/ec-canvas/echarts.js');`
   - 或`const chart = globalThis.echarts.init(canvas, null, { ... });`
+
+## uniapp使用vant下拉菜单时出现无法点击的情况
+
+- 这是uni-app底层的问题，需要将`@vant/weapp/dropdown-item/index.wxml`里面的`van-popup`的事件改成驼峰写法`afterEnter`和`afterLeave`就可以了
