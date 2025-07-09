@@ -1243,4 +1243,27 @@
   watchEffect(() => {})
   ```
 
-  
+
+## 遇到的问题
+
+### modelValue改了就无法使用
+
+```vue
+<template>
+	<!-- 父组件使用v-model时绑定修改后的名称 -->
+	<MyComponent v-model:title="bookTitle" />
+</template>
+<script setup>
+    const { modelValue } = defineProps({
+        // props传入的值默认为modelValue 不能改其他名字
+        modelValue: {
+            type: Number,
+            default: 0,
+        }
+    });
+    // 才能使用update:modelValue特殊事件
+    emit('update:modelValue', value)
+    // 除非使用defineModel修改默认名称
+    const title = defineModel('title')
+</script>
+```
