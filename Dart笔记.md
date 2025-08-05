@@ -587,6 +587,11 @@ void main() {
     print(null ?? 3); // 3
     // 0不算空
     print(0 ?? 1); // 0 且会警告
+    // 和直接用||的区别
+    print(0 || 1); // 会报错 因为 &&和|| 两边只能放bool类型 而??可以像JS中||一样无类型判断
+    // ?? 通常用于判断空 如声明的变量没有值时才会返回另一个结果
+    var num;
+    print(num || 0); // 0
     
     // ??=等同if赋值语句
     var a;
@@ -599,15 +604,15 @@ void main() {
     // 此时a已经有值
     a ??= 6;
     print(a); // 3 不会进行赋值
-
+  
   - 条件属性访问`?.`
-
+  
     - 同ES6
-
+  
   - 级联运算符`..`
-
+  
     - 书写形式类似JS中`Promise`
-
+  
     ```dart
     myObject.myMethod(); // 返回 myMethod 的返回值
     myObject..myMethod(); // 返回 myObject 对象的引用
