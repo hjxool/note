@@ -434,7 +434,10 @@ void main() {
   print(nums.length); // 3
   
   // 构造函数方式声明
+  // 注意 new Set()不能传入任何参数
   var arr = new Set();
+  // 如果想根据其他列表生成Set 进行去重 使用Set.from()
+  arr = Set.from([1, 2, 1])
   // 添加元素
   arr.add('aaa');
   arr.add('bbb');
@@ -480,10 +483,10 @@ void main() {
 
   ```dart
   // 字面量方式声明 没有关键字 用{}声明
-  // 注: 与JS的对象不同的是 key只能用字符串
   var map = {
     'name': 'xxx',
-    'age': 18
+    'age': 18,
+    1: 2
   };
   
   // 特点 有length属性
