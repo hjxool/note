@@ -716,10 +716,10 @@ arr.forEach(fn);
 
   - 放在必传参数后
   - 用`[]`包裹
-  - 如果是指定类型的可选参数必须设置默认值
+  - 如果指定类型，则必须在类型后加`?`号
 
   ```dart
-  String fn(String name, [int age = 1]) {
+  String fn(String name, [int? age, str, str2 = 'asd', String? str3 = '111']) {
       return `你好: $name, 年龄: $age`;
   }
   print(fn('张三', 20));
