@@ -15,6 +15,8 @@ void fn1(int num) {
     // $变量 可将变量放到引号当中 同JS中模板字符串`value is ${num}`
     // 语句后必须加; JS中可以省略但是dart不行
     print('value is $num');
+    // 如果是多层级 就需要用{}包裹
+    print('value is ${t.num}');
 }
 
 // 入口文件 程序必须包含main(不能改名)函数 程序会先从main开始执行 同C语言
@@ -635,6 +637,10 @@ void main() {
      ..add(3)
      ..remove(2); // 只用在末尾写;号
     print(s); // {1, 3}
+    // 也可以用于赋值语句
+    Person p = Person('张三', 20)
+     ..name = '李四'
+     ..age = 40;
     ```
 
 ## 函数
@@ -757,18 +763,34 @@ arr.forEach(fn);
   }
   // 注意 传命名参数 时 要以 key: value的形式
   print(fn('张三', age: 20));
+  
+  // 命名参数默认就是可选参数 可以取代[]位置参数
+  void fn({int? n1}) {} // 加？号不用赋初值
+  void fn({int n1 = 1}) {} // 可不传n1
+  void fn({required int n1}) {} // 加上required关键字表示必传参数 并且不能赋初值
 
-- 函数参数
-
-  - 将函数作为参数传入
-  - 同JS
+- 将函数作为参数传入
 
   ```dart
-  var fn = (value) {
-      print(value);
+  // 函数作为形参 要声明其中参数
+  void fn1({required void fnName({int n1, int n2}), int n1 = 1, int n2 = 2}) {
+      fnName(n1:n1, n2:n2);
   }
-  List arr = [1, 2, 3];
-  arr.forEach(fn);
+  void fn2({int n1 = 1, int n2 = 2}) {} // 与fn1中参数声明格式相同
+  fn1(fnName: fn2);
+  
+  // 但是参数冗长时 这种重复书写的方式就不方便 因此用typedef关键字声明可复用类型
+  // 注意 只能写在最外层 不能写在main入口函数内
+  typedef cusFn = void Function({required int n1, required int n2});
+  void fn1({cusFn? myFunc, int n1 = 1, int n2 = 2}) {
+      if (myFunc != null) {
+        myFunc(n1: n1, n2: n2);
+      }
+  }
+  void fn2({required int n1, required int n2}) {
+      print('n1=$n1,n2=$n2');
+  }
+  fn1(myFunc: fn2, n1: 111, n2: 222);
 
 ### 异步函数
 
@@ -1046,3 +1068,37 @@ arr.forEach(fn);
       print(p.getMoney()); // 100
       print(p.fn()); // 张三 有 100 元
   }
+
+### 继承
+
+```dart
+class Person {
+  String name;
+  Person(this.name);
+  void fn() {
+    print(1);
+  }
+}
+// 3.0版本之前的写法
+class Aaa extends Person {
+  // 注意 不能用this.name 因为name是父类的不是当前类的
+  Aaa(String name) : super(name);
+  @override
+  void fn() {
+    print(2);
+  }
+}
+// 3.0之后的语法糖
+class Aaa extends Person {
+  Aaa(super.name);
+  // ...
+}
+// 如果子类中有 独有属性
+class Aaa extends Person {
+  int age; // 不用赋初值
+  Aaa(String name, this.age) : super(name);
+  // 或者
+  Aaa(super.name, this.age);
+  // ...
+}
+```
