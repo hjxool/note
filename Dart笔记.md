@@ -1083,6 +1083,8 @@ class Person {
 class Aaa extends Person {
   // 注意 不能用this.name 因为name是父类的不是当前类的
   Aaa(String name) : super(name);
+  // 如果是继承命名构造函数
+  Aaa(String name) : super.xxx(name);
   @override
   void fn() {
     print(2);
@@ -1091,6 +1093,7 @@ class Aaa extends Person {
 // 3.0之后的语法糖
 class Aaa extends Person {
   Aaa(super.name);
+  // 继承命名构造函数没有语法糖
   // ...
 }
 // 如果子类中有 独有属性
@@ -1100,5 +1103,26 @@ class Aaa extends Person {
   // 或者
   Aaa(super.name, this.age);
   // ...
+}
+```
+
+### 初始化列表
+
+```dart
+// 用来在进入构造函数体 {} 之前就给实例变量赋值 或者做一些初始化操作
+// 给final变量赋值 普通赋值在构造体内是做不到的（因为 final 一旦进入构造体就必须有值了）
+class Cat {
+  final String name;
+  Cat(String name) : name = name;
+}
+// 计算衍生字段 初始化列表里可以执行表达式
+class Circle {
+  final double radius;
+  final double area;
+  Circle(this.radius) : area = 3.14 * radius * radius;
+}
+// 类继承
+class Dog extends Animal {
+  Dog(String name) : super(name);
 }
 ```
