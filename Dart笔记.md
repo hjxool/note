@@ -1085,9 +1085,14 @@ class Aaa extends Person {
   Aaa(String name) : super(name);
   // 如果是继承命名构造函数
   Aaa(String name) : super.xxx(name);
+  // 覆写父类方法时 要加 @override 标识
   @override
   void fn() {
     print(2);
+  }
+  // 覆写必须同名 但是返回类型可以不同 这是 协变 特性 在Java5之后的版本也存在
+  String fn() {
+      return 'str';
   }
 }
 // 3.0之后的语法糖
@@ -1125,4 +1130,226 @@ class Circle {
 class Dog extends Animal {
   Dog(String name) : super(name);
 }
+```
+
+### 抽象类
+
+- 没有TS中`interface`这样定义接口的关键字，而是统一用抽象类来定义接口
+
+```dart
+// 使用 abstract 关键字来定义一个抽象类 它作为接口
+abstract class Flyable {
+  // 抽象方法 子类必须实现它
+  void fly();
+}
+// 实现 Flyable 接口
+// 注意 implements 和 extends区别
+// implements 不继承任何父类的具体实现 必须从头开始重新实现所有公共成员
+// extends 继承父类的所有方法和属性 可以直接使用父类的具体实现
+class Bird implements Flyable {
+  // 必须实现 fly() 方法
+  @override
+  void fly() {
+    print('The bird is flying.');
+  }
+}
+
+// 抽象类也可以包含 具体方法 子类可以选择继承或重写
+abstract class Animal {
+  void breathe() {
+    print('The animal is breathing.');
+  }
+}
+class Dog extends Animal {// 注意这里用extends
+  // 继承了具体方法 breathe()，不需要重新声明
+}
+void main() {
+  var dog = Dog();
+  dog.breathe();   // 子类实例可以直接调用
+}
+```
+
+### 多态
+
+- **核心思想**：父类引用指向子类对象
+
+```dart
+// 定义一个抽象父类
+abstract class Animal {
+  void makeSound();
+  // 还可以定义抽象属性
+  String get name; // 抽象getter 子类必须实现getter
+  String name; // 这不是抽象属性 抽象属性通常是 getter 或 setter
+  // 也可以定义具体属性 即有初始值 或 实现了getter/setter 子类不需要实现直接继承
+  final String name = 'mammal';
+}
+// 子类继承并实现
+class Dog extends Animal {
+  @override
+  void makeSound() {
+    print('Woof!');
+  }
+  // 实现抽象属性
+  final String dogName;
+  Dog(this.dogName);
+  @override
+  String get name => dogName;
+  // 这样写是错的 @override只能用于getter/setter
+  @override
+  String name;
+}
+class Cat extends Animal {
+  @override
+  void makeSound() {
+    print('Meow!');
+  }
+  final String name;
+  Dog(String name): name = name; // 不用super
+}
+// 接收 父类类型 对象的函数
+void makeAnimalSound(Animal animal) {
+  // 这里就是多态的体现
+  // 同一个调用 animal.makeSound()
+  // 会根据传入的实际对象类型，执行不同的方法
+  // 如 用同一套方法操作mysql mongodb等数据库
+  animal.makeSound(); 
+}
+void main() {
+  Dog myDog = Dog();
+  Cat myCat = Cat();
+  // 虽然传入的是子类实例 但是因为 向上转型 所以任何需要父类类型的地方都可以使用子类实例
+  // 这体现了 类型兼容性 和 运行时绑定 编译时类型是 Animal 运行时类型是 Dog
+  // 这样就不需要为每个子类单独写方法去调用
+  makeAnimalSound(myDog); // 输出: Woof!
+  makeAnimalSound(myCat); // 输出: Meow!
+
+  // 也可以直接使用列表 在实际开发中非常有用
+  List<Animal> farmAnimals = [myDog, myCat];
+  for (var animal in farmAnimals) {
+    animal.makeSound();
+  }
+    
+  // 属性多态
+  Animal dog = Dog('Rex');
+  print(dog.name);
+}
+```
+
+### 混入Mixin
+
+- 解决`extends`不能继承多个的问题，优雅的集合多个类的功能
+
+```dart
+// 可以用 mixin 关键字 也可以是普通类
+mixin Flyable {
+  void fly() {
+    print('I can fly.');
+  }
+}
+class Swimmable {
+  void swim() {
+    print('I can swim.');
+  }
+}
+// with关键字
+class Duck with Flyable, Swimmable {
+  // 同时拥有 Flyable 和 Swimmable 的能力
+}
+
+// 注意使用混入的类会组合成超类
+void main() {
+    Duck d = new Duck()
+    print(d is Duck); // true
+    print(d is Flyable); // true
+    print(d is Swimmable); // true
+}
+```
+
+- 但是`Mixin`会导致高耦合，如多个类中有**重名**的属性或方法，后者会覆盖前者，因此也可以用**组合**(**Composition**)设计模式实现更灵活的运行时组合能力
+
+```dart
+// 接口：定义发送通知的能力
+abstract class Notifier {
+  void send(String message);
+}
+// 实现不同的功能
+// 短信发送器
+class SmsNotifier implements Notifier {
+  @override
+  void send(String message) {
+    print('Sending SMS: $message');
+  }
+}
+// 邮件发送器
+class EmailNotifier implements Notifier {
+  @override
+  void send(String message) {
+    print('Sending Email: $message');
+  }
+}
+class NotificationService {
+  // 持有一个 Notifier 接口的引用
+  Notifier notifier;
+  NotificationService(this.notifier);
+  void notifyUser(String message) {
+    // 调用 notifier 的 send 方法 该方法取决于传入的实例
+    notifier.send(message);
+  }
+  // 动态替换功能的方法
+  void setNotifier(Notifier newNotifier) {
+    this.notifier = newNotifier;
+  }
+}
+void main() {
+  // 初始时使用短信发送器
+  var smsNotifier = SmsNotifier(); // 可以省略new关键字
+  var service = NotificationService(smsNotifier); // 组合设计模式实例
+  service.notifyUser('Hello from Composition!'); // 输出: Sending SMS: Hello from Composition!
+  // 在运行时动态地将功能替换为邮件发送器
+  var emailNotifier = EmailNotifier();
+  service.setNotifier(emailNotifier); // 替换Notifier引用的实例
+  service.notifyUser('Hello again!'); // 输出: Sending Email: Hello again!
+}
+```
+
+### 泛型
+
+```dart
+// 代码中的占位符 使用时再指定类型检查
+class Box<T> {
+  // T 是一个泛型类型参数
+  T content;
+  Box(this.content);
+}
+void main() {
+  // 实例化时指定具体类型
+  var intBox = Box<int>(123);
+  print(intBox.content); // 123
+  var stringBox = Box<String>('Hello Generics');
+  print(stringBox.content); // Hello Generics
+}
+
+// 泛型方法
+T firstElement<T>(List<T> list) {
+  // 确保列表不为空，避免运行时错误
+  if (list.isEmpty) {
+    throw StateError('List is empty');
+  }
+  return list.first;
+}
+void main() {
+  List<int> intList = [1, 2, 3];
+  print(firstElement<int>(intList)); // 1
+}
+
+// 泛型约束
+// T 必须是 num 或其子类（如 int, double）
+class BoxWithConstraint<T extends num> {}
+void main() {
+  var intBox = BoxWithConstraint<int>(100);
+  var doubleBox = BoxWithConstraint<double>(100.5);
+}
+
+// 声明多个泛型类型
+void printItems<T, K>(T item1, K item2) {}
 ```
