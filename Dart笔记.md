@@ -1352,4 +1352,105 @@ void main() {
 
 // 声明多个泛型类型
 void printItems<T, K>(T item1, K item2) {}
+
+// 泛型接口
+abstract class A<T> {
+  T fn(T val);
+}
+class B<T> implements A<T> {
+  @override
+  T fn(T val) {
+    return val;
+  }
+}
+void main() {
+  // 实例化时 我们为 B 指定具体类型
+  var intB = B<int>();
+  print(intB.fn(100)); // intB 只能处理 int 类型
+  var stringB = B<String>();
+  print(stringB.fn('hello')); // stringB 只能处理 String 类型
+}
+```
+
+## import/export
+
+- 封装自己的库
+
+```dart
+// 一般来说是这样的结构
+my_library/
+├── lib/
+│   ├── my_library.dart  // 主库文件 要与包名相同
+│   ├── src/
+│   │   ├── helper_function.dart // 内部文件
+│   │   └── data_models.dart   // 内部文件
+└── pubspec.yaml // 项目的配置文件
+
+// lib/src/helper_function.dart
+String _privateHelper() { // _ 开头表示私有 只在当前文件中可见
+  return 'This is a private helper.';
+}
+String publicHelper() {
+  return 'This is a public helper.';
+}
+
+// lib/my_library.dart
+library my_library;
+export 'src/helper_function.dart' show publicHelper; // 只导出 publicHelper 函数
+export 'src/data_models.dart'; // 全部导出
+
+// 引用本地封装的库
+// .yaml 中添加
+dependencies:
+  my_library:
+    path: ../my_library // 因为使用path所以 put get 获取远程库时不会下载这个库 而是从指定路径加载
+// 然后在 Dart 文件中可以使用 import 引用
+// 因为在.yaml中注册为了包 所以要加package:
+import 'package:my_library/my_library.dart';
+void main() {
+  print(publicHelper());
+}
+```
+
+- 引入单个文件，不需要集中管理时
+
+```dart
+import './file1.dart'; // 写路径即可
+
+// 为避免重名冲突 使用 as 关键字命名别名
+import './file2.dart' as file2;
+// 使用时 别名.变量/方法名
+var myClass1 = MyClass(); // 引用 file1.dart 中的 MyClass
+var myClass2 = file2.MyClass(); // 引用 file2.dart 中的 MyClass
+
+// 导入时也可以选择性导入需要的部分 避免冲突
+import './file2.dart' show AnotherClass; // 只导入 AnotherClass
+import './file2.dart' hide AnotherClass; // 除了 AnotherClass 都导出
+
+// 或者全量导入时想隐藏一些变量方法 以 _ 开头 只在当前文件中可见
+String _privateHelper() {
+  return 'This is a private helper.';
+}
+```
+
+- 系统内置库`import 'dart:xxx'`
+
+## 性能优化const
+
+- `Flutter`开发用到非常多以下这种方式
+
+```dart
+class Person {
+  // 类中必须用final声明属性
+  final String name;
+  final int age;
+  // 构造函数用const声明
+  const Person({required this.name, required this.age});
+}
+// 创建实例可以省略new 加const表示用常量构造函数创建
+// 只要值相同 就会在编译时复用内存空间
+const Person p1 = const Person(name: 'Alice');
+const Person p2 = const Person(name: 'Alice');
+// identical方法判断是否为同一个对象（同一内存空间）
+print(identical(p1, p2)); // 输出: true
 ```
