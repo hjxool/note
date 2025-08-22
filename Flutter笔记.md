@@ -46,11 +46,11 @@
           - 如`C:\Users\admin\.gradle\wrapper\dists\gradle-7.6.3-all\aocdy2d2z8kodnny3rsumj8i8`
        3. 将下载的压缩包在对应目录下解压
   4. 注意第一次运行Flutter项目，还会下载`wrapper`以外其他文件，这时很容易下载失败，因此需要修改DNS为`114.114.114.114 8.8.8.8`才能保证下载，之后就是安装apk
-     
+  
 - 运行项目进度卡在`Running Gradle task 'assembleDebug'`，解决办法
-     
+  
   - 因为核心构建库Gradle在国外，使用阿里云镜像
-     
+    
   1. 修改项目中`android\build.gradle`文件
      
      ```gradle
@@ -95,7 +95,7 @@
                 }
               }
           }
-          ```
+     ```
      
   2. 修改`flutter SDK`安装目录下的`packages\flutter_tools\gradle\flutter.gradle`文件
      
@@ -130,7 +130,7 @@
           	private static final String DEFAULT_MAVEN_HOST =    
           	"https://storage.flutter-io.cn";
           }
-          ```
+     ```
      
   3. `Running Gradle task 'assembleDebug'`失败后报错缺少`Build Tools revision 30.0.3`
      
@@ -144,3 +144,9 @@
   5. 执行`Installing ...apk`时报错
      
      - 这是因为真机调试时手机USB调试权限未全部开启，导致apk应用无法安装到手机
+
+## 设计理念
+
+- Flutter 的设计哲学与 Web（CSS）不同
+  -  Web 中，几乎所有元素都有 `margin` 和 `padding` 属性
+  - Flutter 中，UI 是由一个个独立的 Widget 组合而成的。一个 Widget 本身不具有 `margin` 属性，你需要用一个带有 `margin` 功能的 Widget 来包裹它
