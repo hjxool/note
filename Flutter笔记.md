@@ -150,3 +150,164 @@
 - Flutter 的设计哲学与 Web（CSS）不同
   -  Web 中，几乎所有元素都有 `margin` 和 `padding` 属性
   - Flutter 中，UI 是由一个个独立的 Widget 组合而成的。一个 Widget 本身不具有 `margin` 属性，你需要用一个带有 `margin` 功能的 Widget 来包裹它
+
+## 路由
+
+- 何时使用？
+  - 用页面索引切换显示适合平级页面
+  - 有层级深入的适合路由
+
+### 基础路由
+
+```dart
+// 适用于大多数简单页面的跳转 基于堆栈 新页面覆盖在旧页面之上
+// 从 A 页面跳转到 B 页面
+Navigator.push( // 使用 Navigator.push 方法
+  context, // 注意要传入build中的context
+  MaterialPageRoute( // 传入 MaterialPageRoute 实例
+    builder: (context) => const BPage(), // builder 参数用于构建目标页面
+  ),
+);
+// 从 B 页面返回到 A 页面
+Navigator.pop(context);
+
+// 父 -> 子 传值就用构造函数 子 -> 父 返回数据使用pop
+// 注意 如果是 StatefulWidget 组件传值 子组件使用 widget. 来获取构造函数传入的值
+// B 页面，返回时传递数据
+onPressed: () {
+  Navigator.pop(context, '从 B 页面返回的数据');
+}
+
+// A 页面，接收返回的数据
+onPressed: () async {
+  // 接收push的返回值
+  final result = await Navigator.push(
+    context,
+    MaterialPageRoute(builder: (context) => const BPage()),
+  );
+  print('接收到 B 页面返回的数据: $result');
+}
+```
+
+### 命名路由
+
+```dart
+// 当应用页面较多时 管理和维护路由关系 避免页面间的直接依赖
+// 定义两个页面
+class HomePage extends StatelessWidget { /* ... */ }
+class DetailPage extends StatelessWidget { /* ... */ }
+
+void main() {
+  runApp(MaterialApp(
+    initialRoute: '/', // 初始路由
+    routes: { // 管理路由
+      '/': (context) => const HomePage(),
+      '/detail': (context) => const DetailPage(),
+    },
+  ));
+}
+// 跳转到 /detail 路由 使用 Navigator.pushNamed 方法
+Navigator.pushNamed(context, '/detail');
+
+// 因为不再用构造函数跳转 因此使用pushNamed参数传值
+// A 页面 跳转时传递参数
+Navigator.pushNamed(
+  context,
+  '/detail',
+  arguments: '来自 A 页面的参数',
+);
+
+// B 页面，接收参数
+class DetailPage extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    // 获取参数 此处示例因为直接传入Text中作为参数因此加了as String断言
+    final String? args = ModalRoute.of(context)?.settings.arguments as String?;
+    return Scaffold(
+      appBar: AppBar(title: Text('详情页')),
+      body: Center(
+        child: Text(args ?? '没有参数'),
+      ),
+    );
+  }
+}
+
+// B向A返回数据 同样用 await Navigator.pushNamed
+```
+
+### 高级路由
+
+- `routes`和`onGenerateRoute`只存在一个
+
+```dart
+// 需要复杂逻辑的路由 如：登录验证、权限控制
+MaterialApp(
+  onGenerateRoute: (RouteSettings settings) {
+    // 获取路由名称和参数
+    final name = settings.name;
+    final arguments = settings.arguments;
+	if(检查用户登录状态){
+        switch (name) {
+          case '/':
+            return MaterialPageRoute(builder: (context) => const HomePage());
+          case '/detail':
+            return MaterialPageRoute(
+              builder: (context) => DetailPage(arguments: arguments),
+            );
+          default:
+            // 如果路由不存在，返回一个错误页面
+            return MaterialPageRoute(builder: (context) => const UnknownPage());
+        }
+    } else {
+        return MaterialPageRoute(builder: (context) => const LoginPage());
+    }
+  },
+);
+```
+
+### StatefulWidget路由更新机制
+
+```dart
+// StatefulWidget 在更新时 只会重新创建 class MainApp extends StatefulWidget 实例
+// 而会复用 class _MainAppState extends State<MainApp> 因此 StatefulWidget 作为路由页
+// 在重新加载时不会更新内部状态
+// 注意！但是像 StatelessWidget 一样直接widget.是会更新的
+// 因此就需要实现 didUpdateWidget 方法来更新内部状态
+class _MyCounterPageState extends State<MyCounterPage> {
+  int _count = 0; // 内部状态
+    
+  @override
+  void initState() {
+    super.initState();
+    _count = widget.initialCount; // 内部状态初始值
+  }
+
+  // 当父组件重建并传入新的 MyCounterPage 实例时，此方法会被调用
+  @override
+  void didUpdateWidget(covariant MyCounterPage oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    
+    // 检查新的值和旧的值是否不同
+    if (widget.initialCount != oldWidget.initialCount) {
+      // 如果值发生变化，更新子组件的内部状态
+      setState(() {
+        _count = widget.initialCount;
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Text('当前计数: $_count');
+  }
+}
+```
+
+### 返回多级路由
+
+```dart
+// 使用 popUntil 第二个参数只要为 true 就停止
+Navigator.popUntil(context, ModalRoute.withName('/b')); // 路由出栈 当找到 withName 相匹配的停止
+Navigator.popUntil(context, (route) => route.isFirst); // 回到根路由
+Navigator.popUntil(context, (route) => route.settings.name == '/b');
+```
