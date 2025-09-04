@@ -311,3 +311,10 @@ Navigator.popUntil(context, ModalRoute.withName('/b')); // 路由出栈 当找�
 Navigator.popUntil(context, (route) => route.isFirst); // 回到根路由
 Navigator.popUntil(context, (route) => route.settings.name == '/b');
 ```
+
+## StatefulWidget与StatelessWidget
+
+### context的区别
+
+- 因为`StatefulWidget`需要`extends State<T>`，而`State`对象有一个内置的`context getter`，因此在`build`方法外也可以直接使用`context`
+- 而`StatelessWidget`没有，只能在`build`方法中才能获取到`context`
