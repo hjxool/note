@@ -563,6 +563,53 @@ void main() {
   print(a); // 789 不会报错
   ```
 
+### enum枚举
+
+```dart
+// 适用于表示固定数量的 状态 或 选项
+enum Status {
+  loading,
+  success,
+  error,
+}
+// 每个枚举成员都是 Status 类型的一个实例
+Status s = Status.success;
+if (s == Status.success) { // Dart/Java枚举是通过 对象引用 比较的 而不是值比较
+  print('成功');
+}
+
+// 枚举的属性 每个枚举成员都有
+print(Status.success.index); // .index：成员在枚举中的位置（从 0 开始）
+print(Status.success.name);  // .name：成员的名称（字符串）
+
+// 增强型枚举 2.17+新特性 跟类很类似
+enum Role {
+  admin(level: 3), // 相当于创建实例并传入固定值
+  user(level: 1),
+  guest(level: 0);
+
+  const Role({required this.level}); // 像类的构造函数
+  final int level; // 类的变量声明
+
+  bool get isPrivileged => level >= 2; // 类的getter
+}
+print(Role.admin.level); // 输出 3
+print(Role.user.isPrivileged); // 输出 false
+
+// 枚举扩展（extension）枚举来自第三方库或你想保持枚举干净
+enum Status { loading, success, error }
+extension StatusExtension on Status {
+  String get label {
+    switch (this) {
+      case Status.loading: return '加载中';
+      case Status.success: return '成功';
+      case Status.error: return '失败';
+    }
+  }
+}
+
+```
+
 ## 运算符
 
 - Dart特有运算符
@@ -1092,7 +1139,8 @@ class Aaa extends Person {
   }
   // 覆写必须同名 但是返回类型可以不同 这是 协变 特性 在Java5之后的版本也存在
   String fn() {
-      return 'str';
+      // 父类声明过的 公开 通过super传递 的变量 可以直接用 不需要在子类中声明
+      return '$name';
   }
 }
 // 3.0之后的语法糖
