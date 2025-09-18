@@ -318,3 +318,117 @@ Navigator.popUntil(context, (route) => route.settings.name == '/b');
 
 - 因为`StatefulWidget`需要`extends State<T>`，而`State`对象有一个内置的`context getter`，因此在`build`方法外也可以直接使用`context`
 - 而`StatelessWidget`没有，只能在`build`方法中才能获取到`context`
+
+## 架构范例
+
+- 目录结构
+
+```
+lib/
+├── main.dart                  // 应用入口
+├── core/                     // 核心工具类（如网络、异常处理）
+│   ├── api_client.dart
+│   ├── exceptions.dart
+│   └── logger.dart
+├── data/                     // 数据层（Repository）
+│   ├── user_repository.dart
+│   └── models/
+│       └── user.dart
+├── logic/                    // 业务逻辑层（ViewModel）
+│   └── user_notifier.dart
+├── ui/                       // UI 层（页面和组件）
+│   ├── pages/
+│   │   └── user_page.dart
+│   └── widgets/
+│       └── user_view.dart
+├── providers.dart            // Riverpod Provider 注册
+```
+
+- 数据模型（user）
+
+```dart
+class User {
+  final String id;
+  final String name;
+
+  User({required this.id, required this.name});
+  // 加factory(工厂构造函数)关键字是为了能返回User构造函数 否则 构造函数必须初始化当前类的属性
+  // Dart中单例模式就是用factory
+  factory User.fromJson(Map<String, dynamic> json) =>
+      User(id: json['id'], name: json['name']);
+}
+```
+
+- 数据层（Repository）
+
+```dart
+class UserRepository {
+  Future<User> fetchUser() async {
+    await Future.delayed(Duration(seconds: 1)); // 模拟网络延迟
+    return User(id: '001', name: 'Alice');
+  }
+}
+```
+
+- 业务逻辑层（ViewModel）
+
+```dart
+class UserNotifier extends StateNotifier<AsyncValue<User>> {
+  final UserRepository repository;
+
+  UserNotifier(this.repository) : super(const AsyncValue.loading()) {
+    loadUser();
+  }
+
+  Future<void> loadUser() async {
+    try {
+      final user = await repository.fetchUser();
+      state = AsyncValue.data(user);
+    } catch (e) {
+      state = AsyncValue.error(e);
+    }
+  }
+}
+```
+
+- 状态管理注册
+
+```dart
+final userRepositoryProvider = Provider((ref) => UserRepository());
+
+final userNotifierProvider =
+    StateNotifierProvider<UserNotifier, AsyncValue<User>>(
+        (ref) => UserNotifier(ref.watch(userRepositoryProvider)));
+```
+
+- 页面和组件
+
+```dart
+// 页面
+class UserPage extends ConsumerWidget {
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final userState = ref.watch(userNotifierProvider);
+
+    return Scaffold(
+      appBar: AppBar(title: Text('用户信息')),
+      body: userState.when(
+        data: (user) => UserView(user: user),
+        loading: () => Center(child: CircularProgressIndicator()),
+        error: (err, _) => Center(child: Text('加载失败: $err')),
+      ),
+    );
+  }
+}
+// 组件
+class UserView extends StatelessWidget {
+  final User user;
+
+  const UserView({required this.user});
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(child: Text('欢迎你，${user.name}'));
+  }
+}
+```
