@@ -326,22 +326,18 @@ Navigator.popUntil(context, (route) => route.settings.name == '/b');
 ```
 lib/
 ├── main.dart                  // 应用入口
-├── core/                     // 核心工具类（如网络、异常处理）
-│   ├── api_client.dart
-│   ├── exceptions.dart
-│   └── logger.dart
-├── data/                     // 数据层（Repository）
-│   ├── user_repository.dart
+├── DataModels/                // 数据层（Repository）
+│   └── API/
 │   └── models/
 │       └── user.dart
-├── logic/                    // 业务逻辑层（ViewModel）
+├── ViewModels/                // 业务逻辑层
 │   └── user_notifier.dart
-├── ui/                       // UI 层（页面和组件）
+├── View/                      // UI 层（页面和组件）
 │   ├── pages/
 │   │   └── user_page.dart
 │   └── widgets/
 │       └── user_view.dart
-├── providers.dart            // Riverpod Provider 注册
+├── Providers/                 // Riverpod Provider 注册
 ```
 
 - 数据模型（user）
