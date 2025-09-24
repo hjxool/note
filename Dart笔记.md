@@ -595,8 +595,13 @@ enum Role {
 }
 print(Role.admin.level); // 输出 3
 print(Role.user.isPrivileged); // 输出 false
+```
 
-// 枚举扩展（extension）枚举来自第三方库或你想保持枚举干净
+### Dart 扩展方法（extension）
+
+```dart
+// 不修改 原有类 的情况下给它“加功能”
+// 给 枚举 添加额外功能
 enum Status { loading, success, error }
 extension StatusExtension on Status {
   String get label {
@@ -608,6 +613,23 @@ extension StatusExtension on Status {
   }
 }
 
+// 对 String 进行拓展
+extension MyStringExtension on String {
+  // 扩展方法
+  bool isValidEmail() {
+    return contains('@') && contains('.');
+  }
+  // 扩展 getter
+  String get reversed => split('').reversed.join();
+  // 扩展 setter（少见）
+  set shout(String value) {
+    print(value.toUpperCase());
+  }
+}
+// 使用
+print("test@example.com".isValidEmail()); // true
+print("abc".reversed); // "cba"
+"hello".shout = "hi"; // 输出 "HI"
 ```
 
 ## 运算符

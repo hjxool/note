@@ -51,98 +51,85 @@
   
   - 因为核心构建库Gradle在国外，使用阿里云镜像
     
-  1. 修改项目中`android\build.gradle`文件
-     
+  1. 修改项目中`android\build.gradle`
+  
      ```gradle
-          buildscript {
-              repositories {
-                  // google()
-                  // mavenCentral()
-                  // 注释掉改成如下内容
-                maven { 
-                  allowInsecureProtocol = true // 屏蔽安全警告
-                  url 'https://maven.aliyun.com/repository/google'
-                }
-                maven { 
-                  allowInsecureProtocol = true
-                  url 'https://maven.aliyun.com/repository/jcenter'
-                }
-                maven { 
-                  allowInsecureProtocol = true
-                  url 'http://maven.aliyun.com/nexus/content/groups/public'
-                }
-              }
-              dependencies {
-                  classpath("com.android.tools.build:gradle:7.3.0")
-              }
-          }
-          
-          allprojects {
-              repositories {
-                  // google()
-                  // mavenCentral()
-                maven { 
-                  allowInsecureProtocol = true
-                  url 'https://maven.aliyun.com/repository/google'
-                }
-                maven { 
-                  allowInsecureProtocol = true
-                  url 'https://maven.aliyun.com/repository/jcenter'
-                }
-                maven { 
-                  allowInsecureProtocol = true
-                  url 'http://maven.aliyun.com/nexus/content/groups/public'
-                }
-              }
-          }
+     buildscript {
+         repositories {
+             // 使用国内镜像
+             maven { url = uri("https://maven.aliyun.com/repository/google") }
+             maven { url = uri("https://maven.aliyun.com/repository/public") }
+             maven { url = uri("https://maven.aliyun.com/repository/gradle-plugin"
+         ) }
+             google()
+             mavenCentral()
+         }
+         dependencies {
+             // 使用兼容的版本（根据你的 Gradle 版本调整）
+             classpath("com.android.tools.build:gradle:8.5.0")
+             classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.9.22")
+         }
+     }
+     
+     allprojects {
+         repositories {
+             // 使用国内镜像
+             maven { url = uri("https://maven.aliyun.com/repository/google") }
+             maven { url = uri("https://maven.aliyun.com/repository/public") }
+             maven { url = uri("https://maven.aliyun.com/repository/jcenter") }
+             google()
+             mavenCentral()
+         }
+     }
+     
+     ...
+     // 不要自定义重复的clean！
+     tasks.register<Delete>("clean") {
+         delete(rootProject.layout.buildDirectory)
+     }
+     
      ```
-     
-  2. 修改`flutter SDK`安装目录下的`packages\flutter_tools\gradle\flutter.gradle`文件
-     
-     - 新版Flutter SDK配置不在`flutter.gradle`，迁移到了`packages\flutter_tools\gradle\src\main\groovy\flutter.groovy`
-     
+  
+  2. 修改`android\settings.gradle`
+  
      ```gradle
-          buildscript {
-              repositories {
-                  // google()
-                  // mavenCentral()
-                  // 同样将其中的google等注释掉 添加如下内容
-                  maven { 
-                    allowInsecureProtocol = true
-                    url 'https://maven.aliyun.com/repository/google'
-                  }
-                  maven { 
-                    allowInsecureProtocol = true
-                    url 'https://maven.aliyun.com/repository/jcenter'
-                  }
-                  maven { 
-                    allowInsecureProtocol = true
-                    url 'http://maven.aliyun.com/nexus/content/groups/public'
-                  }
-              }
-              // 保留
-              dependencies {
-                  classpath("com.android.tools.build:gradle:7.3.0")
-              }
-          }
-          // 将DEFAULT_MAVEN_HOST变量修改为"https://storage.flutter-io.cn"
-          class FlutterPlugin implements Plugin<Project> {
-          	private static final String DEFAULT_MAVEN_HOST =    
-          	"https://storage.flutter-io.cn";
-          }
+     pluginManagement {
+         ...
+         repositories {
+         	// 国内镜像
+             maven { url = uri("https://maven.aliyun.com/repository/gradle-plugin") }
+             maven { url = uri("https://maven.aliyun.com/repository/google") }
+             maven { url = uri("https://maven.aliyun.com/repository/public") }
+             // 注意多个这个 不然下载某个依赖会卡住
+             maven { url = uri("https://mirrors.huaweicloud.com/repository/maven") }
+             gradlePluginPortal()
+             google()
+             mavenCentral()
+         }
+     }
+     plugins {
+         id("dev.flutter.flutter-plugin-loader") version "1.0.0"
+         // 注意这两个版本！必须能够与兼容
+         id("com.android.application") version "8.5.0" apply false
+         id("org.jetbrains.kotlin.android") version "1.9.22" apply false
+     }
      ```
-     
-  3. `Running Gradle task 'assembleDebug'`失败后报错缺少`Build Tools revision 30.0.3`
-     
-     - 在Android Studio 的`SDK Tools`中安装
-     
+  
+  3. 修改`android\gradle\wrapper\gradle-wrapper.properties`
+  
+     ```properties
+     // 改为国内镜像
+     // 注意gradle版本必须与 id("com.android.application") 和 id("org.jetbrains.kotlin.android") 兼容！
+     distributionUrl=https\://mirrors.cloud.tencent.com/gradle/gradle-8.7-bin.zip
+     ```
+  
   4. 运行Android项目时，需要运行Android SDK中的`adb(Android Debug Bridge)`命令行工具
-     
+  
      - 如果安装过Android SDK，配置环境变量，在`Path`中添加`%ANDROID_HOME%\platform-tools`和`%ANDROID_HOME%\tools`
             - 注意！不要用网上`path1;paht2`的形式在window11中配置环境变量，会导致无法识别`adb`命令
-     
+  
   5. 执行`Installing ...apk`时报错
-     
+  
      - 这是因为真机调试时手机USB调试权限未全部开启，导致apk应用无法安装到手机
 
 ## 设计理念
