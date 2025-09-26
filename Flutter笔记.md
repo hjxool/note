@@ -415,3 +415,96 @@ class UserView extends StatelessWidget {
   }
 }
 ```
+
+## 状态管理（Riverpod）
+
+- 安装依赖`flutter pub add flutter_riverpod`
+
+```dart
+// 启用
+// Riverpod 在 main.dart 中用 ProviderScope 包裹整个应用
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+void main() {
+  runApp(
+    ProviderScope(
+      child: MyApp(),
+    ),
+  );
+}
+
+// 定义
+// Provider 只读数据
+final onlyReadData = Provider<String>((ref) => "Hello Riverpod!");
+
+// StateProvider 简单可变状态（int、bool 等）
+final singleChange = StateProvider<int>((ref) => 0);
+
+// StateNotifierProvider 复杂业务逻辑
+class CoreNotifier extends StateNotifier<List<String>> {
+  // 定义 如何管理和修改状态
+  CoreNotifier() : super([]);
+  // state来自父类因此不用重复声明
+  void add(String str) => state = [...state, str];
+}
+// 注册成一个 Provider 让 UI 可以通过 ref.watch 来订阅它
+final coreProvider = StateNotifierProvider<CoreNotifier, List<String>>(
+  (ref) => coreNotifier(),
+);
+
+// FutureProvider 异步操作 如网络请求
+final requestProvider = FutureProvider<String>((ref) async {
+    await ...
+    return ...
+})
+// 使用
+final asyncValue = ref.watch(userInfoProvider);
+return asyncValue.when(
+  data: (data) => Text(data), // 异步完成后
+  loading: () => CircularProgressIndicator(), // 异步未完成
+  error: (e, _) => Text("出错了: $e"), // 异步出错
+);
+
+// StreamProvider 实时数据流 如WebSocket、定时器
+// 注：async* 是Dart独有 异步生成器 可以多次 yield 持续产出数据
+final streamProvider = StreamProvider<int>((ref) async* {
+    int count = 0;
+    while(true) {
+        await ...
+        yield ++count;
+    }
+})
+// 使用
+final asyncValue = ref.watch(streamProvider);
+return asyncValue.when( // 因为监听的是stream 所以每一段数据流都会重新build 并执行asyncValue.when
+	data: (val) => Text('完成');
+    loading: () => Text('加载中');
+    error: (e, _) => Text('报错');
+);
+
+// 使用
+// 组件必须继承 ConsumerWidget 或 ConsumerStatefulWidget
+// ConsumerWidget 对应 StatelessWidget
+// ConsumerStatefulWidget 对应 StatefulWidget
+class CounterPage extends ConsumerWidget {
+  @override
+  // build 多了个 ref 参数
+  Widget build(BuildContext context, WidgetRef ref) {
+    // ref.watch 订阅 provider 的值 响应式重新build
+    // 注意 只能用在 build 方法里
+    final num = ref.watch(singleChange);
+    return Column(
+      children: [
+        Text('Count: $num'),
+        ElevatedButton(
+          // ref.read 只读取一次 不会订阅 用于触发操作
+          // 对于简单可变状态 就是修改其 state
+          // 对于 StateNotifierProvider 则是调用其方法来安全的修改属性状态
+          // read(xxx.notifier) 是固定写法 拿到控制器本体
+          onPressed: () => ref.read(singleChange.notifier).state++,
+          child: Text('Increment'),
+        ),
+      ],
+    );
+  }
+}
+```
