@@ -507,4 +507,29 @@ class CounterPage extends ConsumerWidget {
     );
   }
 }
+
+// 注：ConsumerStatefulWidget 的 build 只有 BuildContext 没有 WidgetRef 写了会报错
+class CusList extends ConsumerStatefulWidget {
+  // ref 是 ConsumerState 提供的 ConsumerStatefulWidget 里不能用
+  const CusList({super.key});
+  @override
+  // 注意 全部改成 ConsumerState 开头
+  ConsumerState<CusList> createState() => _CusListState();
+}
+class _CusListState extends ConsumerState<CusList> {
+  // 定义属性时不可用ref
+  @override
+  // 在 生命周期 方法里可以用
+  void initState() { // 注：initState 在 字段初始化 构造函数 之后执行
+    ...
+  }
+  // 在 自定义方法 里方法里可以用
+  void fn() {}
+  @override
+  Widget build(BuildContext context) {
+    // 可以直接使用ref
+    final unreadNum = ref.read(unreadMessageNum.notifier);
+    return ...;
+  }
+}
 ```
