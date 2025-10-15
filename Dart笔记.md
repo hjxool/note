@@ -1038,72 +1038,64 @@ arr.forEach(fn);
   }
   ```
 
-#### 工厂构造函数
+#### 工厂构造函数 factory
 
-- 不能进行实例化，因此不能使用`this`
+- 不同于普通构造函数
+
+  - 返回当前类的实例，也可以返回**子类或其他类的实例**
+    - dart中单例模式就是这么实现的
+
+  - 不强制初始化所有字段（不像普通构造函数那样必须初始化所有非空字段）
+
+- 什么时候使用？
+
+  - 想要**控制实例创建过程**
+  - 需要**缓存对象**或**复用实例**
+  - 构造函数可能**返回不同类型的对象**
+  - 实现**单例模式**或**工厂模式**
+
+- 使用场景
 
   ```dart
-  class Person {
-      String name;
-      // 静态 Person类型 的变量
-      static Person instance;
-      // 工厂构造函数
-      factory Person([String name = '张三']) {
-          // 不能用this
-          print(this.name); // error
-      }
+  // 缓存实例（避免重复创建）
+  class Image {
+    final String name;
+    const Image(this.name);
   }
-  void main() {
-      // 不能做实例化操作
-      Person p1 = new Person('李四');
-      print(p1.name); // error
+  class ImageCache {
+    static final Map<String, Image> _cache = {};
+  
+    factory ImageCache.fromName(String name) {
+      if (_cache.containsKey(name)) {
+        return _cache[name]!;
+      } else {
+        final image = Image(name);
+        _cache[name] = image;
+        return image;
+      }
+    }
+  }
+  
+  // 返回子类实例（工厂模式）
+  abstract class Animal {
+    void speak();
+    factory Animal(String type) {
+      if (type == 'dog') return Dog();
+      if (type == 'cat') return Cat();
+      throw 'Unknown animal type';
+    }
+  }
+  
+  // 实现单例模式
+  class AppConfig {
+    // 在第一次访问类时调用 创建初始实例
+    static final AppConfig _instance = AppConfig._internal();
+  	// 后续使用 AppConfig() 创建实例时 就会直接返回初始实例
+    factory AppConfig() => _instance;
+  	// 命名构造函数 且是私有构造函数 _name
+    AppConfig._internal();
   }
   ```
-
-- 示例
-
-  - `mapObj.putIfAbsent(key, () => value)`方法
-    - 返回值：Map中的`value`值
-    - 用法：根据传入的`key`，查询`mapObj`中是否有`key`
-      - 如果有，则直接返回`key`对应的`value`
-      - 如果不存在，则**先**在`mapObj`中创建对应的`key: value`,**再**返回`() => value`的`value`
-
-  ```dart
-  class Person {
-      String name = '';
-      // 作用类似 单例模式 的 全局变量
-      static final Map instances = {};
-      
-      factory Person(String name) {
-          // 不能实例化 因此没有this 用 类.属性/方法 的形式调用
-          // 工厂构造函数 必须 有return 不然会报错
-          return Person.instances.putIfAbsent('first_instance',() => new Person.createInstance(name));
-      }
-      
-      // 可以有多个工厂函数
-      // factory是关键字 可以加在其他构造函数前 使其变为工厂函数
-      factory Person.createInstanceByMap(Map obj) {
-          return new Person(obj['person_name']);
-      }
-      
-      // 定义用于 实例化 的 命名构造函数
-      Person.createInstance(this.name);
-  }
-  void main() {
-      // 实例化操作
-      Person p1 = new Person('张三');
-      print(p1.name); // 张三
-      
-      Person p2 = new Person('李四');
-      // 因为实例唯一(单例模式) 读取的还是旧实例
-      print(p2.name); // 张三
-      
-      print(p1 == p2); // true
-      
-      // 用另一个工厂构造函数创建实例
-      Person p1 = new Person.createInstanceByMap({'person_name': '张三'});
-      print(p1.name); // 张三
-  }
 
 ### 访问修饰符
 

@@ -434,45 +434,66 @@ void main() {
 
 // 定义
 // Provider 只读数据
-final onlyReadData = Provider<String>((ref) => "Hello Riverpod!");
-
-// StateProvider 简单可变状态（int、bool 等）
-final singleChange = StateProvider<int>((ref) => 0);
-
-// StateNotifierProvider 复杂业务逻辑
-class CoreNotifier extends StateNotifier<List<String>> {
-  // 定义 如何管理和修改状态
-  CoreNotifier() : super([]);
-  // state来自父类因此不用重复声明
-  void add(String str) => state = [...state, str];
-}
-// 注册成一个 Provider 让 UI 可以通过 ref.watch 来订阅它
-final coreProvider = StateNotifierProvider<CoreNotifier, List<String>>(
-  (ref) => coreNotifier(),
+final onlyReadData = Provider<String>(
+  (ref) => "配置",
+  isAutoDispose: true, // 等价于旧版本 .autoDispose
 );
 
-// FutureProvider 异步操作 如网络请求
-final requestProvider = FutureProvider<String>((ref) async {
-    await ...
-    return ...
-})
+// 定义数据结构 控制方法
+class Counter extends Notifier<int> {
+  // build 相当于旧版本构造函数 是初始化状态的入口
+  @override
+  int build() => 0;
+  // 或者
+  int build() {
+    // 读取其他 Provider
+    final str = ref.read(onlyReadData);
+    
+    // 监听其他 Provider
+    ref.listen<bool>(otherProvider, (previous, next) {
+      print("设置发生变化: $previous -> $next");
+    });
+    
+    return 0;
+  }
+
+  void increment() => state++; // state 即 build 返回值
+}
+final counterProvider = NotifierProvider<Counter, int>(Counter.new);
+
+// 异步操作 如网络请求
+class UserNotifier extends AsyncNotifier<User> {
+  // 注：异步的返回值都是 Future<T>
+  @override
+  Future<User> build() async {
+    return fetchUser();
+  }
+  
+  // 内置API修改 .when 时的状态
+  Future<void> refresh() async {
+    state = const AsyncLoading(); // 手动设置为加载中
+    // guard 会自动帮你把异常转成 AsyncError 成功则转成 AsyncData
+    state = await AsyncValue.guard(() => fetchUser());
+  }
+}
+final userProvider = AsyncNotifierProvider<UserNotifier, User>(UserNotifier.new);
 // 使用
-final asyncValue = ref.watch(userInfoProvider);
+final asyncValue = ref.watch(userProvider);
 return asyncValue.when(
   data: (data) => Text(data), // 异步完成后
   loading: () => CircularProgressIndicator(), // 异步未完成
   error: (e, _) => Text("出错了: $e"), // 异步出错
 );
 
-// StreamProvider 实时数据流 如WebSocket、定时器
-// 注：async* 是Dart独有 异步生成器 可以多次 yield 持续产出数据
-final streamProvider = StreamProvider<int>((ref) async* {
-    int count = 0;
-    while(true) {
-        await ...
-        yield ++count;
-    }
-})
+// 实时数据流 如WebSocket、定时器
+class MessagesNotifier extends StreamNotifier<List<Message>> {
+  // 注：这里是 Stream<T>
+  @override
+  Stream<List<Message>> build() {
+    return messageStream();
+  }
+}
+final messagesProvider = StreamNotifierProvider<MessagesNotifier, List<Message>>(MessagesNotifier.new);
 // 使用
 final asyncValue = ref.watch(streamProvider);
 return asyncValue.when( // 因为监听的是stream 所以每一段数据流都会重新build 并执行asyncValue.when
