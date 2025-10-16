@@ -508,11 +508,25 @@ return asyncValue.when( // 因为监听的是stream 所以每一段数据流都�
 // ConsumerStatefulWidget 对应 StatefulWidget
 class CounterPage extends ConsumerWidget {
   @override
+  void initState() {
+    // 2.x之后的版本使用 ref.listenManual 可以在 initState 等生命周期使用
+    roviderSubscription<stateT> temp = ref.listenManual<int>(counterProvider, (pre, now) {...});
+    // ref.listenManual 取消监听
+    temp.close();
+  }
+  
+  @override
   // build 多了个 ref 参数
   Widget build(BuildContext context, WidgetRef ref) {
     // ref.watch 订阅 provider 的值 响应式重新build
     // 注意 只能用在 build 方法里
-    final num = ref.watch(singleChange);
+    final num = ref.watch(counterProvider);
+    
+    // ref.listen 是1.x版本的 只能在build内使用 监听 provider 状态变化
+    void Function() temp = ref.listen<int>(counterProvider, (pre, now) {...});
+    // ref.listen 取消监听
+    temp()
+    
     return Column(
       children: [
         Text('Count: $num'),
