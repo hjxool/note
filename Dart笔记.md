@@ -1206,8 +1206,9 @@ abstract class Flyable {
 }
 // 实现 Flyable 接口
 // 注意 implements 和 extends区别
-// implements 不继承任何父类的具体实现 必须从头开始重新实现所有公共成员
-// extends 继承父类的所有方法和属性 可以直接使用父类的具体实现
+// implements 不继承任何父类的具体实现 必须从头开始重新实现所有公共成员 是一种约束和规范 且可以implements多个类
+// extends 继承父类的所有方法和属性 可以直接使用父类的具体实现 只能继承一个类
+// 注：无论A implements/extends/with B A的实例都属于B类型
 class Bird implements Flyable {
   // 必须实现 fly() 方法
   @override
