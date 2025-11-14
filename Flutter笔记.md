@@ -325,6 +325,7 @@ lib/
 │   └── widgets/
 │       └── user_view.dart
 ├── Providers/                 // Riverpod Provider 注册
+├── Utils/                     // 通用组件
 ```
 
 - 数据模型（user）
