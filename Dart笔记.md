@@ -1267,7 +1267,8 @@ class Cat extends Animal {
     print('Meow!');
   }
   final String name;
-  Dog(String name): name = name; // 不用super
+  // 不用super 因为是覆写父类属性和方法 只要不用到父类构造函数/方法/属性就不用super
+  Dog(String name): name = name;
 }
 // 接收 父类类型 对象的函数
 void makeAnimalSound(Animal animal) {
