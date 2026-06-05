@@ -419,6 +419,8 @@ class UserView extends StatelessWidget {
 
 ## 状态管理（Riverpod）
 
+### 示例
+
 - 安装依赖`flutter pub add flutter_riverpod`
 
 ```dart
@@ -569,3 +571,25 @@ class _CusListState extends ConsumerState<CusList> {
   }
 }
 ```
+
+### 如何正确使用
+
+- `ref.watch(provider)`
+  - 获取的是状态本身，同步是 `State`，异步是 `AsyncValue`
+  - 主要用途：在 Widget 的 `build` 里监听渲染 UI
+- `ref.read(provider.notifier)`
+  - 获取业务控制器，即class
+  - 主要用途：调用class内定义的方法
+- `ref.read(provider.future)`
+  - 获取当前的异步网络任务`Future`
+  - 主要用途：在初始化或跳转时等待网络请求结束
+- 看似很多，主要使用的就3种场景
+  - 在 `build` 方法里刷新 UI
+    - 标准姿势：`ref.watch(myProvider)`
+    - 原则：绝对不要在 `build` 里加 `.notifier` 或 `.future`（除非极特殊情况），也不要用 `read`。因为 `build` 的核心任务就是“盯着状态看，状态变了我就刷新”
+  - 在按钮点击等事件里调用方法
+    - 标准姿势：`ref.read(myProvider.notifier).某个你写的方法()`
+    - 原则：事件触发是单次的，用 `read`；要调用方法，后缀必须是 `.notifier`
+  - 在进入新页面前预加载、等接口返回
+    - 标准姿势：`await ref.read(myProvider.future);`
+    - 原则：既然要用 `await`，后面必须是一个真正的 `Future`，所以后缀必须是 `.future`
