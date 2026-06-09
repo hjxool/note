@@ -306,6 +306,49 @@ Navigator.popUntil(context, (route) => route.settings.name == '/b');
 - 因为`StatefulWidget`需要`extends State<T>`，而`State`对象有一个内置的`context getter`，因此在`build`方法外也可以直接使用`context`
 - 而`StatelessWidget`没有，只能在`build`方法中才能获取到`context`
 
+### 传入参数区别
+
+```dart
+class UserCard extends StatelessWidget {
+  final String name; // 构造函数传入的参数
+  const UserCard({super.key, required this.name});
+  @override
+  Widget build(BuildContext context) {
+    // 处于同一个类中，直接使用 name，写 widget.name 会报错
+    return Text(name); 
+  }
+}
+
+// 这是 Widget 类，负责接收参数
+class CounterPage extends StatefulWidget {
+  final String title; // 参数在这里
+  final VoidCallback onPressed;
+  const CounterPage({super.key, required this.title, required this.onPressed});
+  // 这是 Widget 类自身的方法，直接调用 onPressed
+  void logClick() {
+    onPressed(); 
+  }
+  @override
+  State<CounterPage> createState() => _CounterPageState();
+}
+// 这是 State 类，逻辑和 UI 在这里
+class _CounterPageState extends State<CounterPage> {
+  @override
+  void initState() {
+    super.initState();
+    // 在生命周期中访问，必须用 widget.title
+    print("初始化页面: ${widget.title}"); 
+  }
+  @override
+  Widget build(BuildContext context) {
+    // 在 build 中访问，必须用 widget.title
+    return Scaffold(
+      appBar: AppBar(title: Text(widget.title)), 
+    );
+  }
+}
+```
+
 ## 架构范例
 
 - 目录结构
