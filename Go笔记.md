@@ -21,17 +21,23 @@ myproject/
  └── utils/ 				# 工具包
       └── utils.go  # 因为没有main函数 所以只能当库包 不影响go build时 可执行程序必须同属一个包 的规则
 # 如果是微服务
-myproject/
- ├── go.mod
- ├── cmd/						# 不同服务 每个都是单独go build ./cmd/xxx编译 或者go run ./cmd/xxx独立运行
- │    ├── mainapp/
- │    │    └── main.go
- │    ├── utils/
- │    │    └── main.go
- │    └── other/
- │         └── main.go
- └── internal/
-      └── common.go
+├── my_project/                  # 你的整个大项目根目录
+│   ├── common/                  # ❌ 注意：这里面绝对不能有 package main
+│   │   ├── go.mod               # module 名为 example.com/common
+│   │   └── utils/
+│   │       └── crypto.go        # 包名是 package utils (公共加密工具)
+│   │
+│   ├── user_service/            # 微服务 A：用户服务
+│   │   ├── go.mod               # module 名为 example.com/usersvc
+│   │   ├── main.go              # package main 👈 这里是用户服务的启动入口
+│   │   └── handler/
+│   │       └── user.go          # package handler (普通的业务包)
+│   │
+│   └── order_service/           # 微服务 B：订单服务
+│       ├── go.mod               # module 名为 example.com/ordersvc
+│       ├── main.go              # package main 👈 这里是订单服务的启动入口
+│       └── handler/
+│           └── order.go         # package handler (普通的业务包)
 # 分层结构
 project/
 ├── main.go  # 程序入口 路由注册
