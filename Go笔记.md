@@ -10,6 +10,88 @@
 %T    // 类型
 ```
 
+## interface
+
+- **多态**是“**行为**的通用”
+- **注意**！不只是结构体可以继承实现，任何自定义类型只要实现了接口中定义的内容，它就实现了该接口
+  - 除了结构体，基础类型、切片、map映射、甚至func函数，只要通过`type`关键字进行了重新定义，都可以实现接口
+
+### 作为接口限制行为
+
+```go
+// 虽然go语言中没有显示继承声明 但这是为了极致的解耦(开闭原则) 显式声明必须知道接口的存在
+// 如第三方库中有个结构体没有显式声明实现任何接口 在Java中就拿它毫无办法
+// 但go中只要引入该结构体 声明的方法正好符合接口 就可以将该结构体当作对应interface多态使用
+
+// interface多态示例
+type Payer interface { // 统一的行为标准
+    Pay(amount int) bool
+}
+type WeChatPay struct{}
+func (w *WeChatPay) Pay(amount int) { /* 微信支付逻辑 */ }
+type Alipay struct{}
+func (a *Alipay) Pay(amount int) { /* 支付宝支付逻辑 */ }
+func HandlePayment(p Payer, amount int) {
+    p.Pay(amount) // 只要实现了 Pay 方法的结构体 都能传进来
+}
+
+// 但隐式继承也有其不便 为了检查是否完全继承实现某个接口 可以用如下方法编译时检查
+// 用 _匿名变量 避免编译器因没使用该变量而报错
+// (*...)() 对传入的变量进行 强制类型转换
+// 使用 nil空指针 是因为它在内存里不占空间 不需要实际去 new 一个巨大的结构体
+var _ 某个interface = (*自定义结构体)(nil)
+```
+
+### 作为类型约束/类型集合
+
+```go
+// 1.18版后的go语言 interface不止作为方法的集合 还可以作为类型集合
+type Number interface {
+    int64 | float64
+}
+// 注意！只能用于泛型的类型约束 绝对不能用来声明普通的变量
+func Sum[T Number](n T) T {...}
+// 也视作类型集合 包含所有实现了内部方法的类型
+type ReadWriter interface {
+    Read()
+    Write()
+}
+
+// 不要写到一起！
+// 违背单一职责原则 interface {int64 | float64} 这样的写法就应该用于泛型 而不是接口实现
+// 类型约束就是类型约束 不要和接口实现混到一起用
+type SerializableNumber interface {
+    int64 | float64
+    Serialize() string
+}
+```
+
+## 泛型
+
+- **泛型**是“**数据类型**的通用”
+
+```go
+// comparable 不是具体类型 是interface类型约束 表示该类型的值必须支持 比较运算符
+func SumIntsOrFloats[K comparable, V int64 | float64](m map[K]V) V {
+	var sum V
+	for _, v := range m {
+		sum += v
+	}
+	return sum
+}
+ints := map[string]int64{
+  "first":  34,
+  "second": 12,
+}
+floats := map[string]float64{
+  "first":  35.98,
+  "second": 26.99,
+}
+fmt.Printf("泛型求和: %v 和 %v\n", SumIntsOrFloats[string, int64](ints), SumIntsOrFloats[string, float64](floats))
+// 也可以不传入类型参数 由编译器推断类型 但注意 对于不接收参数的泛型函数 就需要传入类型参数
+fmt.Printf("自动推断类型的泛型求和: %v 和 %v\n", SumIntsOrFloats(ints), SumIntsOrFloats(floats))
+```
+
 ## 准备
 
 ### 项目结构
@@ -225,6 +307,42 @@ func main() {
 }
 ```
 
+### 赋值
+
+```go
+// go语言中 方括号 [] 有特殊且固定的语法用途 因此不能用来给数组赋值
+// 定义类型：[]string声明切片/数组 map[string]int声明Map类型
+// 访问索引/键：arr[0]读取或修改数组元素 myMap["name"]访问字典里的键
+// 如果写成 []string["xxx"] Go编译器会认为是对一个名叫 []string 的类型进行“索引取值”操作 语法逻辑上冲突
+
+// 因此对于 复合类型（切片、数组、结构体、Map）初始化和值构造一律使用 类型名{元素...} 的格式
+// 字符串切片
+names := []string{"张三", "李四"} 
+// 整型数组
+primes := [3]int{2, 3, 5}
+
+// 键值对初始化 直接在花括号里填入 key: value
+userAge := map[string]int{"alice": 18, "bob": 20} 
+// 创建一个空的 map 
+emptyMap := map[string]string{}
+
+type User struct {
+    Name string
+    Age  int
+}
+// 结构体赋值依然是用 {}
+u := User{Name: "王五", Age: 30}
+
+// 创建map
+// make 函数形式
+messages := make(map[string]string)
+// 字面量形式
+messages := map[string]string{}
+// 虽然两种写法在底层完全等价 但 make 函数还支持第二个参数用来指定 Map 的初始容量 因此更常用
+// 因为Map底层是哈希表 随着数据增加 Map会自动扩容 每次扩容Go底层都需要重新申请更大的内存并把老数据搬过去 这非常消耗性能
+// 用make可以预估Map里面会装多少数据 提前分配空间 后续超出依然会自动扩容
+```
+
 ## http服务
 
 ```go
@@ -303,7 +421,10 @@ func GinRegisterAndLogin() {
 		password := ctx.PostForm("password")
 		// 校验
 		if username == "admin" && password == "123" {
+      // JSON 返回格式{"id":"1","title":"Blue Train"} 更紧凑
 			ctx.JSON(http.StatusOK, gin.H{"message": "登录成功"})
+      // IndentedJSON 返回带数据结构的格式 适合开发调试时使用
+      ctx.IndentedJSON(...)
 		} else {
 			ctx.JSON(http.StatusUnauthorized, gin.H{"error": "密码错误"})
 		}
