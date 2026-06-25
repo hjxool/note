@@ -69,6 +69,7 @@ type SerializableNumber interface {
 ## 泛型
 
 - **泛型**是“**数据类型**的通用”
+- 任何泛型参数后都**必须有类型约束**
 
 ```go
 // comparable 不是具体类型 是interface类型约束 表示该类型的值必须支持 比较运算符
@@ -90,6 +91,25 @@ floats := map[string]float64{
 fmt.Printf("泛型求和: %v 和 %v\n", SumIntsOrFloats[string, int64](ints), SumIntsOrFloats[string, float64](floats))
 // 也可以不传入类型参数 由编译器推断类型 但注意 对于不接收参数的泛型函数 就需要传入类型参数
 fmt.Printf("自动推断类型的泛型求和: %v 和 %v\n", SumIntsOrFloats(ints), SumIntsOrFloats(floats))
+
+// 如果想不限制泛型约束 用any
+func Index[T any](s []T, x T) int {}
+
+// 泛型结构体
+type Node[T any] struct {
+	Val  T
+	Next *Node[T]
+}
+type List[T any] struct {
+	Head *Node[T]
+}
+// 注意：给泛型结构体绑定方法时 接收者必须写成 Xxx[T]
+func (l *List[T]) Push(val T) {}
+// 实例化
+// 必须显式地用方括号 [...] 指定具体的类型！与泛型函数不同 函数可以依靠编译器自动推导 结构体必须写明
+intList := List[int]{} 
+intList.Push(10)
+intList.Push(20)
 ```
 
 ## 准备
@@ -342,6 +362,19 @@ messages := map[string]string{}
 // 因为Map底层是哈希表 随着数据增加 Map会自动扩容 每次扩容Go底层都需要重新申请更大的内存并把老数据搬过去 这非常消耗性能
 // 用make可以预估Map里面会装多少数据 提前分配空间 后续超出依然会自动扩容
 ```
+
+### 是否可以使用指针
+
+- 值类型：需要通过指针才能修改原值，都则只进行拷贝，尤其对于结构体性能较差，所以一般用指针引用
+  - 基础数据类型
+  - 结构体
+  - 固定长度的数组
+- 自带指针的容器：底层设计已经实现了指针，不需要再显式声明指针引用，也不会进行拷贝
+  - interface接口
+  - 切片
+  - map
+  - channel
+  - func
 
 ## http服务
 
