@@ -376,6 +376,158 @@ messages := map[string]string{}
   - channel
   - func
 
+## channel通道与Goroutines协程
+
+- 注意！`chan T`与`[]T`、`map[K]V`、`*T`、`func(...)`一样是类型构造语法，不是泛型，字面量语法就是这样
+
+```go
+// 协程就一个关键字 go fn 即可
+func say(s string){...}
+go say("world")
+
+// 创建通道 只能用make
+ch := make(chan int)
+// 通道是协程间传递数据的队列与同步机制
+ch <- value   // 把 value 放进通道
+value := <-ch // 从通道取出一个值
+
+// make(chan int) 默认通道容量为0 这就是 无缓冲通道
+// 无缓冲通道没有存储空间 因此必须同步交接
+// 缓冲通道 容量 > 0
+// 队列满时 ch <- v 存操作阻塞 直到有人 <-ch
+// 队列为空时 <-ch 取操作阻塞 直到有人 ch <- v
+
+// 通道如何让 goroutine 协作？
+go sum(s[:len(s)/2], c) // 两个 goroutine 并行计算
+go sum(s[len(s)/2:], c) // 每个 goroutine 计算完后把结果发送到通道
+x, y := <-c, <-c // 主 goroutine 通过 <-c 等待两个结果
+
+// 关闭通道
+go func xxx(ch chan int){
+  close(ch)
+}(ch)
+// 接收方可以通过第二个返回值判断通道是否关闭
+v, ok := <-ch // ok == true 成功取到值(无论通道是否关闭) ok == false 没有值了且通道已关闭
+// for range 会持续接收直到通道关闭
+for i := range ch
+// 通道关闭不是资源释放 而是“发送结束”的信号 因此不需要经常关闭
+
+// 只读通道
+func consumer(ch <-chan int)
+// 只写通道
+func producer(ch chan<- int)
+```
+
+### 退出通道模式
+
+```go
+func fibonacci(c, quit chan int) {
+	x, y := 0, 1
+	for {
+    // select 会阻塞 直到某个 case 可以执行
+		select {
+      // 如果多个 case 同时就绪 会随机选择一个执行
+      case c <- x: // x值填入通道
+        x, y = y, x+y // 更新x y值
+      case <-quit: // 当前示例中只有go func()取够10次后才会触发
+        fmt.Println("quit")
+        return
+      default: // 如果所有通道操作都阻塞 会立即执行 default
+      
+		}
+	}
+}
+
+func main() {
+	c := make(chan int) // 用于正常工作的通道
+	quit := make(chan int) // 作为退出信号
+  // 协程执行一个匿名函数
+	go func() {
+		for i := 0; i < 10; i++ {
+			fmt.Println(<-c) // 无缓冲通道 阻塞等待有值填入
+		}
+		quit <- 0 // 全部取完以后 quit通道填入一个值作为信号
+	}()
+	fibonacci(c, quit)
+}
+```
+
+### 并发锁
+
+```go
+// sync.Mutex 互斥锁
+type SafeCounter struct {
+	mu sync.Mutex // 必须要用sync.Mutex控制
+	v  map[string]int
+}
+
+func (c *SafeCounter) Inc(key string) {
+  // 使用 Lock/Unlock 包围临界区
+  // Lock 和 Unlock 之间的代码只能被一个 goroutine 执行
+	c.mu.Lock()
+	c.v[key]++
+	c.mu.Unlock()
+}
+
+func (c *SafeCounter) Value(key string) int {
+	c.mu.Lock()
+	defer c.mu.Unlock() // 使用 defer 确保 Unlock 一定执行 否则锁无法被释放
+	return c.v[key]
+}
+
+func main() {
+	c := SafeCounter{v: make(map[string]int)}
+	for i := 0; i < 1000; i++ {
+		go c.Inc("somekey")
+	}
+
+	time.Sleep(time.Second)
+	fmt.Println(c.Value("somekey"))
+}
+
+// sync.RWMutex 读写锁
+type SafeMap struct {
+    mu  sync.RWMutex
+    m   map[string]int
+}
+func (s *SafeMap) Get(key string) int {
+    s.mu.RLock() // 读锁：允许多个读者并发
+    defer s.mu.RUnlock()
+    return s.m[key]
+}
+func (s *SafeMap) Set(key string, value int) {
+    s.mu.Lock() // 写锁：必须独占
+    defer s.mu.Unlock()
+    s.m[key] = value
+}
+func main() {
+    s := &SafeMap{m: make(map[string]int)}
+    s.Set("count", 0)
+
+    // 启动 5 个读者 goroutine
+    for i := 0; i < 5; i++ {
+        go func(id int) {
+            for {
+                v := s.Get("count")
+                fmt.Printf("Reader %d read: %d\n", id, v)
+                time.Sleep(100 * time.Millisecond)
+            }
+        }(i)
+    }
+
+    // 启动 1 个写者 goroutine
+    go func() {
+        for i := 1; i <= 5; i++ {
+            time.Sleep(500 * time.Millisecond)
+            fmt.Println("Writer updating...")
+            s.Set("count", i)
+        }
+    }()
+
+    time.Sleep(4 * time.Second)
+}
+```
+
 ## http服务
 
 ```go
