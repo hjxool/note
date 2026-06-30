@@ -353,6 +353,23 @@ type User struct {
 // 结构体赋值依然是用 {}
 u := User{Name: "王五", Age: 30}
 
+// 结构体切片
+[]User{
+    User{Name: "王五", Age: 30},
+}
+// 也可以省略类型 因为会自动类型推断
+[]User{
+    {Name: "王五", Age: 30},
+}
+// 结构体引用切片
+[]*User{
+    &User{...}
+}
+// 同样可以省略类型声明
+[]*User{
+    {...}
+}
+
 // 创建map
 // make 函数形式
 messages := make(map[string]string)
