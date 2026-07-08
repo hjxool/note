@@ -40,6 +40,33 @@ func HandlePayment(p Payer, amount int) {
 // (*...)() 对传入的变量进行 强制类型转换
 // 使用 nil空指针 是因为它在内存里不占空间 不需要实际去 new 一个巨大的结构体
 var _ 某个interface = (*自定义结构体)(nil)
+
+// 匿名嵌套
+type A struct {
+  Key1 any,
+  // 没有显式字段名的结构体 内部的字段和方法会被平铺到外层
+  // 如A实例就可以直接a.Pay取值和调用 而不用a.WeChatPay.Pay
+  // 并且自动拥有一个名为 WeChatPay 的字段
+  WeChatPay,
+}
+// ⚠️这里虽然内部字段被提升了 但是在底层的物理结构上依然属于WeChatPay 这个子结构体
+// 因此初始化时 必须把它当成一个名为 WeChatPay 的隐式字段来赋值
+a := A{
+  Key1: ...,
+  WeChatPay: WeChatPay{...}
+}
+// ⚠️同时因为匿名嵌入结构体内的方法也提升到外层 因此也就继承了interface所需的方法
+// 因此满足 Payer接口
+HandlePayment(a, ...)
+// ⚠️如果是具名子结构体是不具备这一特性的
+type B struct {
+  WeChatPay WeChatPay
+}
+b := B{
+  WeChatPay: WeChatPay{...}
+}
+HandlePayment(b, ...) // ❌ 与Payer interface类型不符
+b.Pay() // ❌ 必须用b.WeChatPay.Pay()
 ```
 
 ### 作为类型约束/类型集合
@@ -392,6 +419,18 @@ messages := map[string]string{}
   - map
   - channel
   - func
+
+### ... 的用法
+
+```go
+// 形参使用
+func fn(args ...int){
+  // 作用类似js的rest参数 args会变成[]int类型
+  for _,num := range args{}
+ 	// 实参使用 作用类似js的扩展运算符 将[]int展开成单个int
+  fn2(args...)
+}
+```
 
 ## channel通道与Goroutines协程
 
