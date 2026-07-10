@@ -686,7 +686,8 @@ print("abc".reversed); // "cba"
   - 级联运算符`..`
   
     - 书写形式类似JS中`Promise`
-  
+    - ⚠️比`.`优先级低
+    
     ```dart
     myObject.myMethod(); // 返回 myMethod 的返回值
     myObject..myMethod(); // 返回 myObject 对象的引用
@@ -709,7 +710,11 @@ print("abc".reversed); // "cba"
     // 也可以用于赋值语句
     Person p = Person('张三', 20)
      ..name = '李四'
-     ..age = 40;
+     ..age = 40; // 最终返回的是Person实例
+    
+    // 因为级联运算符优先级比 . 低
+    // 因此 a..b.c() 把b.c()看作整体 a调用b身上的c后返回a
+    // 不能写成 a..b..c() 因为c不是a的方法而是b的
     ```
 
 ## 函数
