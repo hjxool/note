@@ -638,8 +638,36 @@ class _CusListState extends ConsumerState<CusList> {
     - 原则：既然要用 `await`，后面必须是一个真正的 `Future`，所以后缀必须是 `.future`
 - Provider 的类型决定了你拿到什么
   - `ref.watch(Provider)`返回的就是值
-    - `ref.read(Provider.notifier)`返回的就是控制器，通过`.state` 可读写
+    - `ref.read(Provider.notifier)`返回的就是控制器，通过`.state` **可读写**
   - `ref.watch(FutureProvider)`返回的就是`AsyncValue`要用 `.when` 或 `.value` 来处理
     - `ref.read(FutureProvider.future)`返回的就是`Future<T>`
   - `ref.watch(StreamProvider)`返回的就是`AsyncValue<T>`
     - `ref.read(StreamProvider.stream)`返回的就是`Stream<T>`
+
+### `autoDispose`优化
+
+- 作用：当 provider 没有被任何 widget 监听时，它会自动释放资源
+
+```go
+class AuthNotifier extends AsyncNotifier<String?> {
+  @override
+  FutureOr<String?> build() async {
+    return null;
+  }
+  Future<void> login(String username, String password) async {
+    state = const AsyncValue.loading();
+    state = await AsyncValue.guard(() async {
+      final token = await UserApi.login(username: username, password: password);
+      updateToken(token); 
+      return token;
+    });
+  }
+  void logout() {
+    updateToken('');
+    state = const AsyncValue.data(null);
+  }
+}
+final authProvider = AsyncNotifierProvider.autoDispose<AuthNotifier, String?>(
+  AuthNotifier.new,
+);
+```
