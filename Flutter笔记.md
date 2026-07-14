@@ -636,3 +636,10 @@ class _CusListState extends ConsumerState<CusList> {
   - 在进入新页面前预加载、等接口返回
     - 标准姿势：`await ref.read(myProvider.future);`
     - 原则：既然要用 `await`，后面必须是一个真正的 `Future`，所以后缀必须是 `.future`
+- Provider 的类型决定了你拿到什么
+  - `ref.watch(Provider)`返回的就是值
+    - `ref.read(Provider.notifier)`返回的就是控制器，通过`.state` 可读写
+  - `ref.watch(FutureProvider)`返回的就是`AsyncValue`要用 `.when` 或 `.value` 来处理
+    - `ref.read(FutureProvider.future)`返回的就是`Future<T>`
+  - `ref.watch(StreamProvider)`返回的就是`AsyncValue<T>`
+    - `ref.read(StreamProvider.stream)`返回的就是`Stream<T>`
