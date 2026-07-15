@@ -671,3 +671,167 @@ final authProvider = AsyncNotifierProvider.autoDispose<AuthNotifier, String?>(
   AuthNotifier.new,
 );
 ```
+
+### 局部`ProviderScope`
+
+- `Provider`
+
+  - **定位**：**只读** 数据、计算属性、依赖注入的媒介
+
+  - **存储**：简单的值
+
+  - **修改**：**无法直接修改** 其内部的值。要想变，只能依赖其他 Provider 的变化（通过 `ref.watch`）
+
+    ```go
+    // === 1. 普通 Provider：它自己不能改，只能算 ===
+    final totalPriceProvider = Provider<double>((ref) {
+      final cart = ref.watch(shoppingCartProvider); // 监听购物车
+      return cart.fold(0, (sum, item) => sum + item.price); // 仅仅做计算，返回只读结果
+    });
+    ```
+
+  - **使用场景**：缓存计算结果（如：从购物车列表计算出总价）、获取全局配置、配合`ProviderScope`做局部注入
+
+- `xxxNotifierProvider`
+
+  - **定位**：**可变** 状态管理，封装业务逻辑的中心
+
+  - **存储**：`Notifier`状态类、内部管理的`state`
+
+  - **修改**：`ref.read(provider.notifier).method()`触发方法来修改状态
+
+    ```go
+    // === 2. NotifierProvider：它是可以被调用的业务控制台 ===
+    final shoppingCartProvider = NotifierProvider<ShoppingCartNotifier, List<Product>>(ShoppingCartNotifier.new);
+    class ShoppingCartNotifier extends Notifier<List<Product>> {
+      @override
+      List<Product> build() => []; // 初始状态
+      
+      void addProduct(Product p) => state = [...state, p]; // 外部可以调用这个方法修改状态
+    }
+    ```
+
+  - **使用场景**：用户登录状态、购物车列表的增删改查、分页加载的数据列表
+
+```go
+// 除了全局应用 也可以在某个局部区域用 ProviderScope 进行作用域隔离
+// 场景：有个通用组件内部管理传入的单个组件动画 且因为可以关联多个该通用组件进行联动 因此需要一个外部notifier管理多个组件状态 但因为是通用组件 因此不能全局声明provider监听 所以我想的办法是在用的地方临时创建provider传入组件进行监听 但由此导致app刚启动时动画列表卡顿 为了解决这个问题局部应用ProviderScope
+// ProviderScope 可以应用全局声明的provider和notifier 在多个局部ProviderScope内即使用同一个provider和notifier也不会互相干扰 哪怕是 父子层级 只要分别用ProviderScope包裹 就不会互相干扰
+
+// 示例：局部 ProviderScope 内取同一个provider 简化组件直接传值
+// 假如存在这样一个商品模型
+class Product {
+  final String id;
+  final String name;
+  final bool isFavorite;
+ 	... 
+}
+// 经典编译时安全占位符 配合局部 ProviderScope 使用避免了组件层层传值 且比xxxNotifierProvider这类状态管理类更节约性能
+// 当没有 ProviderScope 重写它的值 且内部取用这个值时就会报错
+final currentProductProvider = Provider<Product>((ref) {
+  throw UnimplementedError(); 
+});
+// 在这里应用 ProviderScope
+class ProductListView extends ConsumerWidget {
+  final List<Product> products = [
+    Product(id: '1', name: 'iPhone 18 Pro'),
+    Product(id: '2', name: 'MacBook Air M6'),
+    Product(id: '3', name: 'iPad Pro OLED'),
+  ];
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return ListView.builder(
+      itemCount: products.length,
+      itemBuilder: (context, index) {
+        // 遍历生成子组件 取出每一项的值
+        final product = products[index];
+        // 关键点：在这里使用局部的 ProviderScope
+        return ProviderScope(
+          overrides: [ // overrides 表示把全局声明的 provider 换成你指定的“局部版本”
+            // overrideWithValue：最简单常用 直接给 provider 最终值
+            // overrideWith：换掉 provider 的逻辑，而不是值
+            // overrideWithProvider：用另一个 provider 的“实例”替换当前 provider
+            currentProductProvider.overrideWithValue(product), // 重写为具体product
+          ],
+          // 子组件就可以直接使用这个 provider 了
+          child: const ProductItem(), 
+        );
+      },
+    );
+  }
+}
+// 子组件直接消费
+class ProductItem extends ConsumerWidget {
+  // 注意：这里不需要 final Product product 构造函数传参了！
+  const ProductItem({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    // 直接 watch。由于上层 ProviderScope 已经重写了它，这里不会抛出 UnimplementedError
+    final product = ref.watch(currentProductProvider);
+
+    return ListTile(
+      title: Text(product.name),
+      subtitle: Text('ID: ${product.id}'),
+      trailing: Icon(
+        product.isFavorite ? Icons.favorite : Icons.favorite_border,
+        color: product.isFavorite ? Colors.red : null,
+      ),
+      onTap: () {
+        print('点击了商品: ${product.name}');
+      },
+    );
+  }
+}
+
+// 示例：父子层级应用 ProviderScope
+// 假如全局声明的同一个 provider
+final counterProvider = StateProvider<int>((ref) => 0);
+class NestedScopeExample extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        // ==================== 父层级 ProviderScope ====================
+        ProviderScope(
+          // ⚠️这里就没有用 overrides 了 因为对于状态管理类不需要外部注入值
+          child: Consumer(
+            builder: (context, ref, _) {
+              final parentCount = ref.watch(counterProvider); // 父子监听同一个provider
+              return Column(
+                children: [
+                  Text('父层级数字: $parentCount'), // 永远是 0
+                  // ------------------ 子孙层级 ProviderScope ------------------
+                  ProviderScope(
+                    child: Consumer(
+                      builder: (context, ref, _) {
+                        final childCount = ref.watch(counterProvider);
+                        return Column(
+                          children: [
+                            Text('子层级数字: $childCount'),
+                            ElevatedButton(
+                              onPressed: () {
+                                // 子层级去修改状态
+                                ref.read(counterProvider.notifier).state++;
+                              },
+                              child: const Text('点我加 1'),
+                            ),
+                          ],
+                        );
+                      },
+                    ),
+                  ),
+                  // ---------------------------------------------------------
+                  
+                ],
+              );
+            },
+          ),
+        ),
+        // ==============================================================
+      ],
+    );
+  }
+}
+```
