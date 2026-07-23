@@ -1021,3 +1021,46 @@ CREATE TABLE user_roles (
     FOREIGN KEY (role_id) REFERENCES roles(id)
 );
 ```
+
+## gorm
+
+- **默认命名约定**
+
+  - `User` struct -> `users` 表  
+  - `UserProfile` struct -> `user_profiles` 表
+
+- 实现 `TableName()` 方法：如果想指定特定表名
+
+  ```go
+  type User struct {
+      ID   uint
+      Name string
+  }
+  // 明确指定 User 对应的表名为 sys_user
+  func (User) TableName() string {
+      return "sys_user"
+  }
+  ```
+
+- 使用 `db.Table()` 显式指定（适合单次动态查询）：表名是动态生成的情况
+
+  ```go
+  var user User
+  // 查询指定的 admin_users 表，而不是默认的 users 表
+  db.Table("admin_users").Where("id = ?", 1).First(&user)
+  ```
+
+- 全局修改 `NamingStrategy`（配置全局规则）
+
+  ```go
+  import (
+      "gorm.io/gorm"
+      "gorm.io/gorm/schema"
+  )
+  db, err := gorm.Open(sqlite.Open("test.db"), &gorm.Config{
+      NamingStrategy: schema.NamingStrategy{
+          TablePrefix:   "t_",  // 所有表名前缀，如：t_users
+          SingularTable: true,  // 禁用复数表名，单数形式（User -> t_user）
+      },
+  })
+  ```
