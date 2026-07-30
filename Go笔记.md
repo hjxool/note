@@ -156,17 +156,20 @@ myproject/
 │   │   └── utils/
 │   │       └── crypto.go        # 包名是 package utils (公共加密工具)
 │   │
-│   ├── user_service/            # 微服务 A：用户服务
-│   │   ├── go.mod               # module 名为 example.com/usersvc
-│   │   ├── main.go              # package main 👈 这里是用户服务的启动入口
-│   │   └── handler/
-│   │       └── user.go          # package handler (普通的业务包)
-│   │
-│   └── order_service/           # 微服务 B：订单服务
-│       ├── go.mod               # module 名为 example.com/ordersvc
-│       ├── main.go              # package main 👈 这里是订单服务的启动入口
-│       └── handler/
-│           └── order.go         # package handler (普通的业务包)
+    user_service/
+        ├── main.go               // 启动与路由组装
+        ├── auth/                 // 1. 认证模块（登录、注册、Token签发、密码重置）
+        │   ├── handler.go
+        │   ├── model.go
+        │   └── service.go
+        ├── profile/              // 2. 用户资料/信息模块（查看个人资料、修改头像、修改密码）
+        │   ├── handler.go
+        │   └── model.go
+        ├── common/               // 3. 通用基础设施（DB连接、统一响应格式）
+        │   ├── db.go
+        │   └── response.go
+        ├── go.mod
+        └── go.sum
 # 分层结构
 project/
 ├── main.go  # 程序入口 路由注册
