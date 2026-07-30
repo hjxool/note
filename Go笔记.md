@@ -170,15 +170,30 @@ myproject/
         │   └── response.go
         ├── go.mod
         └── go.sum
-# 分层结构
+# 大型项目结构
 project/
-├── main.go  # 程序入口 路由注册
-├── config/db.go  # 配置相关
-├── models/user.go  # 只定义数据库表映射的结构体
-├── repository/user_repo.go  # 封装数据库操作
-├── services/user_service.go  # 处理业务逻辑
-├── handlers/user_handler.go  # 前/后置拦截器 字段校验 
-├── utils/http_client.go  # 通用方法
+    user_service/
+    ├── cmd/
+    │   └── main.go                 // 入口文件：仅负责配置加载、依赖初始化、服务启动与优雅关机
+    ├── config/                     // 配置管理（读取 yaml/env）
+    ├── global/                     // 全局变量/句柄定义（如 *gorm.DB, *zap.Logger）
+    ├── model/                      // 数据模型层（Entity 数据库映射 & DTO 请求/响应结构体）
+    │   ├── user.go                 // User 表实体
+    │   └── dto.go                  // LoginRequest, UserProfileResp 等
+    ├── repository/                 // 持久化层 (DAO)：只负责与 DB / Redis 打交道（CRUD）
+    │   └── user_repo.go
+    ├── service/                    // 业务逻辑层：核心业务逻辑（密码比对、Token签发、校验等）
+    │   └── user_service.go
+    ├── handler/                    // 传输层 / 控制层 (Controller)：解析 HTTP 请求参数、调用 Service、返回 Response
+    │   ├── user_handler.go
+    │   └── response.go             // 统一响应封装 (SuccessResponse / ErrorResponse)
+    ├── middleware/                 // Gin 中间件
+    │   └── auth.go                 // AuthMiddleware JWT 认证中间件
+    ├── router/                     // 路由层：路由分组与注册
+    │   └── router.go
+    └── pkg/                        // 通用工具包（可独立复用的工具，如 jwt, utils 等）
+        └── jwt/
+            └── jwt.go
 ```
 
 #### 分层结构示例
